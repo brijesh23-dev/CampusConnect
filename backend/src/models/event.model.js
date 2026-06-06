@@ -11,7 +11,9 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
+    image: {
+      type: String,
+    },
     category: {
       type: String,
       required: true,
@@ -37,8 +39,14 @@ const eventSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    registeredStudents: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Event", eventSchema);

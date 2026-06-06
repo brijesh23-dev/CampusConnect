@@ -11,7 +11,6 @@ const generateToken = (userId, role) => {
 const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    console.log(req.body);
     const existingUser = await UserModel.findOne({ email });
     
     if (existingUser) {
@@ -51,11 +50,11 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  console.log(req.body);
   try {
     const { email, password } = req.body;
 
     const user = await UserModel.findOne({ email });
+    const token = generateToken(user._id, user.role);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
@@ -66,8 +65,14 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-
-    res.json({
+    
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+    res.status(201).json({
       message: "Login successful",
       user: {
         id: user._id,
@@ -76,7 +81,7 @@ const login = async (req, res) => {
         role: user.role,
         interests: user.interests,
       },
-      token: generateToken(user._id, user.role),
+      token ,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -89,8 +94,18 @@ const getMe = async (req, res) => {
   });
 };
 
+const logout = async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true, 
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  res.json({ message: "Logout successful" });
+};
+
 module.exports = {
   register,
   login,
   getMe,
+  logout,
 };

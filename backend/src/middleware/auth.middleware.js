@@ -4,7 +4,6 @@ const config = require("../config/config");
 
 const protect = async (req, res, next) => {
   try {
-  
     const token = req.headers.authorization?.startsWith("Bearer")
       ? req.headers.authorization.split(" ")[1]
       : req.cookies?.token;
@@ -15,7 +14,7 @@ const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, config.JWT_SECRET);
 
-    req.user = await User.findById(decoded.id).select("-password");
+    req.user = await User.findById(decoded.id).select("-password");  //added user to req for future use in controllers
 
     if (!req.user) {
       return res.status(401).json({ message: "User not found" });
@@ -26,7 +25,7 @@ const protect = async (req, res, next) => {
   }
 };
 
-const authorizeRoles = (...roles) => {
+const authorizeRoles = (...roles) => {    //spread operator to accept multiple roles and return a middleware function that checks if the user's role is in the allowed roles
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({

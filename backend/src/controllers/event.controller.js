@@ -1,10 +1,15 @@
-const eventModel = require("../models/event.model");
+
+const EventModel = require("../models/event.model");
 const notificationModel = require("../models/notification.model");
-const userModel = require("../models/user.model");
+const UserModel = require("../models/user.model");
+
 const createEvent = async (req, res) => {
+  console.log("body:",req.body);
+  console.log("file:",req.file);
+  console.log("user:",req.user);
   try {
     let { title, description, category, date, time, venue } = req.body;
-    let newEvent = new eventModel({
+    let newEvent = new EventModel({
       title,
       description,
       category,
@@ -12,33 +17,35 @@ const createEvent = async (req, res) => {
       time,
       venue,
       club: req.user._id,
+      image: req.file ? req.file.path : null || req.body.image ,
     });
-        const interestedStudents = await UserModel.find({
-      role: "student",
-      interests: category,
-    });
-        const notifications = interestedStudents.map(
-      (student) => ({
-        user: student._id,
-        event: event._id,
-        message: `New ${category} event: ${title}`,
-      })
-    );
-      if (notifications.length > 0) {
-      await Notification.insertMany(notifications);
-    }
+    //     const interestedStudents = await UserModel.find({
+    //   role: "student",
+    //   interests: category,
+    // });
+    //     const notifications = interestedStudents.map(
+    //   (student) => ({
+    //     user: student._id,
+    //     event: event._id,
+    //     message: `New ${category} event: ${title}`,
+    //   })
+    // );
+    //   if (notifications.length > 0) {
+    //   await Notification.insertMany(notifications);
+    // }
     await newEvent.save();
     res.status(201).json({
       message: "Event created successfully",
       event: newEvent,
     });
   } catch (error) {
+    console.log("error:",error.stack);
     res.status(500).json({ message: error.message });
   }
 };
 
 const getAllEvents = async (req, res) => {
-  let allevent = await eventModel.find().populate("club", "name email");
+  let allevent = await EventModel.find().populate("club", "name email");
   console.log(allevent);
   res.status(200).json({
     message: "All events fetched successfully",
@@ -48,7 +55,7 @@ const getAllEvents = async (req, res) => {
 
 const getsingleEvent = async (req, res) => {
   let { id } = req.params;
-  let event = await eventModel.findById(id).populate("club", "name email");
+  let event = await EventModel.findById(id).populate("club", "name email");
   if (!event) {
     return res.status(404).json({
       message: "Event not found",
@@ -60,9 +67,9 @@ const getsingleEvent = async (req, res) => {
   });
 };
 const getMyevents = async (req, res) => {
+  //console.log(req.user);
   try {
-    const events = await Event.find({ club: req.user._id }).sort({ date: 1 });
-
+    const events = await EventModel.find({ club: req.user._id }).sort({ date: 1 });
     res.json({ events });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -70,7 +77,7 @@ const getMyevents = async (req, res) => {
 };
 const updateEvent = async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id);
+    const event = await EventModel.findById(req.params.id);
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -80,7 +87,7 @@ const updateEvent = async (req, res) => {
       return res.status(403).json({ message: "Not allowed" });
     }
 
-    const updatedEvent = await Event.findByIdAndUpdate(
+    const updatedEvent = await EventModel.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true },
@@ -97,7 +104,7 @@ const updateEvent = async (req, res) => {
 
 const deleteEvent = async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id);
+    const event = await EventModel.findById(req.params.id);
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -107,7 +114,7 @@ const deleteEvent = async (req, res) => {
       return res.status(403).json({ message: "Not allowed" });
     }
 
-    await eventModel.findByIdAndDelete(req.params.id);
+    await EventModel.findByIdAndDelete(req.params.id);
 
     res.json({ message: "Event deleted successfully" });
   } catch (error) {
