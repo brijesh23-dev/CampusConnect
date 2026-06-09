@@ -14,5 +14,17 @@ html,body{
 }
 
 .nav-btn{
-    @apply px-5 py-[6px] bg-blue-100 text-blue-600 rounded-md font-Poppins tracking-tight font-semibold transition-all duration-200 hover:bg-blue-600 hover:text-white;
+    @apply px-5 py-[6px] bg-blue-100 text-blue-600 rounded-md font-Poppins tracking-tight font-semibold transition-all duration-200 hover:bg-blue-600 hover:text-white  max-lg:hidden;
+}
+
+.form-input{
+    @apply  w-full border p-3 rounded-lg mb-4 outline-none focus-within:ring-2 focus-within:ring-blue-600;
+}
+
+.ham-icon{
+    @apply text-3xl  text-blue-500 ;
+}
+
+.sidebar-link{
+    @apply flex items-center text-black bg-neutral-100 px-3 py-2  font-medium hover:bg-neutral-300;
 }

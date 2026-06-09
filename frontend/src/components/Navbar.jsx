@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import HubIcon from "@mui/icons-material/Hub";
 import { logoutUser } from "../redux/authSlice";
 
+
 function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -15,49 +16,78 @@ function Navbar() {
   };
 
   return (
-    <nav className="flex items-center justify-between px-8 py-3 shadow-md bg-white sticky top-0 z-20 ">
+    <nav className="flex items-center justify-between px-8 py-3 shadow-md bg-white sticky top-0 z-10 ">
       <div className="flex items-center  text-blue-600">
         <Link to="/" className="text-2xl font-bold">
-         <span className="font-bold mr-3 text-shadow-lg font-Inter"><HubIcon ></HubIcon> CampusConnect</span> 
+          <span className="font-bold mr-3 text-shadow-lg font-Inter">
+            <HubIcon></HubIcon> <span className="">CampusConnect</span>
+          </span>
         </Link>
       </div>
 
       <div className="flex gap-5 items-center">
-        <Link to="/events" className="nav-btn">events</Link>
+        {
+          user&& <>
+          <Link to="/events" className="nav-btn">
+          events
+        </Link>
+          </>
+        }
 
         {!user && (
           <>
-            <Link to="/login" className="nav-btn">Login</Link>
-            <Link to="/register" className="nav-btn">Register</Link>
+            <Link to="/login" className="nav-btn  ">
+              Login
+            </Link>
+            <Link to="/register" className="nav-btn">
+              Register
+            </Link>
           </>
         )}
 
         {user?.role === "student" && (
           <>
-            <Link to="/student/dashboard" className="nav-btn">Dashboard</Link>
+            <Link to="/student/dashboard" className="nav-btn">
+              Dashboard
+            </Link>
 
-            <Link to="/notifications" className="nav-btn">Notifications</Link>
+            <Link to="/notifications" className="nav-btn">
+              Notifications
+            </Link>
           </>
         )}
 
         {user?.role === "club" && (
           <>
-            <Link to="/club/dashboard" className="px-5 py-2 bg-blue-600 rounded-md font-bold text-white">Dashboard</Link>
+            <Link
+              to="/club/dashboard"
+              className="nav-btn"
+            >
+              Dashboard
+            </Link>
 
-            <Link to="/create-event" className="px-5 py-2 bg-blue-600 rounded-md font-bold text-white">Create Event</Link>
+            {/* <Link
+              to="/create-event"
+              className="nav-btn"
+            >
+              Create Event
+            </Link> */}
 
-            <Link to="/my-events" className="px-5 py-2 bg-blue-600 rounded-md font-bold text-white">My Events</Link>
+            {/* <Link
+              to="/my-events"
+              className="nav-btn"
+            >
+              My Events
+            </Link> */}
           </>
         )}
 
         {user && (
-          <button
-            onClick={handleLogout}
-            className="nav-btn"
-          >
+          <button onClick={handleLogout} className="nav-btn">
             Logout
           </button>
         )}
+
       </div>
     </nav>
   );

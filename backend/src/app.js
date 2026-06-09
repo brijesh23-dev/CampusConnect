@@ -25,6 +25,7 @@ app.use("/api/notifications", notificationRoutes);
 app.get("/", (req, res) => {
   res.send("College Event API running");
 });
+
 app.use((err,req,res,next)=>{
   const statusCode = err.status || 500;
   res.status(statusCode).json({

@@ -13,6 +13,7 @@ function Register() {
   const navigate = useNavigate();
   const {error,loading,user}  = useSelector((state)=>state.auth);
 console.log("user",user)
+
   const onSubmit = async (data) => {
     const res = await dispatch(registerUser(data)).unwrap();
     console.log('response',res)
@@ -45,7 +46,7 @@ console.log("user",user)
         noValidate
         className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
-        <h1 className="text-3xl font-bold mb-6 text-center">
+        <h1 className="text-3xl font-bold mb-6 text-center font-Inter text-blue-600">
           Create Account
         </h1>
 
@@ -53,7 +54,7 @@ console.log("user",user)
 
           placeholder="Full Name"
           {...register("name")}
-          className="w-full border p-3 rounded-lg mb-4"
+          className="form-input "
         />
         {errors.name && <p className="text-red-500 text-sm mb-4">{errors.name.message}</p>}
 
@@ -61,7 +62,7 @@ console.log("user",user)
           type="email"
           placeholder="Email"
           {...register("email")}
-          className="w-full border p-3 rounded-lg mb-4"
+          className=" form-input  selection:none "
         />
         {errors.email && <p className="text-red-500 text-sm mb-4">{errors.email.message}</p>}
 
@@ -69,19 +70,20 @@ console.log("user",user)
           type="password"
           placeholder="Password"
           {...register("password")}
-          className="w-full border p-3 rounded-lg mb-4"
+          className="form-input"
         />
         {errors.password && <p className="text-red-500 text-sm mb-4">{errors.password.message}</p>}
 
         <select
           {...register("role")}
-          className="w-full border p-3 rounded-lg mb-4"
+          className="form-input "
         >
-          <option value="student">Student</option>
+          <option value="student" className=" appearance-none">Student</option>
           <option value="club">Club</option>
           <option value="admin">admin</option>
         </select>
         {errors.role && <p className="text-red-500 text-sm mb-4">{errors.role.message}</p>}
+        
 
         <button
           type="submit"

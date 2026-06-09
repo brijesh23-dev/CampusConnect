@@ -8,41 +8,53 @@ export const fetchEvents = createAsyncThunk("events/fetchEvents", async () => {
 
 export const createEvent = createAsyncThunk(
   "events/createEvent",
-  async (formData,thunkApi) => {
-   console.log([...formData.entries()]);
-    try{
-    const res = await API.post("/events/create", formData);
-    return res.data.events;
-    }catch(error){
-      console.log("error:",error.response?.data );
+  async (formData, thunkApi) => {
+    console.log([...formData.entries()]);
+    try {
+      const res = await API.post("/events/create", formData);
+      return res.data.events;
+    } catch (error) {
+      console.log("error:", error.response?.data);
       return thunkApi.rejectWithValue(
-        error.response?.data ||error.response || error.response.data.message || "Failed to create event");
+        error.response?.data ||
+          error.response ||
+          error.response.data.message ||
+          "Failed to create event",
+      );
     }
   },
 );
 export const fetchMyEvents = createAsyncThunk(
   "events/fetchMyEvents",
   async (thunkAPI) => {
-    try{
+    try {
       const res = await API.get("/events/my-events");
       console.log(res.data.events);
-    return res.data.events;
-    }catch(error){
+      return res.data.events;
+    } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data ||error.response || error.response.data.message || "Failed to fetch events");
+        error.response?.data ||
+          error.response ||
+          error.response.data.message ||
+          "Failed to fetch events",
+      );
     }
   },
 );
 
 export const deleteEvent = createAsyncThunk(
   "events/deleteEvent",
-  async (id,thunkAPI) => {
-    try{
+  async (id, thunkAPI) => {
+    try {
       await API.delete(`/events/delete/${id}`);
-    return id;
-    }catch(error){
+      return id;
+    } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data ||error.response || error.response.data.message || "Failed to delete event");
+        error.response?.data ||
+          error.response ||
+          error.response.data.message ||
+          "Failed to delete event",
+      );
     }
   },
 );
@@ -50,21 +62,44 @@ export const deleteEvent = createAsyncThunk(
 export const fetchSingleEvent = createAsyncThunk(
   "events/fetchSingleEvent",
   async (id) => {
+    console.log(id)
     const res = await API.get(`/events/${id}`);
+    console.log(res)
     return res.data.event;
   },
 );
 
 export const updateEvent = createAsyncThunk(
   "events/updateEvent",
-  async ({ id, data,thunkAPI }) => {
-    try{
+  async ({ id, data, thunkAPI }) => {
+    try {
       const res = await API.put(`/events/update/${id}`, data);
-    return res.data.event;
-    }catch(error){
+      return res.data.event;
+    } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data || error.response || error.response.data.message || "faild to update event"
-      )
+        error.response?.data ||
+          error.response ||
+          error.response.data.message ||
+          "faild to update event",
+      );
+    }
+  },
+);
+
+
+export const fetchParticipants = createAsyncThunk(
+  "events/fetchParticipants",
+  async (id, thunkAPI) => {
+    try {
+      const res = await API.get(`/events/${id}/participants`);
+      return res.data.participants;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data ||
+          error.response ||
+          error.response.data.message ||
+          "Failed to fetch participants",
+      );
     }
   },
 );
@@ -74,8 +109,10 @@ const eventSlice = createSlice({
 
   initialState: {
     events: [],
-    loading: false,
+    eventLoading: false,
     singleEvent: null,
+    participants: [],
+    error: null,
   },
 
   reducers: {},
@@ -111,9 +148,9 @@ const eventSlice = createSlice({
         state.loading = false;
         state.events = state.events.filter(
           (event) => event._id !== action.payload,
-        )
+        );
       })
-      .addCase(deleteEvent.rejected,(state,action)=>{
+      .addCase(deleteEvent.rejected, (state, action) => {
         state.error = action.payload;
       })
       .addCase(fetchSingleEvent.fulfilled, (state, action) => {
@@ -125,8 +162,17 @@ const eventSlice = createSlice({
           event._id === action.payload._id ? action.payload : event,
         );
       })
-      .addCase(updateEvent.rejected,(state,action)=>{
+      .addCase(updateEvent.rejected, (state, action) => {
         state.error = action.payload;
+      })
+      .addCase(fetchParticipants.fulfilled, (state, action) => {
+        state.loading = false;
+        state.participants = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchParticipants.rejected, (state, action) => {
+        state.error = action.payload;
+        state.participants = [];
       })
   },
 });

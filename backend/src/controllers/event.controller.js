@@ -1,12 +1,12 @@
-
 const EventModel = require("../models/event.model");
 const notificationModel = require("../models/notification.model");
 const UserModel = require("../models/user.model");
+const RegistrationModel = require("../models/Registration.model");
 
 const createEvent = async (req, res) => {
-  console.log("body:",req.body);
-  console.log("file:",req.file);
-  console.log("user:",req.user);
+  console.log("body:", req.body);
+  console.log("file:", req.file);
+  console.log("user:", req.user);
   try {
     let { title, description, category, date, time, venue } = req.body;
     let newEvent = new EventModel({
@@ -17,7 +17,7 @@ const createEvent = async (req, res) => {
       time,
       venue,
       club: req.user._id,
-      image: req.file ? req.file.path : null || req.body.image ,
+      image: req.file ? req.file.path : null || req.body.image,
     });
     //     const interestedStudents = await UserModel.find({
     //   role: "student",
@@ -39,7 +39,7 @@ const createEvent = async (req, res) => {
       event: newEvent,
     });
   } catch (error) {
-    console.log("error:",error.stack);
+    console.log("error:", error.stack);
     res.status(500).json({ message: error.message });
   }
 };
@@ -69,7 +69,9 @@ const getsingleEvent = async (req, res) => {
 const getMyevents = async (req, res) => {
   //console.log(req.user);
   try {
-    const events = await EventModel.find({ club: req.user._id }).sort({ date: 1 });
+    const events = await EventModel.find({ club: req.user._id }).sort({
+      date: 1,
+    });
     res.json({ events });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -122,6 +124,63 @@ const deleteEvent = async (req, res) => {
   }
 };
 
+const registerForEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+
+    const event = await EventModel.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({
+        message: "Event not found",
+      });
+    }
+
+    const alreadyRegistered = await RegistrationModel.findOne({
+      student: req.user._id,
+      event: eventId,
+    });
+
+    if (alreadyRegistered) {
+      return res.status(400).json({
+        message: "Already registered for this event",
+      });
+    }
+
+    const registration = await RegistrationModel.create({
+      student: req.user._id,
+      event: eventId,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      registration,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const getParticipants = async (req, res) => {
+  try {
+    const registrations = await RegistrationModel.find({
+      event: req.params.id,
+    }).populate("student", "name email");
+
+    res.status(200).json({
+      success: true,
+      participants: registrations,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createEvent,
   getAllEvents,
@@ -129,4 +188,6 @@ module.exports = {
   getMyevents,
   updateEvent,
   deleteEvent,
+  registerForEvent,
+  getParticipants,
 };

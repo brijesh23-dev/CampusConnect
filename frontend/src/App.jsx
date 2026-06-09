@@ -20,6 +20,8 @@ import EventDetails from "./pages/EventDetails";
 import Footer from "./components/Footer";
 import Layout from "./components/Layout";
 import PageNotfound from "./components/PageNotfound";
+import EventParticipants from "./pages/EventParticipants";
+
 function App() {
   const dispatch = useDispatch();
 
@@ -28,9 +30,8 @@ function App() {
   }, [dispatch]);
 
   return (
-
-      <Routes>
-        <Route path="/" element={<Layout />}>
+    <Routes>
+      <Route path="/" element={<Layout />}>
         <Route path="*" element={<PageNotfound />} />
         <Route path="/" element={<Events />} />
         <Route path="/events" element={<Events />} />
@@ -97,8 +98,16 @@ function App() {
           }
         />
         <Route path="/events/:id" element={<EventDetails />} />
-        </Route>
-      </Routes>
+      </Route>
+      <Route
+        path="/participants/:id"
+        element={
+          <ProtectedRoute role="club">
+            <EventParticipants />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 

@@ -81,23 +81,21 @@ function Events() {
               className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition flex flex-col justify-between relative"
             >
               <div>
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-2xl font-bold font-Inter text-neutral-800">{event.title}</h2>
+
+                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm transition-all duration-200 ease-in-out  hover:text-white hover:bg-blue-700">
+                    {event.category}
+                  </span>
+                </div>
                 <div>
-                  {event.image ? (
+                  {event.image &&(
                     <img
                       src={event.image}
                       alt={event.title}
                       className="w-full h-48 object-cover rounded-lg mb-4"
                     />
-                  ) : (
-                    <h1> no image is available</h1>
                   )}
-                </div>
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-2xl font-bold font-Inter text-neutral-800">{event.title}</h2>
-
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm transition-all duration-200 ease-in-out hover:text-white hover:bg-blue-700">
-                    {event.category}
-                  </span>
                 </div>
 
                 <p className="text-neutral-700 mb-4 ">{event.description}</p>
@@ -111,7 +109,7 @@ function Events() {
 
                   <p>{event.club?.name || "Club"}</p>
                 </div>
-              </div>
+              </div>  
               <div className=" ">
                 <Link
                   to={`/events/${event._id}`}
