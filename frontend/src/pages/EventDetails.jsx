@@ -21,11 +21,12 @@ function EventDetails() {
   const { loading, success, registrations } = useSelector(
     (state) => state.registrations,
   );
-
+  console.log(registrations)
   const isRegistered = registrations?.some(
-    (registration) => registration.event === id,
+    (registration) => registration.event._id === id,
   );
   console.log(isRegistered)
+  
   useEffect(() => {
     dispatch(fetchSingleEvent(id));
     dispatch(fetchMyregistration());
@@ -86,32 +87,22 @@ function EventDetails() {
 
         <Link
           to="/events"
-          className="inline-block mt-8 bg-blue-600 text-white px-6 py-3 rounded-xl"
+          className="px-3 py-2 bg-blue-700 rounded-lg mt-5"
         >
           Back to Events
         </Link>
-        {/* <button
-          onClick={handleRegister}
-          disabled={loading}
-          className="ml-4 px-3 py-2 text-white text-center rounded-lg bg-blue-600"
-        >
-          {loading
-            ? "Registering..."
-            : success
-              ? "registered"
-              : "Register Event"}
-        </button> */}
+ 
         {isRegistered ? (
           <button
             disabled
-            className="bg-gray-400 text-white px-6 py-3 rounded-xl"
+            className="bg-gray-400 text-white px-6 py-3 ml-4 rounded-xl"
           >
             Already Registered
           </button>
         ) : (
           <button
             onClick={handleRegister}
-            className="bg-green-600 text-white px-6 py-3 rounded-xl"
+            className="px-3 py-2 bg-blue-700 rounded-lg mt-5"
           >
             Register Event
           </button>

@@ -30,6 +30,7 @@ export const fetchParticipants = createAsyncThunk("registration/fetchParticipant
   async(eventId,thunkAPI)=>{
     try{
       const res = await API.get(`/registration/participants/${eventId}`);
+      console.log(res)
       return res.data;
     }catch(error){
       return thunkAPI.rejectWithValue(

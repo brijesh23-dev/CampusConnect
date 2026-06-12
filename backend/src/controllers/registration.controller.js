@@ -62,12 +62,12 @@ const getMyRegistration = async(req,res)=>{
 const getEventParticipants = async(req,res)=>{
 
 try{
-    eventParticipants = await registrationModel.find({
-    events:req.params.eventId
-  }).papulate("student","name email")
+    const eventParticipants = await registrationModel.find({
+    event:req.params.eventId
+  }).populate("student","name email")
   res.status(200).json({
     success:true,
-    participatnts:eventParticipants
+    participants:eventParticipants
   })
 }catch(error){
   res.status(500).json({
