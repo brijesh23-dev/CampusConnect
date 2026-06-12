@@ -1,11 +1,22 @@
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link ,useNavigate, useParams} from "react-router-dom";
+import { useSelector ,useDispatch} from "react-redux";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import InterestsIcon from '@mui/icons-material/Interests';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import {fetchMyregistration,} from '../redux/RegistrationSlice'
+import { useEffect } from "react";
+
 function StudentDashboard() {
+  const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth);
 
+  const {registrations} = useSelector((state)=>state.registrations);
+
+  useEffect(()=>{
+    dispatch(fetchMyregistration())
+  },[dispatch])
+  console.log(registrations)
+  
   const interests = user?.interests || [];
 
   return (
@@ -101,6 +112,23 @@ function StudentDashboard() {
               Manage your interests for personalized event recommendations.
             </p>
           </Link>
+             {/* Registered*/}
+          <Link
+            to="/my-registrations"
+            className="group bg-white p-8 rounded-3xl shadow-md hover:shadow-2xl transition duration-300 hover:-translate-y-2"
+          >
+            <div className="text-5xl mb-5 group-hover:scale-125 transition">
+              <InterestsIcon fontSize="inherit" color="primary" />
+            </div>
+
+            <h2 className="text-2xl font-bold mb-3">
+              Registered Event
+            </h2>
+
+            <p className="text-gray-600">
+              Manage your interests for personalized event recommendations.
+            </p>
+          </Link>
         </div>
 
         {/* Quick Stats */}
@@ -132,7 +160,7 @@ function StudentDashboard() {
             </h3>
 
             <p className="text-4xl font-bold text-green-600">
-              5
+              {registrations.length}
             </p>
           </div>
         </div>

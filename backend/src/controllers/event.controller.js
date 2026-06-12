@@ -181,6 +181,8 @@ const getParticipants = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   createEvent,
   getAllEvents,

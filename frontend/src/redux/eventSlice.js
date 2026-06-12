@@ -62,9 +62,7 @@ export const deleteEvent = createAsyncThunk(
 export const fetchSingleEvent = createAsyncThunk(
   "events/fetchSingleEvent",
   async (id) => {
-    console.log(id)
     const res = await API.get(`/events/${id}`);
-    console.log(res)
     return res.data.event;
   },
 );

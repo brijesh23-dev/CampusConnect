@@ -6,6 +6,7 @@ const testRoutes = require("./routes/test.routes");
 const eventRoutes = require('./routes/event.routes');
 const userRoutes = require('./routes/user.routes');
 const notificationRoutes = require('./routes/notifincatrion.routes');
+const registrationRoutes = require('./routes/registration.routes')
 const morgan = require('morgan');
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/test", testRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use('/api/registration',registrationRoutes)
 app.get("/", (req, res) => {
   res.send("College Event API running");
 });

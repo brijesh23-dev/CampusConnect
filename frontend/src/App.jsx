@@ -21,6 +21,8 @@ import Footer from "./components/Footer";
 import Layout from "./components/Layout";
 import PageNotfound from "./components/PageNotfound";
 import EventParticipants from "./pages/EventParticipants";
+import MyRegistrations from "./pages/MyRegistrations";
+import Participants from "./pages/Participants";
 
 function App() {
   const dispatch = useDispatch();
@@ -37,6 +39,7 @@ function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/participants/:eventId" element={<Participants />} />
 
         <Route
           path="/student/dashboard"
@@ -46,6 +49,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/my-registrations" element={<MyRegistrations />} />
         <Route
           path="/admin/dashboard"
           element={

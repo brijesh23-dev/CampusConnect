@@ -101,12 +101,12 @@ function MyEvents() {
                     <p>
                       👥 Registered: {event.registeredStudents?.length || 0}
                     </p>
-                    <Link
+                    {/* <Link
                       to={`/participants/${event._id}`}
                       className="flex-1 text-center bg-green-600 text-white py-3 rounded-xl"
                     >
                       Participants
-                    </Link>
+                    </Link> */}
                   </div>
                 </div>
 
@@ -116,6 +116,12 @@ function MyEvents() {
                     className="flex-1 text-center py-2 text-white bg-neutral-800 shadow-sm rounded-xl  hover:bg-neutral-300 "
                   >
                     Edit
+                  </Link>
+                  <Link
+                    to={`/participants/${event._id}`}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                  >
+                    View Participants
                   </Link>
 
                   <button
