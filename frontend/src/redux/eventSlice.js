@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../api/axios";
 
-export const fetchEvents = createAsyncThunk("events/fetchEvents", async () => {
-  const res = await API.get("/events/all");
+export const fetchEvents = createAsyncThunk("events/fetchEvents", async (params) => {
+  const query = new URLSearchParams(params)
+  const res = await API.get(`/events/all?${query}`);
   return res.data.events;
 });
 

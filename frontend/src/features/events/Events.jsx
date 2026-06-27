@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchEvents } from "../redux/eventSlice";
+import { fetchEvents } from "../../redux/eventSlice";
+import { Button, Card, Image, Text } from "@chakra-ui/react";
 
 function Events() {
   const dispatch = useDispatch();
@@ -36,9 +37,11 @@ function Events() {
   }
 
   return (
-    <div className="h-full px-6 pt-10 max-h-max">
+    <div className="h-full px-6 pt-10 max-h-max font-Inter">
       <div className="max-w-7xl mx-auto max-h-max  mb-5">
-        <h1 className="text-4xl font-bold mb-8 text-blue-600  font-Inter  ">College Events</h1>
+        <h1 className="text-4xl font-bold mb-8 text-blue-600  font-Inter  ">
+          College Events
+        </h1>
 
         {/* Search + Filter */}
 
@@ -80,16 +83,18 @@ function Events() {
               key={event._id}
               className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition flex flex-col justify-between relative"
             >
-              <div>
+              <div> 
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-2xl font-bold font-Inter text-neutral-800">{event.title}</h2>
+                  <h2 className="text-2xl font-bold font-Inter text-neutral-800">
+                    {event.title}
+                  </h2>
 
                   <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm transition-all duration-200 ease-in-out  hover:text-white hover:bg-blue-700">
                     {event.category}
                   </span>
-                </div>
+                </div> 
                 <div>
-                  {event.image &&(
+                  {event.image && (
                     <img
                       src={event.image}
                       alt={event.title}
@@ -108,15 +113,16 @@ function Events() {
                   <p> {event.venue}</p>
 
                   <p>{event.club?.name || "Club"}</p>
-                </div>
-              </div>  
-              <div className=" ">
+                </div> 
+              </div>
+              <div >
                 <Link
                   to={`/events/${event._id}`}
                   className="block text-center w-full mt-6 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition position-absolute bottom-4"
                 >
                   View Details
                 </Link>
+               
               </div>
             </div>
           ))}

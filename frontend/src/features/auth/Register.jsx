@@ -1,27 +1,46 @@
 import { useForm } from "react-hook-form";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { zodResolver } from '@hookform/resolvers/zod';
-import {registerSchema} from "../utilities/validation";
-import { registerUser } from "../redux/authSlice";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema } from "../../utilities/validation";
+import { registerUser } from "../../redux/authSlice";
+import { toast ,Bounce} from "react-toastify";
+import { memo, useEffect, useEffectEvent } from "react";
 
 function Register() {
-  const { register, handleSubmit,formState:{errors} } = useForm({
-      zodResolver: zodResolver(registerSchema),    
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+      esolver: zodResolver(registerSchema),
   });
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {error,loading,user}  = useSelector((state)=>state.auth);
-console.log("user",user)
+  const { error, loading, user } = useSelector((state) => state.auth);
+  useEffect(() => {
+    toast.error(error, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  }, [error]);
 
   const onSubmit = async (data) => {
     const res = await dispatch(registerUser(data)).unwrap();
-    console.log('response',res)
-    if(res.role==='student' ){
+    console.log("response", res);
+    if (res.role === "student") {
       navigate("/student/dashboard");
-    }else if(res.role==='club'){
+    } else if (res.role === "club") {
       navigate("/club/dashboard");
-    }else{
+    } else {
       navigate("/admin/dashboard");
     }
     // if(){
@@ -37,10 +56,8 @@ console.log("user",user)
 
   return (
     <div className="flex justify-center items-center min-h-screen px-4">
-      {
-        loading&&<h1>loading...</h1>
-      }
-      {error&&<p>{error}</p>}
+      {loading && <h1>loading...</h1>}
+      {/* {error&&<p>{error}</p>} */}
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
@@ -51,12 +68,13 @@ console.log("user",user)
         </h1>
 
         <input
-
           placeholder="Full Name"
           {...register("name")}
           className="form-input "
         />
-        {errors.name && <p className="text-red-500 text-sm mb-4">{errors.name.message}</p>}
+        {errors.name && (
+          <p className="text-red-500 text-sm mb-4">{errors.name.message}</p>
+        )}
 
         <input
           type="email"
@@ -64,7 +82,9 @@ console.log("user",user)
           {...register("email")}
           className=" form-input  selection:none "
         />
-        {errors.email && <p className="text-red-500 text-sm mb-4">{errors.email.message}</p>}
+        {errors.email && (
+          <p className="text-red-500 text-sm mb-4">{errors.email.message}</p>
+        )}
 
         <input
           type="password"
@@ -72,18 +92,20 @@ console.log("user",user)
           {...register("password")}
           className="form-input"
         />
-        {errors.password && <p className="text-red-500 text-sm mb-4">{errors.password.message}</p>}
+        {errors.password && (
+          <p className="text-red-500 text-sm mb-4">{errors.password.message}</p>
+        )}
 
-        <select
-          {...register("role")}
-          className="form-input "
-        >
-          <option value="student" className=" appearance-none">Student</option>
+        <select {...register("role")} className="form-input ">
+          <option value="student" className=" appearance-none">
+            Student
+          </option>
           <option value="club">Club</option>
           <option value="admin">admin</option>
         </select>
-        {errors.role && <p className="text-red-500 text-sm mb-4">{errors.role.message}</p>}
-        
+        {errors.role && (
+          <p className="text-red-500 text-sm mb-4">{errors.role.message}</p>
+        )}
 
         <button
           type="submit"
@@ -91,7 +113,6 @@ console.log("user",user)
         >
           Register
         </button>
-
 
         <p className="text-center mt-4 text-sm">
           Already have an account?{" "}

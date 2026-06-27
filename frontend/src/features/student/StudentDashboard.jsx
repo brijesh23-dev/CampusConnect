@@ -3,7 +3,7 @@ import { useSelector ,useDispatch} from "react-redux";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import InterestsIcon from '@mui/icons-material/Interests';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import {fetchMyregistration,} from '../redux/RegistrationSlice'
+import {fetchMyregistration,} from '../../redux/RegistrationSlice'
 import { useEffect } from "react";
 
 function StudentDashboard() {
@@ -97,7 +97,7 @@ function StudentDashboard() {
           {/* Interests */}
 
           <Link
-            to="/student/interests"
+            to="/manage-interests"
             className="group bg-white p-8 rounded-3xl shadow-md hover:shadow-2xl transition duration-300 hover:-translate-y-2"
           >
             <div className="text-5xl mb-5 group-hover:scale-125 transition">

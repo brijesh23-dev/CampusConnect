@@ -5,7 +5,6 @@ export const loginSchema = z.object({
     .string()
     .min(1, "Email is required")
     .email("Enter a valid email"),
-
   password: z
     .string()
     .min(1, "Password is required")

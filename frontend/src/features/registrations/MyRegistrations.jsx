@@ -1,7 +1,7 @@
 import { useSelector ,useDispatch} from "react-redux";
-import {} from '../redux/RegistrationSlice'
+import {} from '../../redux/RegistrationSlice'
 import { useEffect } from "react";
-import { fetchMyregistration } from "../redux/RegistrationSlice";
+import { fetchMyregistration } from "../../redux/RegistrationSlice";
 
 function MyRegistrations() {
   const dispatch = useDispatch();

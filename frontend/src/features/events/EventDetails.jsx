@@ -5,11 +5,11 @@ import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
 import QueryBuilderOutlinedIcon from "@mui/icons-material/QueryBuilderOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import { fetchSingleEvent } from "../redux/eventSlice";
+import { fetchSingleEvent } from "../../redux/eventSlice";
 import {
   registerForEvent,
   fetchMyregistration,
-} from "../redux/RegistrationSlice";
+} from "../../redux/RegistrationSlice";
 
 function EventDetails() {
   const { id } = useParams();
@@ -21,12 +21,12 @@ function EventDetails() {
   const { loading, success, registrations } = useSelector(
     (state) => state.registrations,
   );
-  console.log(registrations)
+  console.log(registrations);
   const isRegistered = registrations?.some(
     (registration) => registration.event._id === id,
   );
-  console.log(isRegistered)
-  
+  console.log(isRegistered);
+
   useEffect(() => {
     dispatch(fetchSingleEvent(id));
     dispatch(fetchMyregistration());
@@ -48,25 +48,26 @@ function EventDetails() {
 
   return (
     <div className="min-h-screen bg-gray-100 px-6 py-10">
-      <div className="h-96">
-        {singleEvent?.image && (
-          <img
-            src={singleEvent?.image}
-            alt={singleEvent?.title}
-            className="w-full h-full object-cover rounded-lg mb-4"
-          />
-        )}
-      </div>
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-md">
-        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm transition-all duration-200 hover:bg-blue-600 hover:text-white">
           {singleEvent?.category}
         </span>
 
         <h1 className="text-4xl font-bold mt-4 mb-4">{singleEvent?.title}</h1>
+        {/* image container */}
+        <div className=" mb-5">
+          {singleEvent?.image && (
+            <img
+              src={singleEvent?.image}
+              alt={singleEvent?.title}
+              className="w-full h-full object-cover rounded-lg mb-4"
+            />
+          )}
+        </div>
 
         <p className="text-gray-600 mb-6">{singleEvent?.description}</p>
 
-        <div className="space-y-3 text-gray-700">
+        <div className="space-y-3 text-neutral-700">
           <div clsassName="flex items-center flex-row gap-2">
             <CalendarTodayOutlinedIcon className="inline-block mr-2" />
             <span> {new Date(singleEvent?.date).toLocaleDateString()}</span>
@@ -85,28 +86,27 @@ function EventDetails() {
           </div>
         </div>
 
-        <Link
-          to="/events"
-          className="px-3 py-2 bg-blue-700 rounded-lg mt-5"
-        >
-          Back to Events
-        </Link>
- 
-        {isRegistered ? (
-          <button
-            disabled
-            className="bg-gray-400 text-white px-6 py-3 ml-4 rounded-xl"
-          >
-            Already Registered
-          </button>
-        ) : (
-          <button
-            onClick={handleRegister}
-            className="px-3 py-2 bg-blue-700 rounded-lg mt-5"
-          >
-            Register Event
-          </button>
-        )}
+        <div className="mt-4">
+          <Link to="/events" className="px-3 py-2 bg-blue-700 rounded-lg mt-5">
+            Back to Events
+          </Link>
+
+          {isRegistered ? (
+            <button
+              disabled
+              className="bg-gray-400 text-white px-6 py-3 ml-4 rounded-xl"
+            >
+              Already Registered
+            </button>
+          ) : (
+            <button
+              onClick={handleRegister}
+              className="px-3 py-2 bg-blue-700 rounded-lg mt-5"
+            >
+              Register Event
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

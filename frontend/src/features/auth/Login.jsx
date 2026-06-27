@@ -2,8 +2,8 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "../utilities/validation";
-import { loginUser } from "../redux/authSlice";
+import { loginSchema } from "../../utilities/validation";
+import { loginUser } from "../../redux/authSlice";
 import { MdOutlineEmail } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 
@@ -11,9 +11,10 @@ function Login() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
-    zodResolver: zodResolver(loginSchema),
+    esolver: zodResolver(loginSchema),
   });
 
   const dispatch = useDispatch();
@@ -25,8 +26,10 @@ function Login() {
       if (res.role === "student") {
         navigate("/student/dashboard");
       } else {
-        navigate("/club/dashboard");
+        //navigate("/club/dashboard");
+        navigate("/club");
       }
+      reset();
     } catch (error) {
       console.log(error);
     }

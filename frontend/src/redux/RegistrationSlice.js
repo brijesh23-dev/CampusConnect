@@ -71,7 +71,7 @@ const registrationSlice = createSlice({
         state.registrations = action.payload.registration;
       })
       .addCase(fetchParticipants.fulfilled,(state,action)=>{
-        state.participants = action.payload.participants
+        state.participants = action.payload.participants;
       })
     
   },

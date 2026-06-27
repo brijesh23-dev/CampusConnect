@@ -1,8 +1,8 @@
 import React from "react";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
 import { Outlet } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/common/Sidebar";
 
 const Layout = () => {
   return (

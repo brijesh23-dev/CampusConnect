@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import HubIcon from "@mui/icons-material/Hub";
-import { logoutUser } from "../redux/authSlice";
+import { logoutUser } from "../../redux/authSlice";
 
 
 function Navbar() {
@@ -60,7 +60,7 @@ function Navbar() {
         {user?.role === "club" && (
           <>
             <Link
-              to="/club/dashboard"
+              to="/club"
               className="nav-btn"
             >
               Dashboard

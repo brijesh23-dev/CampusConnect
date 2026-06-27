@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { fetchMyEvents, deleteEvent } from "../redux/eventSlice";
+import { fetchMyEvents, deleteEvent } from "../../redux/eventSlice";
 
 function MyEvents() {
   const dispatch = useDispatch();
 
   const { events, loading } = useSelector((state) => state.events);
+  console.log(events);
 
   useEffect(() => {
     dispatch(fetchMyEvents());
@@ -26,7 +27,7 @@ function MyEvents() {
     } catch (error) {}
   };
 
-  if (loading) {
+  if (loading || !events) {
     return (
       <div className="flex justify-center mt-20">
         <h1 className="text-2xl font-semibold">Loading...</h1>
@@ -35,7 +36,7 @@ function MyEvents() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 px-6 py-10">
+    <div className="min-h-screen bg-gray-100 px-6 py-10 font-Inter">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-4xl font-bold">My Events</h1>
@@ -64,42 +65,43 @@ function MyEvents() {
             </Link>
           </div>
         ) : (
-          //card view of events
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          //grid layout
+          <div className="grid gap-8 lg:grid-cols-2 2xl:grid-cols-3">
             {events.map((event) => (
+              //card
               <div
-                key={event._id}
-                className="bg-white rounded-2xl shadow-md p-6  relative hover:shadow-xl transition"
+                key={event?._id}
+                className="bg-white rounded-2xl shadow-md p-6   hover:shadow-xl transition"
               >
-                <div className="flex  flex-col mb-20">
+                <div className="flex flex-col mb-4">
                   <div className="flex justify-between items-start mb-4">
-                    <h2 className="text-2xl font-bold">{event.title}</h2>
+                    <h2 className="text-2xl font-bold">{event?.title}</h2>
 
                     <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm  transition-all duration-200 ease-in-out  hover:text-white hover:bg-blue-700 ">
-                      {event.category}
+                      {event?.category}
                     </span>
                   </div>
                   <div>
-                    {event.image && (
+                    {event?.image && (
                       <img
-                        src={event.image}
+                        src={event?.image}
                         alt="#"
                         className="w-full h-48 object-cover rounded-lg mb-4"
                       />
                     )}
                   </div>
 
-                  <p className="text-gray-600 mb-4">{event.description}</p>
+                  <p className="text-gray-600 mb-4">{event?.description}</p>
 
                   <div className="space-y-2 text-sm text-gray-700">
-                    <p>📅 {new Date(event.date).toLocaleDateString()}</p>
+                    <p>📅 {new Date(event?.date).toLocaleDateString()}</p>
 
-                    <p>⏰ {event.time}</p>
+                    <p>⏰ {event?.time}</p>
 
-                    <p>📍 {event.venue}</p>
+                    <p>📍 {event?.venue}</p>
 
                     <p>
-                      👥 Registered: {event.registeredStudents?.length || 0}
+                      👥 Registered: {event?.registeredStudents?.length || 0}
                     </p>
                     {/* <Link
                       to={`/participants/${event._id}`}
@@ -110,26 +112,30 @@ function MyEvents() {
                   </div>
                 </div>
 
-                <div className="flex gap-5 items-center  justify-between p-3 my-6 absolute bottom-4 left-6 right-6">
-                  <Link
-                    to={`/edit-event/${event._id}`}
-                    className="flex-1 text-center py-2 text-white bg-neutral-800 shadow-sm rounded-xl  hover:bg-neutral-300 "
-                  >
-                    Edit
-                  </Link>
-                  <Link
-                    to={`/participants/${event._id}`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    View Participants
-                  </Link>
+                <div className="flex flex-col gap-3" >
+                  <div className="flex flex-row gap-4">
+                    <Link
+                      to={`/edit-event/${event?._id}`}
+                      className="flex-1 text-center py-2 text-white bg-neutral-800 shadow-sm rounded-xl  hover:bg-neutral-300 "
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(event?._id)}
+                      className="flex-1 text-center py-2  text-white bg-neutral-800 shadow-sm rounded-lg  hover:bg-neutral-300 "
+                    >
+                      Delete
+                    </button>
+                  </div>
 
-                  <button
-                    onClick={() => handleDelete(event._id)}
-                    className="flex-1 text-center py-2  text-white bg-neutral-800 shadow-sm rounded-lg  hover:bg-neutral-300 "
-                  >
-                    Delete
-                  </button>
+                  <div className=" flex flex-row justify-center ">
+                    <Link
+                      to={`/participants/${event?._id}`}
+                      className="bg-blue-600 text-white  rounded-lg flex-1 text-center py-3"
+                    >
+                      View Participants
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

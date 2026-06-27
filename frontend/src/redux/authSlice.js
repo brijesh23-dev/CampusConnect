@@ -1,36 +1,38 @@
-import { createSlice, createAsyncThunk,isAnyOf} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
 import API from "../api/axios";
 
 export const checkUser = createAsyncThunk("auth/checkUser", async () => {
-  const res = await API.get("/auth/getme",{
+  const res = await API.get("/auth/getme", {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   }); //getme
   console.log("checkUser response:", res.data);
   return res.data.user;
 });
 
-export const loginUser = createAsyncThunk("auth/loginUser", async (data,thunkAPI) => {
-try{
-    const res = await API.post("/auth/login", data);
-  console.log("loginUser response:", res.data);
-  return res.data.user; 
-}catch(error){
-  return thunkAPI.rejectWithValue(
-    error.response.data.message
-  )
-}
-});
+export const loginUser = createAsyncThunk(
+  "auth/loginUser",
+  async (data, thunkAPI) => {
+    try {
+      const res = await API.post("/auth/login", data);
+      console.log("loginUser response:", res.data);
+      return res.data.user;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  },
+);
 
-export const registerUser = createAsyncThunk("auth/registerUser", async (data,thunkAPI) => {
-  try{
+export const registerUser = createAsyncThunk(
+  "auth/registerUser",
+  async (data, thunkAPI) => {
+    try {
       const res = await API.post("/auth/register", data);
-  return res.data.user;
-  }catch(error){
-     return thunkAPI.rejectWithValue(
-      error.response?.data?.message
-     )
-  }
-});
+      return res.data.user;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message);
+    }
+  },
+);
 
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
   await API.post("/auth/logout");
@@ -38,10 +40,15 @@ export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
 
 export const updateInterests = createAsyncThunk(
   "auth/updateInterests",
-  async (interests) => {
-    const res = await API.put("/users/interests", { interests });
-    return res.data.user;
-  }
+  async (interests, thunkAPI) => {
+    console.log("reach to updateinterest thunk");
+    try {
+      const res = await API.put("/users/interests", { interests });
+      return res.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  },
 );
 
 const authSlice = createSlice({
@@ -68,9 +75,13 @@ const authSlice = createSlice({
       })
 
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload;          
-      })  
-      .addCase(registerUser.pending,(state)=>{
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(loginUser.rejected,(state,action)=>{
+        state.error = action.payload;
+      })
+      .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -87,7 +98,8 @@ const authSlice = createSlice({
         state.user = null;
       })
       .addCase(updateInterests.fulfilled, (state, action) => {
-        state.user = action.payload;
+        console.log(action.payload);
+        state.user = action.payload.user;
       });
   },
 });

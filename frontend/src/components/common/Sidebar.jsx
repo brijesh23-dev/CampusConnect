@@ -2,10 +2,10 @@ import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../redux/authSlice";
+import { logoutUser } from "../../redux/authSlice";
 import { MdPeopleOutline } from "react-icons/md";
 import {
-    CiChat1,
+  CiChat1,
   CiCircleChevDown,
   CiCircleRemove,
   CiCompass1,
@@ -34,7 +34,11 @@ const Sidebar = () => {
         className="fixed right-3 top-0 z-50 flex h-14 w-14 items-center justify-center  text-blue-800 transition-all duration-200 ease-in lg:hidden"
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
-        {isOpen ? <CiCircleRemove className="text-3xl" /> : <CiCircleChevDown className="text-3xl" />}
+        {isOpen ? (
+          <CiCircleRemove className="text-3xl" />
+        ) : (
+          <CiCircleChevDown className="text-3xl" />
+        )}
       </button>
 
       <aside
@@ -50,48 +54,38 @@ const Sidebar = () => {
             </div>
 
             <nav className="flex flex-col  divide-y-[2px] divide-neutral-200">
-              <Link
-                to="/events"
-                className="sidebar-link"
-              >
+              <Link to="/events" className="sidebar-link">
                 <CiTrophy className="text-2xl" />
                 <span className="ml-5">Events</span>
               </Link>
 
               {!user && (
                 <>
-                  <Link
-                    to="/login"
-                    className="sidebar-link"
-                  >
+                  <Link to="/login" className="sidebar-link">
                     <CiLogin className="text-2xl" />
                     <span className="ml-5">Login</span>
                   </Link>
 
-                  <Link
-                    to="/register"
-                    className="sidebar-link"
-                  >
+                  <Link to="/register" className="sidebar-link">
                     <CiPaperplane className="text-2xl" />
                     <span className="ml-5">Register</span>
                   </Link>
                 </>
               )}
-
+              {user?.role === "club" && (
+                <Link to="/club" className="sidebar-link">
+                  <CiTrophy className="text-2xl" />
+                  <span className="ml-5">Dashboard</span>
+                </Link>
+              )}
               {user?.role === "student" && (
                 <>
-                  <Link
-                    to="/student/dashboard"
-                    className="sidebar-link"
-                  >
+                  <Link to="/student/dashboard" className="sidebar-link">
                     <CiCompass1 className="text-2xl" />
                     <span className="ml-5">Dashboard</span>
                   </Link>
 
-                  <Link
-                    to="/notifications"
-                    className="sidebar-link"
-                  >
+                  <Link to="/notifications" className="sidebar-link">
                     <CiChat1 className="text-2xl" />
                     <span className="ml-5">Notifications</span>
                   </Link>
@@ -101,13 +95,11 @@ const Sidebar = () => {
           </div>
 
           {user && (
-            <button
-              onClick={handleLogout}
-              className=""
-            ><span className="sidebar-link">
-                <CiLogout className="text-2xl"/>
-              <span className="ml-5">Logout</span>
-            </span>
+            <button onClick={handleLogout} className="">
+              <span className="sidebar-link">
+                <CiLogout className="text-2xl" />
+                <span className="ml-5">Logout</span>
+              </span>
             </button>
           )}
         </div>

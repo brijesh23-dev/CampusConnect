@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchNotifications,
   markNotificationRead,
-} from "../redux/notificationSlice";
+} from "../../redux/notificationSlice";
 
 function Notifications() {
   const dispatch = useDispatch();
@@ -13,6 +13,7 @@ function Notifications() {
   const { notifications, loading } = useSelector(
     (state) => state.notifications
   );
+  console.log(notifications)
 
   useEffect(() => {
     dispatch(fetchNotifications());
@@ -38,7 +39,7 @@ function Notifications() {
         <p>No notifications found</p>
       )}
 
-      {notifications.map((notification) => (
+      {notifications?.map((notification) => (
         <div key={notification._id}>
           <h3>{notification.message}</h3>
 

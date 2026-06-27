@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { Box, FileUpload, Icon } from "@chakra-ui/react";
+import { LuUpload } from "react-icons/lu";
 
-import { createEvent } from "../redux/eventSlice";
+import { createEvent } from "../../redux/eventSlice";
 
 function CreateEvent() {
   const { register, handleSubmit, reset } = useForm();
@@ -11,16 +13,15 @@ function CreateEvent() {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-
-    try{
-           const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description);
-    formData.append("category", data.category);
-    formData.append("date", data.date);
-    formData.append("time", data.time);
-    formData.append("venue", data.venue);
-    formData.append("image", data.image[0]);
+    try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      formData.append("category", data.category);
+      formData.append("date", data.date);
+      formData.append("time", data.time);
+      formData.append("venue", data.venue);
+      formData.append("image", data.image[0]);
       await dispatch(createEvent(formData)).unwrap();
 
       alert("Event created successfully");
@@ -29,7 +30,7 @@ function CreateEvent() {
 
       navigate("/my-events");
     } catch (error) {
-      console.log("create event",error);
+      console.log("create event", error);
     }
   };
 
@@ -38,7 +39,7 @@ function CreateEvent() {
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-md">
         <h1 className="text-4xl font-bold mb-8">Create Event</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)}   className="space-y-6 ">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 ">
           {/* Title */}
 
           <div>
@@ -150,6 +151,19 @@ function CreateEvent() {
               })}
               className="w-full border border-gray-300 p-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {/* <FileUpload.Root maxW="xl" alignItems="stretch" maxFiles={10}>
+              <FileUpload.HiddenInput />
+              <FileUpload.Dropzone>
+                <Icon size="md" color="fg.muted">
+                  <LuUpload />
+                </Icon>
+                <FileUpload.DropzoneContent>
+                  <Box>Drag and drop files here</Box>
+                  <Box color="fg.muted">.png, .jpg up to 5MB</Box>
+                </FileUpload.DropzoneContent>
+              </FileUpload.Dropzone>
+              <FileUpload.List />
+            </FileUpload.Root> */}
           </div>
 
           {/* Submit Button */}

@@ -5,6 +5,7 @@ export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
   async () => {
     const res = await API.get("/notifications");
+    console.log(res.data)
     return res.data.notifications;
   }
 );

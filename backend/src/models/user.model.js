@@ -24,12 +24,13 @@ const userSchema = new mongoose.Schema(
       default: "student",
     },
 
-    interests: {
-      type: [String],
-      default: [],
-    },
+    interests: [
+      {
+        type: String,
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("User", userSchema);

@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchSingleEvent,
   updateEvent,
-} from "../redux/eventSlice";
+} from "../../redux/eventSlice";
 
 function EditEvent() {
   const { id } = useParams();

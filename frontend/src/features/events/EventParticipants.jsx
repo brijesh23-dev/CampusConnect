@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { fetchParticipants } from "../redux/eventSlice";
+import { fetchParticipants } from "../../redux/eventSlice";
 
 function EventParticipants() {
   const { id } = useParams();

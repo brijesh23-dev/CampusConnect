@@ -1,5 +1,5 @@
 const EventModel = require("../models/event.model");
-const notificationModel = require("../models/notification.model");
+const Notification = require("../models/notification.model");
 const UserModel = require("../models/user.model");
 const RegistrationModel = require("../models/Registration.model");
 
@@ -19,21 +19,21 @@ const createEvent = async (req, res) => {
       club: req.user._id,
       image: req.file ? req.file.path : null || req.body.image,
     });
-    //     const interestedStudents = await UserModel.find({
-    //   role: "student",
-    //   interests: category,
-    // });
-    //     const notifications = interestedStudents.map(
-    //   (student) => ({
-    //     user: student._id,
-    //     event: event._id,
-    //     message: `New ${category} event: ${title}`,
-    //   })
-    // );
-    //   if (notifications.length > 0) {
-    //   await Notification.insertMany(notifications);
-    // }
+
     await newEvent.save();
+
+    const interestedStudents = await UserModel.find({
+      role: "student",
+      interests: category,
+    });
+    const notifications = interestedStudents.map((student) => ({
+      user: student._id,
+      event: newEvent._id,
+      message: `New ${category} event: ${title}`,
+    }));
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
+    }
     res.status(201).json({
       message: "Event created successfully",
       event: newEvent,
@@ -45,11 +45,25 @@ const createEvent = async (req, res) => {
 };
 
 const getAllEvents = async (req, res) => {
+  let filter = {};
+   let { search,category } = req.query;
+   if(category){
+    filter.category = category;
+   }
+
+   if(search){
+    filter.title = {
+    $regex:search,
+    $options:"i"
+    }
+   }
+   const events = await EventModel.find(filter);
   let allevent = await EventModel.find().populate("club", "name email");
   console.log(allevent);
   res.status(200).json({
     message: "All events fetched successfully",
     events: allevent,
+    events
   });
 };
 
@@ -180,8 +194,6 @@ const getParticipants = async (req, res) => {
     });
   }
 };
-
-
 
 module.exports = {
   createEvent,
