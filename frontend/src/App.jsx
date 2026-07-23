@@ -1,5 +1,5 @@
-import React from "react";
-import AppRoutes from "./routes/appRoutes";
+
+import AppRoutes from "./routes/AppRoutes";
 import { ToastContainer,Bounce } from "react-toastify";
 import { cn } from "@/lib/utils";
 const App = () => {
