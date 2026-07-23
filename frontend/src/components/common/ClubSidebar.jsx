@@ -1,136 +1,114 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
-import {motion} from "motion/react"
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../../redux/authSlice";
 import {
   MdDashboard,
   MdEventNote,
-  MdAnalytics,
-  MdHome,
+  MdExplore,
+  MdPeopleOutline,
+  MdSettings,
+  MdHelp,
+  MdLogout,
+  MdAddCircleOutline,
   MdChevronRight,
-  MdExpandLess,
   MdExpandMore,
+  MdExpandLess,
 } from "react-icons/md";
 
-function ClubSidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [expandedMenus, setExpandedMenus] = useState({});
+const mainLinks = [
+  { id: "dashboard", name: "Dashboard", path: "/clubs", exact: true, icon: <MdDashboard className="text-xl flex-shrink-0" /> },
+  {
+    id: "events",
+    name: "My Events",
+    icon: <MdEventNote className="text-xl flex-shrink-0" />,
+    subItems: [
+      { name: "My Events", path: "/clubs/events" },
+      { name: "Create Event", path: "/clubs/create-event" },
+    ],
+  },
+  { id: "explore", name: "Explore", path: "/events", icon: <MdExplore className="text-xl flex-shrink-0" /> },
+  { id: "clubs", name: "Clubs", path: "/clubs", icon: <MdPeopleOutline className="text-xl flex-shrink-0" /> },
+  { id: "settings", name: "Settings", path: "/club/settings", icon: <MdSettings className="text-xl flex-shrink-0" /> },
+];
 
-  const toggleMenu = (menuName) => {
-    setExpandedMenus((prev) => ({
-      ...prev,
-      [menuName]: !prev[menuName],
-    }));
+function ClubSidebar() {
+  const [expandedMenus, setExpandedMenus] = useState({ events: true });
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+
+  const toggleMenu = (menuId) =>
+    setExpandedMenus((prev) => ({ ...prev, [menuId]: !prev[menuId] }));
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate("/login");
   };
 
-  const mainLinks = [
-    {
-      id: "dashboard",
-      name: "Dashboard",
-      path: "/club",
-      icon: <MdDashboard className="text-xl flex-shrink-0" />,
-    },
-    {
-      id: "events",
-      name: "Events",
-      icon: <MdEventNote className="text-xl flex-shrink-0" />,
-      subItems: [
-        { name: "My Events", path: "/club/events" },
-        { name: "Create Event", path: "/club/create-event" },
-      ],
-    },
-    {
-      id: "analytics",
-      name: "Analytics",
-      path: "/club/analytics",
-      icon: <MdAnalytics className="text-xl flex-shrink-0" />,
-    },
-    {
-      id: "home",
-      name: "Home",
-      path: "/events",
-      icon: <MdHome className="text-xl flex-shrink-0" />,
-    },
-  ];
-
   return (
-    <aside
-      className={`${
-        isCollapsed ? "w-20" : "w-64"
-      } h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white shadow-2xl transition-all duration-300 ease-in-out flex flex-col border-r border-slate-700`}
-    >
+    <aside className="w-56 h-screen bg-white border-r border-gray-100 flex flex-col shadow-sm flex-shrink-0">
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 p-4 border-b border-slate-700">
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg font-bold text-sm">
-            CP
+      <div className="p-5 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-white font-bold text-sm shadow">
+            {user?.name?.[0]?.toUpperCase() || "C"}
           </div>
-          {!isCollapsed && (
-            <span className="text-lg font-bold transition-opacity duration-300 ease-in-out opacity-100">
-              Club Panel
-            </span>
-          )}
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-gray-900 truncate">
+              {user?.name || "Event Manager"}
+            </p>
+            <p className="text-xs text-gray-400 truncate">Admin Access</p>
+          </div>
         </div>
-
-        <motion.button
-          type="button"
-          onClick={() => setIsCollapsed((prev) => !prev)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-700 text-white transition-all duration-200 hover:bg-slate-600 flex-shrink-0"
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={isCollapsed ? "Expand" : "Collapse"}
-        >
-          <MdChevronRight
-            className={`text-xl transition-transform duration-300 ease-in-out ${
-              isCollapsed ? "rotate-0" : "-rotate-90"
-            }`}
-          />
-        </motion.button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+      {/* New Event CTA */}
+      <div className="px-4 pt-4">
+        <NavLink
+          to="/clubs/create-event"
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold hover:opacity-90 transition shadow-sm"
+        >
+          <MdAddCircleOutline className="text-lg" />
+          New Event
+        </NavLink>
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-3 pt-4 space-y-1">
         {mainLinks.map((link) =>
           link.subItems ? (
-            <div key={link.id} className="space-y-1">
+            <div key={link.id}>
               <button
                 onClick={() => toggleMenu(link.id)}
-                className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-slate-700 text-white hover:bg-slate-600 transition-all duration-200 ease-in-out group"
-                title={link.name}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition"
               >
-                <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="flex items-center gap-3">
                   {link.icon}
-                  {!isCollapsed && (
-                    <span className="text-sm font-medium truncate opacity-100 transition-opacity duration-300">
-                      {link.name}
-                    </span>
-                  )}
+                  <span>{link.name}</span>
                 </div>
-                {!isCollapsed && (
-                  <span className="transition-transform duration-300">
-                    {expandedMenus[link.id] ? (
-                      <MdExpandLess className="text-lg" />
-                    ) : (
-                      <MdExpandMore className="text-lg" />
-                    )}
-                  </span>
+                {expandedMenus[link.id] ? (
+                  <MdExpandLess className="text-lg" />
+                ) : (
+                  <MdExpandMore className="text-lg" />
                 )}
               </button>
 
-              {expandedMenus[link.id] && !isCollapsed && (
-                <div className="pl-4 space-y-1 animate-in fade-in duration-200">
-                  {link.subItems.map((subItem, idx) => (
+              {expandedMenus[link.id] && (
+                <div className="pl-9 mt-1 space-y-1">
+                  {link.subItems.map((sub) => (
                     <NavLink
-                      key={idx}
-                      to={subItem.path}
+                      key={sub.path}
+                      to={sub.path}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ease-in-out ${
+                        `block px-3 py-2 rounded-xl text-sm font-medium transition ${
                           isActive
-                            ? "bg-blue-600 text-white shadow-lg"
-                            : "text-slate-300 hover:bg-slate-600 hover:text-white"
+                            ? "bg-violet-600 text-white"
+                            : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                         }`
                       }
                     >
-                      <span className="w-1 h-1 rounded-full bg-current flex-shrink-0" />
-                      <span className="truncate">{subItem.name}</span>
+                      {sub.name}
                     </NavLink>
                   ))}
                 </div>
@@ -140,45 +118,38 @@ function ClubSidebar() {
             <NavLink
               key={link.id}
               to={link.path}
-              end={link.path === "/club"}
+              end={link.exact}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-in-out group ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
                   isActive
-                    ? "bg-blue-600 text-white shadow-lg"
-                    : "text-slate-300 hover:bg-slate-700 hover:text-white"
+                    ? "bg-violet-600 text-white"
+                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                 }`
               }
-              title={link.name}
             >
-              <span className="flex-shrink-0">{link.icon}</span>
-              {!isCollapsed && (
-                <span className="text-sm font-medium truncate transition-opacity duration-300 opacity-100">
-                  {link.name}
-                </span>
-              )}
+              {link.icon}
+              <span>{link.name}</span>
             </NavLink>
           )
         )}
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-slate-700 p-4">
-        <div className="bg-slate-700 rounded-lg p-3 transition-all duration-300 ease-in-out">
-          {isCollapsed ? (
-            <div className="flex justify-center">
-              <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">
-                i
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              <p className="text-xs font-semibold text-slate-300">Quick Tip</p>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Click the arrow to collapse and expand the sidebar.
-              </p>
-            </div>
-          )}
-        </div>
+      <div className="px-3 pb-3 space-y-1 border-t border-gray-100 pt-3">
+        <NavLink
+          to="/help"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition"
+        >
+          <MdHelp className="text-xl flex-shrink-0" />
+          <span>Help</span>
+        </NavLink>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition"
+        >
+          <MdLogout className="text-xl flex-shrink-0" />
+          <span>Logout</span>
+        </button>
       </div>
     </aside>
   );

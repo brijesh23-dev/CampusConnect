@@ -8,13 +8,14 @@ const createEvent = async (req, res) => {
   console.log("file:", req.file);
   console.log("user:", req.user);
   try {
-    let { title, description, category, date, time, venue } = req.body;
+    let { title, description, category, date,startTime,endTime, venue } = req.body;
     let newEvent = new EventModel({
       title,
       description,
       category,
       date,
-      time,
+       startTime,
+       endTime,
       venue,
       club: req.user._id,
       image: req.file ? req.file.path : null || req.body.image,

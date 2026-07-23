@@ -5,13 +5,11 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import "./index.css";
 //import chakraProvider from "./Provider.jsx";
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <BrowserRouter>
-      <ChakraProvider value={defaultSystem}>
         <App/>
-      </ChakraProvider>
     </BrowserRouter>
   </Provider>,
 );

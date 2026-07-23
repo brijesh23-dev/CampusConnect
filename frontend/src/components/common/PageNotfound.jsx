@@ -6,7 +6,7 @@ function PageNotFound() {
       <h1 className="text-6xl font-bold text-blue-600">404</h1>
 
       <p className="text-xl mt-4 text-gray-700">
-        Page Not Found
+        Page Not Found kjlgskjklj
       </p>
 
       <Link

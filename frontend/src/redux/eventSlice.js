@@ -10,7 +10,7 @@ export const fetchEvents = createAsyncThunk("events/fetchEvents", async (params)
 export const createEvent = createAsyncThunk(
   "events/createEvent",
   async (formData, thunkApi) => {
-    console.log([...formData.entries()]);
+    console.log(formData)
     try {
       const res = await API.post("/events/create", formData);
       return res.data.events;

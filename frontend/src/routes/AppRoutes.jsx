@@ -1,31 +1,41 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import { checkUser } from "../redux/authSlice";
 
-import Login from "../features/auth/Login";
-import Register from "../features/auth/Register";
-import StudentDashboard from "../features/student/StudentDashboard";
-import AdminDashboard from "../features/admin/AdminDashboard";
-import ClubDashboard from "../features/analytics/ClubDashboard";
-import Events from "../features/events/Events";
-import CreateEvent from "../features/events/CreateEvent";
-import Notifications from "../features/notifications/Notifications";
-import ProtectedRoute from "../components/common/ProtectedRoute";
-import Navbar from "../components/common/Navbar";
-import MyEvents from "../features/events/MyEvents";
-import EditEvent from "../features/events/EditEvent";
-import EventDetails from "../features/events/EventDetails";
-import Footer from "../components/common/Footer";
-import Layout from "../Layouts/Layout";
-import PageNotfound from "../components/common/PageNotfound";
-import EventParticipants from "../features/events/EventParticipants";
-import MyRegistrations from "../features/registrations/MyRegistrations";
-import Participants from "../features/registrations/Participants";
-import ManageInterests from "../features/interests/ManageInterests";
-import Analytics from "../features/analytics/Dashboard";
+// Layouts
+import PublicLayout from "../Layouts/PublicLayout";
 import ClubLayout from "../Layouts/ClubLayout";
+import StudentLayout from "../Layouts/StudentLayout";
+
+// Public pages
+import LandingPage from "../pages/public/LandingPage";
+import Events from "../pages/public/Events";
+import EventDetails from "../pages/public/EventDetails";
+import Login from "../pages/public/Login";
+import Register from "../pages/public/Register";
+
+// Student pages
+import StudentDashboard from "../pages/student/StudentDashboard";
+import Notifications from "../pages/student/Notifications";
+import ManageInterests from "../pages/student/ManageInterests";
+import MyRegistrations from "../pages/student/MyRegistrations";
+
+// Club pages
+import ClubDashboard from "../pages/club/ClubDashboard";
+import MyEvents from "../pages/club/MyEvents";
+import CreateEvent from "../pages/club/CreateEvent";
+import EditEvent from "../pages/club/EditEvent";
+import Participants from "../pages/club/Participants";
+
+// Admin pages
+import AdminLayout from "../Layouts/AdminLayout";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+
+// Common
+import ProtectedRoute from "../components/common/ProtectedRoute";
+import PageNotfound from "../components/common/PageNotfound";
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -36,8 +46,68 @@ function AppRoutes() {
 
   return (
     <Routes>
+      {/* ── Public routes (with Navbar + Footer) ── */}
+      <Route element={<PublicLayout />}>
+        <Route index element={<LandingPage />} />
+        <Route path="events" element={<Events />} />
+        <Route path="events/:id" element={<EventDetails />} />
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+        <Route path="*" element={<PageNotfound />} />
+      </Route>
+
+      {/* ── Student routes (with StudentSidebar) ── */}
       <Route
-        path="/club"
+        path="/student"
+        element={
+          <ProtectedRoute role="student">
+            <StudentLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="dashboard" element={<StudentDashboard />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="interests" element={<ManageInterests />} />
+        <Route path="registrations" element={<MyRegistrations />} />
+      </Route>
+
+      {/* Backward-compatible student routes */}
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute role="student">
+            <StudentLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Notifications />} />
+      </Route>
+
+      <Route
+        path="/my-registrations"
+        element={
+          <ProtectedRoute role="student">
+            <StudentLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<MyRegistrations />} />
+      </Route>
+
+      <Route
+        path="/manage-interests"
+        element={
+          <ProtectedRoute role="student">
+            <StudentLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<ManageInterests />} />
+      </Route>
+
+      {/* ── Club routes (with ClubSidebar) ── */}
+      <Route
+        path="/clubs"
         element={
           <ProtectedRoute role="club">
             <ClubLayout />
@@ -45,92 +115,24 @@ function AppRoutes() {
         }
       >
         <Route index element={<ClubDashboard />} />
-        <Route path="events" element={<MyEvents />} />z
+        <Route path="events" element={<MyEvents />} />
         <Route path="create-event" element={<CreateEvent />} />
         <Route path="edit-event/:id" element={<EditEvent />} />
         <Route path="participants/:eventId" element={<Participants />} />
-        <Route path="analytics" element={<Analytics />} />
       </Route>
 
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Events />} />
-        <Route path="events" element={<Events />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="participants/:eventId" element={<Participants />} />
-        <Route path="manage-interests" element={<ManageInterests />} />
-        <Route path="*" element={<PageNotfound />} />
-
-        <Route
-          path="/student/dashboard"
-          element={
-            <ProtectedRoute role="student">
-              <StudentDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/my-registrations" element={<MyRegistrations />} />
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute role="admin">
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* <Route
-          path="/club/dashboard"
-          element={
-            <ProtectedRoute role="club">
-              <ClubDashboard />
-            </ProtectedRoute>
-          }
-        /> */}
-
-        <Route
-          path="/create-event"
-          element={
-            <ProtectedRoute role="club">
-              <CreateEvent />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute role="student">
-              <Notifications />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-events"
-          element={
-            <ProtectedRoute role="club">
-              <MyEvents />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/edit-event/:id"
-          element={
-            <ProtectedRoute role="club">
-              <EditEvent />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/events/:id" element={<EventDetails />} />
-      </Route>
+      {/* ── Admin routes (with AdminSidebar) ── */}
       <Route
-        path="/participants/:id"
+        path="/admin"
         element={
-          <ProtectedRoute role="club">
-            <EventParticipants />
+          <ProtectedRoute role="admin">
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
+      </Route>
     </Routes>
   );
 }

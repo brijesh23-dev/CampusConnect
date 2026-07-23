@@ -1,7 +1,9 @@
 import React from "react";
 import AppRoutes from "./routes/appRoutes";
 import { ToastContainer,Bounce } from "react-toastify";
+import { cn } from "@/lib/utils";
 const App = () => {
+  console.log(cn("p-2", "p-4"));
   return (
     <>
       <AppRoutes />
