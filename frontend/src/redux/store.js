@@ -4,7 +4,7 @@ import authReducer from "./authSlice";
 import eventReducer from "./eventSlice";
 import notificationReducer from "./notificationSlice";
 import registerForEvent from "./RegistrationSlice";
-import dashboardAnalytics from './DashboardSlice'
+import dashboardAnalytics from './dashboardSlice'
 
 export const store = configureStore({
   reducer: {
