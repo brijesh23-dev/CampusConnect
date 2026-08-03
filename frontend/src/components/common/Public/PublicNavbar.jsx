@@ -1,18 +1,24 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { MdSearch, MdMenu, MdClose, MdAddCircleOutline } from "react-icons/md";
 
 const navItems = [
   { label: "Events", path: "/events" },
-  { label: "Clubs", path: "/clubs" },
-  { label: "Calendar", path: "/calendar" },
+  { label: "Clubs", path: "/clubs-directory" },
 ];
 
 const PublicNavbar = () => {
   const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const submitSearch = (event) => {
+    event.preventDefault();
+    const query = search.trim();
+    navigate(query ? `/events?q=${encodeURIComponent(query)}` : "/events");
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
@@ -22,7 +28,7 @@ const PublicNavbar = () => {
           to="/"
           className="text-xl font-extrabold text-blue-600 flex-shrink-0 tracking-tight"
         >
-          CampusPulse
+          CampusConnect
         </Link>
 
         {/* Desktop Nav */}
@@ -45,21 +51,23 @@ const PublicNavbar = () => {
         </nav>
 
         {/* Search bar */}
-        <div className="hidden md:flex flex-1 max-w-xs items-center gap-2 bg-gray-100 rounded-xl px-4 py-2">
+        <form onSubmit={submitSearch} className="hidden md:flex flex-1 max-w-xs items-center gap-2 bg-gray-100 rounded-xl px-4 py-2">
           <MdSearch className="text-gray-400 flex-shrink-0" />
           <input
             type="text"
             placeholder="Search events..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
             className="bg-transparent text-sm text-gray-700 w-full outline-none placeholder:text-gray-400"
           />
-        </div>
+        </form>
 
         {/* Actions */}
         <div className="flex items-center gap-3">
           {user ? (
             <>
               <Link
-                to={user.role === "student" ? "/student/dashboard" : "/club"}
+                to={user.role === "student" ? "/student/dashboard" : user.role === "admin" ? "/admin/dashboard" : "/clubs"}
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2 rounded-xl hover:bg-gray-100 transition"
               >
                 Dashboard
@@ -81,13 +89,15 @@ const PublicNavbar = () => {
               </Link>
             </>
           )}
-          <Link
-            to="/clubs/create-event"
-            className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition shadow-sm"
-          >
-            <MdAddCircleOutline className="text-lg" />
-            Create Event
-          </Link>
+          {user?.role === "club" && (
+            <Link
+              to="/clubs/create-event"
+              className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition shadow-sm"
+            >
+              <MdAddCircleOutline className="text-lg" />
+              Create Event
+            </Link>
+          )}
 
           {/* Mobile menu toggle */}
           <button

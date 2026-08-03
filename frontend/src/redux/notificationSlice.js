@@ -3,10 +3,13 @@ import API from "../api/axios";
 
 export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
-  async () => {
-    const res = await API.get("/notifications");
-    console.log(res.data)
-    return res.data.notifications;
+  async (_, thunkAPI) => {
+    try {
+      const res = await API.get("/notifications");
+      return res.data.notifications;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch notifications");
+    }
   }
 );
 
@@ -39,9 +42,11 @@ const notificationSlice = createSlice({
         state.notifications = action.payload;
       })
 
+      .addCase(fetchNotifications.rejected, (state) => {
+        state.loading = false;
+      })
       .addCase(markNotificationRead.fulfilled, (state, action) => {
         const updatedNotification = action.payload;
-
         state.notifications = state.notifications.map((notification) =>
           notification._id === updatedNotification._id
             ? updatedNotification

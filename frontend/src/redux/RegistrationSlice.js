@@ -67,13 +67,28 @@ const registrationSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchMyregistration.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchMyregistration.fulfilled, (state, action) => {
+        state.loading = false;
         state.registrations = action.payload.registration;
       })
-      .addCase(fetchParticipants.fulfilled,(state,action)=>{
+      .addCase(fetchMyregistration.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchParticipants.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchParticipants.fulfilled, (state, action) => {
+        state.loading = false;
         state.participants = action.payload.participants;
       })
-    
+      .addCase(fetchParticipants.rejected, (state) => {
+        state.loading = false;
+      });
   },
 });
 

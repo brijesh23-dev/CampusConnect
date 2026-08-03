@@ -26,7 +26,7 @@ const protect = async (req, res, next) => {
 };
 
 const authorizeRoles = (...roles) => {    //spread operator to accept multiple roles and return a middleware function that checks if the user's role is in the allowed roles
-  return (req, res, next) => {
+  return (req, res, next)=>{
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         message: `Role (${req.user.role}) is not allowed`,

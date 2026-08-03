@@ -9,12 +9,18 @@ import {
   MdLogout,
   MdHelp,
   MdSecurity,
+  MdAssessment,
+  MdInsights,
+  MdGroups,
 } from "react-icons/md";
 
 const navLinks = [
   { id: "dashboard", name: "Dashboard", path: "/admin/dashboard", icon: <MdDashboard className="text-xl flex-shrink-0" /> },
   { id: "users", name: "Users", path: "/admin/dashboard?tab=users", icon: <MdPeople className="text-xl flex-shrink-0" /> },
+  { id: "clubs", name: "Clubs", path: "/admin/dashboard?tab=clubs", icon: <MdGroups className="text-xl flex-shrink-0" /> },
   { id: "events", name: "Events", path: "/admin/dashboard?tab=events", icon: <MdEvent className="text-xl flex-shrink-0" /> },
+  { id: "analytics", name: "Analytics", path: "/admin/analytics", icon: <MdInsights className="text-xl flex-shrink-0" /> },
+  { id: "reports", name: "Reports", path: "/admin/reports", icon: <MdAssessment className="text-xl flex-shrink-0" /> },
   { id: "settings", name: "Settings", path: "/admin/settings", icon: <MdSettings className="text-xl flex-shrink-0" /> },
 ];
 

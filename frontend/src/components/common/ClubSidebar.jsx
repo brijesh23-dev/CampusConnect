@@ -14,6 +14,8 @@ import {
   MdChevronRight,
   MdExpandMore,
   MdExpandLess,
+  MdAccountCircle,
+  MdNotifications,
 } from "react-icons/md";
 
 const mainLinks = [
@@ -27,9 +29,10 @@ const mainLinks = [
       { name: "Create Event", path: "/clubs/create-event" },
     ],
   },
+  { id: "profile", name: "Club Profile", path: "/clubs/profile", icon: <MdAccountCircle className="text-xl flex-shrink-0" /> },
+  { id: "notifications", name: "Notifications", path: "/clubs/notifications", icon: <MdNotifications className="text-xl flex-shrink-0" /> },
   { id: "explore", name: "Explore", path: "/events", icon: <MdExplore className="text-xl flex-shrink-0" /> },
-  { id: "clubs", name: "Clubs", path: "/clubs", icon: <MdPeopleOutline className="text-xl flex-shrink-0" /> },
-  { id: "settings", name: "Settings", path: "/club/settings", icon: <MdSettings className="text-xl flex-shrink-0" /> },
+  { id: "settings", name: "Settings", path: "/clubs/settings", icon: <MdSettings className="text-xl flex-shrink-0" /> },
 ];
 
 function ClubSidebar() {

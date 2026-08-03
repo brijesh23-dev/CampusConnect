@@ -108,6 +108,7 @@ const eventSlice = createSlice({
 
   initialState: {
     events: [],
+    loading: false,
     eventLoading: false,
     singleEvent: null,
     participants: [],
@@ -125,6 +126,10 @@ const eventSlice = createSlice({
       .addCase(fetchEvents.fulfilled, (state, action) => {
         state.loading = false;
         state.events = action.payload;
+      })
+      .addCase(fetchEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to fetch events";
       })
 
       .addCase(createEvent.fulfilled, (state, action) => {
@@ -152,8 +157,19 @@ const eventSlice = createSlice({
       .addCase(deleteEvent.rejected, (state, action) => {
         state.error = action.payload;
       })
+      .addCase(fetchSingleEvent.pending, (state) => {
+        state.eventLoading = true;
+        state.singleEvent = null;
+        state.error = null;
+      })
       .addCase(fetchSingleEvent.fulfilled, (state, action) => {
+        state.eventLoading = false;
         state.singleEvent = action.payload;
+      })
+      .addCase(fetchSingleEvent.rejected, (state, action) => {
+        state.eventLoading = false;
+        state.singleEvent = null;
+        state.error = action.error.message || "Event not found";
       })
 
       .addCase(updateEvent.fulfilled, (state, action) => {

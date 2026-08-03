@@ -9,13 +9,15 @@ const mockInitialEvents = [
   { _id: "e5", title: "Spring Tech Career Fair 2026", category: "business", date: "2026-07-28", venue: "Student Union Grand Hall", organizer: "Career Services", status: "approved" },
 ];
 
-function EventsTable() {
+function EventsTable({ onDeleteRequest, compact }) {
   const [events, setEvents] = useState(mockInitialEvents);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
 
-  const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete/cancel this event?")) {
+  const handleDelete = (id, title) => {
+    if (onDeleteRequest) {
+      onDeleteRequest(id, title);
+    } else {
       setEvents(events.filter((e) => e._id !== id));
     }
   };
@@ -31,13 +33,14 @@ function EventsTable() {
     );
   };
 
-  const filtered = events.filter((e) => {
+  const allFiltered = events.filter((e) => {
     const matchesSearch =
       e.title.toLowerCase().includes(search.toLowerCase()) ||
       e.organizer.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = filterCategory === "all" || e.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
+  const filtered = compact ? allFiltered.slice(0, 5) : allFiltered;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden space-y-4 p-6">
@@ -147,7 +150,7 @@ function EventsTable() {
                         </button>
                       )}
                       <button
-                        onClick={() => handleDelete(e._id)}
+                        onClick={() => handleDelete(e._id, e.title)}
                         className="p-1.5 rounded-xl border border-gray-200 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition"
                         title="Remove Event"
                       >

@@ -1,284 +1,218 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { fetchEvents } from "../../redux/eventSlice";
-import { MdSearch, MdTune, MdLocationOn, MdCalendarToday, MdPeople } from "react-icons/md";
+import { Link, useSearchParams } from "react-router-dom";
+import {
+  MdCalendarToday,
+  MdEvent,
+  MdLocationOn,
+  MdSearch,
+  MdTune,
+} from "react-icons/md";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import { fetchEvents } from "../../redux/eventSlice";
 
-const CATEGORIES = ["All Events", "Tech Talks", "Career Fairs", "Music Performances", "Hackathons"];
 const PAGE_SIZE = 6;
+const categories = [
+  { label: "All events", value: "all" },
+  { label: "Technology", value: "technology" },
+  { label: "Coding", value: "coding" },
+  { label: "AI", value: "ai" },
+  { label: "Arts & culture", value: "arts" },
+  { label: "Sports", value: "sports" },
+];
 
-const statusBadge = {
-  open:  { label: "Open",  color: "bg-green-500" },
-  full:  { label: "Full",  color: "bg-red-500" },
-  soon:  { label: "Soon",  color: "bg-yellow-500" },
+const isWithinDateRange = (dateValue, period) => {
+  if (period === "all") return true;
+
+  const eventDate = new Date(dateValue);
+  if (Number.isNaN(eventDate.getTime())) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  eventDate.setHours(0, 0, 0, 0);
+
+  if (period === "today") return eventDate.getTime() === today.getTime();
+
+  const end = new Date(today);
+  end.setDate(today.getDate() + (period === "week" ? 7 : 30));
+  return eventDate >= today && eventDate <= end;
 };
 
 function Events() {
   const dispatch = useDispatch();
-  const { events, loading } = useSelector((state) => state.events);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { events = [], loading } = useSelector((state) => state.events);
+  const initialQuery = searchParams.get("q") || "";
 
-  const [search, setSearch]       = useState("");
-  const [category, setCategory]   = useState("all");
-  const [activeTab, setActiveTab] = useState("All Events");
-  const [page, setPage]           = useState(1);
+  const [search, setSearch] = useState(initialQuery);
+  const [category, setCategory] = useState("all");
+  const [dateRange, setDateRange] = useState("all");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     dispatch(fetchEvents());
   }, [dispatch]);
 
+  useEffect(() => {
+    const query = searchParams.get("q") || "";
+    setSearch(query);
+  }, [searchParams]);
+
   const filteredEvents = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
     return events.filter((event) => {
-      const matchesSearch =
-        event.title.toLowerCase().includes(search.toLowerCase()) ||
-        event.description.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory = category === "all" || event.category === category;
-      return matchesSearch && matchesCategory;
+      const searchableText = [event.title, event.description, event.category, event.venue]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      const matchesSearch = !normalizedSearch || searchableText.includes(normalizedSearch);
+      const matchesCategory = category === "all" || event.category?.toLowerCase() === category;
+
+      return matchesSearch && matchesCategory && isWithinDateRange(event.date, dateRange);
     });
-  }, [events, search, category]);
+  }, [category, dateRange, events, search]);
 
-  const totalPages = Math.ceil(filteredEvents.length / PAGE_SIZE);
-  const paged = filteredEvents.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(filteredEvents.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pagedEvents = filteredEvents.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  const getStatus = (event) => {
-    if (event.registeredStudents?.length >= event.capacity) return "full";
-    return "open";
+  const updateSearch = (value) => {
+    setSearch(value);
+    setPage(1);
+    const nextParams = new URLSearchParams(searchParams);
+    if (value.trim()) nextParams.set("q", value.trim());
+    else nextParams.delete("q");
+    setSearchParams(nextParams, { replace: true });
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  const clearFilters = () => {
+    setSearch("");
+    setCategory("all");
+    setDateRange("all");
+    setPage(1);
+    setSearchParams({}, { replace: true });
+  };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Page header */}
-      <div className="max-w-7xl mx-auto px-6 pt-12 pb-6">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-1">
-          Discover Campus Events
-        </h1>
-        <p className="text-gray-500">
-          Find exactly what you're looking for, from academic workshops to weekend social mixers.
+    <main className="min-h-screen bg-white">
+      <section className="mx-auto max-w-7xl px-6 pb-6 pt-12">
+        <h1 className="mb-2 text-4xl font-extrabold text-gray-900">Discover campus events</h1>
+        <p className="max-w-2xl text-gray-600">
+          Find workshops, performances, competitions, and communities worth showing up for.
         </p>
-      </div>
+      </section>
 
-      {/* Search + Filters */}
-      <div className="max-w-7xl mx-auto px-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-3 mb-4">
-          {/* Search */}
-          <div className="flex-1 flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-3">
-            <MdSearch className="text-gray-400 text-xl flex-shrink-0" />
+      <section className="mx-auto max-w-7xl px-6" aria-label="Event filters">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row">
+          <label className="flex flex-1 items-center gap-2 rounded-xl bg-gray-100 px-4 py-3">
+            <MdSearch className="shrink-0 text-xl text-gray-500" aria-hidden="true" />
+            <span className="sr-only">Search events</span>
             <input
-              type="text"
-              placeholder="Search by event name or keyword..."
+              type="search"
+              placeholder="Search by event name, venue, or keyword"
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="bg-transparent text-sm text-gray-700 w-full outline-none placeholder:text-gray-400"
+              onChange={(event) => updateSearch(event.target.value)}
+              className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-500"
             />
-          </div>
+          </label>
 
-          {/* Category dropdown */}
+          <label className="sr-only" htmlFor="event-category">Category</label>
           <select
+            id="event-category"
             value={category}
-            onChange={(e) => { setCategory(e.target.value); setPage(1); }}
-            className="border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200"
+            onChange={(event) => { setCategory(event.target.value); setPage(1); }}
+            className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-300"
           >
-            <option value="all">Category</option>
-            <option value="technology">Technology</option>
-            <option value="coding">Coding</option>
-            <option value="ai">AI</option>
-            <option value="sports">Sports</option>
+            {categories.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
             <option value="music">Music</option>
             <option value="business">Business</option>
             <option value="social">Social</option>
-            <option value="arts">Arts & Culture</option>
           </select>
 
-          {/* Date filter */}
-          <select className="border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-200">
-            <option>Date</option>
-            <option>Today</option>
-            <option>This Week</option>
-            <option>This Month</option>
+          <label className="sr-only" htmlFor="event-date">Date</label>
+          <select
+            id="event-date"
+            value={dateRange}
+            onChange={(event) => { setDateRange(event.target.value); setPage(1); }}
+            className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="all">Any date</option>
+            <option value="today">Today</option>
+            <option value="week">Next 7 days</option>
+            <option value="month">Next 30 days</option>
           </select>
 
-          {/* More filters */}
-          <button className="flex items-center gap-2 border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">
-            <MdTune className="text-lg" />
-            More Filters
+          <button onClick={clearFilters} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300">
+            <MdTune className="text-lg" aria-hidden="true" /> Clear filters
           </button>
         </div>
 
-        {/* Quick filter tabs */}
         <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => (
+          {categories.map((item) => (
             <button
-              key={cat}
-              onClick={() => setActiveTab(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                activeTab === cat
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
+              key={item.value}
+              onClick={() => { setCategory(item.value); setPage(1); }}
+              aria-pressed={category === item.value}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${category === item.value ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
             >
-              {cat}
+              {item.label}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Events grid */}
-      <div className="max-w-7xl mx-auto px-6 pb-16">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-bold text-gray-900">Upcoming Events</h2>
-          <span className="text-sm text-gray-500">
-            Showing {filteredEvents.length} events
-          </span>
+      <section className="mx-auto max-w-7xl px-6 pb-16 pt-10" aria-live="polite">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <h2 className="text-xl font-bold text-gray-900">Upcoming events</h2>
+          <span className="text-sm text-gray-600">{filteredEvents.length} {filteredEvents.length === 1 ? "event" : "events"} found</span>
         </div>
 
-        {paged.length === 0 ? (
-          <div className="text-center py-24">
-            <p className="text-2xl font-bold text-gray-300 mb-2">No events found</p>
-            <p className="text-gray-400 text-sm">Try adjusting your search or filters</p>
+        {loading ? (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-96 animate-pulse rounded-2xl bg-gray-100" />)}
+          </div>
+        ) : pagedEvents.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-gray-300 px-6 py-20 text-center">
+            <MdEvent className="mx-auto mb-3 text-4xl text-gray-400" aria-hidden="true" />
+            <p className="text-lg font-bold text-gray-900">No events match those filters</p>
+            <p className="mt-1 text-sm text-gray-600">Try a different search term or clear the filters.</p>
+            <button onClick={clearFilters} className="mt-5 text-sm font-semibold text-blue-700 hover:underline">Clear all filters</button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paged.map((event) => {
-              const status = getStatus(event);
-              return (
-                <div
-                  key={event._id}
-                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300 group flex flex-col"
-                >
-                  {/* Card image */}
-                  <div className="relative h-48 bg-gray-100 overflow-hidden">
-                    {event.image ? (
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-blue-100 to-violet-100 flex items-center justify-center">
-                        <span className="text-4xl">🎓</span>
-                      </div>
-                    )}
-                    {/* Category badge */}
-                    <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                      {event.category}
-                    </span>
-                    {/* Status indicator */}
-                    <span className={`absolute top-3 right-3 flex items-center gap-1.5 text-white text-xs font-semibold px-3 py-1 rounded-full ${statusBadge[status]?.color}`}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                      {statusBadge[status]?.label}
-                    </span>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {pagedEvents.map((event) => (
+              <article key={event._id} className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-shadow duration-200 hover:shadow-lg">
+                <div className="relative flex h-48 items-center justify-center overflow-hidden bg-blue-50">
+                  {event.image ? <img src={event.image} alt="" className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" /> : <MdEvent className="text-5xl text-blue-500" aria-hidden="true" />}
+                  <span className="absolute left-3 top-3 rounded-full bg-blue-700 px-3 py-1 text-xs font-bold capitalize text-white">{event.category || "Campus event"}</span>
+                </div>
+                <div className="flex flex-1 flex-col p-5">
+                  <p className="mb-1 truncate text-xs font-semibold text-violet-700">{event.club?.name || "Campus club"}</p>
+                  <h3 className="mb-4 text-lg font-bold leading-snug text-gray-900">{event.title}</h3>
+                  <div className="mb-5 space-y-2 text-sm text-gray-600">
+                    <p className="flex items-center gap-2"><MdCalendarToday aria-hidden="true" /> {new Date(event.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}{event.startTime ? ` · ${event.startTime}` : ""}</p>
+                    <p className="flex items-center gap-2"><MdLocationOn aria-hidden="true" /> <span className="truncate">{event.venue || "Venue to be announced"}</span></p>
                   </div>
-
-                  {/* Card body */}
-                  <div className="p-5 flex flex-col flex-1">
-                    <p className="text-xs text-violet-600 font-semibold mb-1 truncate">
-                      {event.club?.name || "Campus Club"}
-                    </p>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3 leading-snug line-clamp-2">
-                      {event.title}
-                    </h3>
-
-                    <div className="space-y-1.5 mb-5">
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <MdCalendarToday className="text-base flex-shrink-0" />
-                        <span>{new Date(event.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} • {event.time}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <MdLocationOn className="text-base flex-shrink-0" />
-                        <span className="truncate">{event.venue}</span>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-3 mt-auto">
-                      <Link
-                        to={`/events/${event._id}`}
-                        className="flex-1 text-center py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
-                      >
-                        View Details
-                      </Link>
-                      {status === "full" ? (
-                        <button
-                          disabled
-                          className="flex-1 text-center py-2.5 rounded-xl bg-gray-100 text-sm font-semibold text-gray-400 cursor-not-allowed"
-                        >
-                          Waitlist
-                        </button>
-                      ) : (
-                        <Link
-                          to={`/events/${event._id}`}
-                          className="flex-1 text-center py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
-                        >
-                          Register
-                        </Link>
-                      )}
-                    </div>
+                  <div className="mt-auto flex gap-3">
+                    <Link to={`/events/${event._id}`} className="flex-1 rounded-xl border border-gray-300 py-2.5 text-center text-sm font-semibold text-gray-800 transition hover:bg-gray-50">Details</Link>
+                    <Link to={`/events/${event._id}`} className="flex-1 rounded-xl bg-blue-700 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-800">Register</Link>
                   </div>
                 </div>
-              );
-            })}
+              </article>
+            ))}
           </div>
         )}
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-12">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 transition disabled:opacity-40"
-            >
-              <HiChevronLeft />
-            </button>
-
-            {[...Array(Math.min(totalPages, 5))].map((_, i) => {
-              const p = i + 1;
-              return (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-semibold transition ${
-                    page === p
-                      ? "bg-blue-600 text-white"
-                      : "border border-gray-200 text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  {p}
-                </button>
-              );
-            })}
-
-            {totalPages > 5 && (
-              <>
-                <span className="text-gray-400 text-sm">...</span>
-                <button
-                  onClick={() => setPage(totalPages)}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-100"
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 transition disabled:opacity-40"
-            >
-              <HiChevronRight />
-            </button>
-          </div>
+        {!loading && totalPages > 1 && (
+          <nav className="mt-12 flex items-center justify-center gap-2" aria-label="Event pagination">
+            <button onClick={() => setPage((value) => Math.max(1, value - 1))} disabled={currentPage === 1} className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-700 disabled:opacity-40"><HiChevronLeft /></button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => <button key={number} onClick={() => setPage(number)} aria-current={currentPage === number ? "page" : undefined} className={`h-9 w-9 rounded-xl text-sm font-semibold ${currentPage === number ? "bg-blue-700 text-white" : "border border-gray-200 text-gray-700 hover:bg-gray-50"}`}>{number}</button>)}
+            <button onClick={() => setPage((value) => Math.min(totalPages, value + 1))} disabled={currentPage === totalPages} className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-700 disabled:opacity-40"><HiChevronRight /></button>
+          </nav>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 

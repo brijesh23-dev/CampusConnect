@@ -2,33 +2,79 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { fetchMyregistration } from "../../redux/RegistrationSlice";
 import RegistrationCard from "../../components/common/student/RegistrationCard";
+import { Link } from "react-router-dom";
+import { MdEventAvailable, MdCalendarToday } from "react-icons/md";
+
+// Loading skeleton card
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 animate-pulse">
+      <div className="h-3 bg-gray-100 rounded-full w-1/3 mb-4" />
+      <div className="h-5 bg-gray-100 rounded-full w-3/4 mb-3" />
+      <div className="h-3 bg-gray-100 rounded-full w-1/2 mb-2" />
+      <div className="h-3 bg-gray-100 rounded-full w-2/3 mb-6" />
+      <div className="h-8 bg-gray-100 rounded-xl w-full" />
+    </div>
+  );
+}
 
 function MyRegistrations() {
   const dispatch = useDispatch();
-  const { registrations } = useSelector((state) => state.registrations);
+  const { registrations, loading } = useSelector((state) => state.registrations);
 
   useEffect(() => {
     dispatch(fetchMyregistration());
   }, [dispatch]);
 
   return (
-    <div className="max-w-6xl mx-auto py-10 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900">My Registered Events</h1>
-        <p className="text-gray-500 mt-1">Here are the events you are currently signed up to attend.</p>
+    <div className="max-w-6xl mx-auto py-8 px-4">
+      {/* Page header */}
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white shadow-md flex-shrink-0">
+          <MdEventAvailable className="text-2xl" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-extrabold text-gray-900">My Registrations</h1>
+          <p className="text-sm text-gray-400 mt-0.5">
+            {loading
+              ? "Loading your events…"
+              : registrations.length > 0
+              ? `You are registered for ${registrations.length} event${registrations.length !== 1 ? "s" : ""}`
+              : "You haven't registered for any events yet"}
+          </p>
+        </div>
       </div>
 
-      {registrations.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
-          <p className="text-gray-400 font-medium mb-4">You haven't registered for any events yet.</p>
-          <a
-            href="/events"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition shadow"
+      {/* Loading skeletons */}
+      {loading && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && registrations.length === 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
+            <MdCalendarToday className="text-3xl text-blue-400" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No registrations yet</h3>
+          <p className="text-sm text-gray-400 mb-6">
+            Explore upcoming events and RSVP to add them here.
+          </p>
+          <Link
+            to="/events"
+            className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold hover:opacity-90 transition shadow"
           >
             Browse Events
-          </a>
+          </Link>
         </div>
-      ) : (
+      )}
+
+      {/* Registrations grid */}
+      {!loading && registrations.length > 0 && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {registrations.map((reg) => (
             <RegistrationCard key={reg._id} registration={reg} />

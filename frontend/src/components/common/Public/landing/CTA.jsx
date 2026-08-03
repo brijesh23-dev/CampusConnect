@@ -8,7 +8,7 @@ function CTA() {
           Ready to get started?
         </h2>
         <p className="text-gray-500 mb-8">
-          Join thousands of students already discovering events on CampusPulse.
+          Join thousands of students already discovering events on CampusConnect.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link

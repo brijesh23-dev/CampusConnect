@@ -1,3 +1,7 @@
+---
+marp: true
+---
+
 # CampusConnect
 
 CampusConnect is a MERN-style student event management project with a React frontend and an Express/MongoDB backend. It supports user registration, login, role-based routes, event management, notification delivery, and student interest tracking.

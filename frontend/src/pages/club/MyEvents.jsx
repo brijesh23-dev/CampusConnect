@@ -45,8 +45,8 @@ function MyEvents() {
           <h1 className="text-4xl font-bold">My Events</h1>
 
           <Link
-            to="/create-event"
-            className="bg-blue-600 text-white px-5 py-3 rounded-xl"
+            to="/clubs/create-event"
+            className="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition"
           >
             Create Event
           </Link>

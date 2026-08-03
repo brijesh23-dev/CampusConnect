@@ -11,13 +11,15 @@ import {
   MdHelp,
   MdLogout,
   MdAddCircleOutline,
+  MdStar,
 } from "react-icons/md";
 
 const navLinks = [
   { id: "dashboard", name: "Dashboard", path: "/student/dashboard", icon: <MdDashboard className="text-xl flex-shrink-0" /> },
+  { id: "recommended", name: "Recommended", path: "/student/recommended", icon: <MdStar className="text-xl flex-shrink-0" /> },
   { id: "my-events", name: "My Events", path: "/my-registrations", icon: <MdEventNote className="text-xl flex-shrink-0" /> },
   { id: "explore", name: "Explore", path: "/events", icon: <MdExplore className="text-xl flex-shrink-0" /> },
-  { id: "clubs", name: "Clubs", path: "/clubs", icon: <MdPeopleOutline className="text-xl flex-shrink-0" /> },
+  { id: "clubs", name: "Clubs", path: "/clubs-directory", icon: <MdPeopleOutline className="text-xl flex-shrink-0" /> },
   { id: "notifications", name: "Notifications", path: "/notifications", icon: <MdNotifications className="text-xl flex-shrink-0" /> },
   { id: "settings", name: "Settings", path: "/student/settings", icon: <MdSettings className="text-xl flex-shrink-0" /> },
 ];

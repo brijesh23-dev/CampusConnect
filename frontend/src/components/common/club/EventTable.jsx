@@ -78,13 +78,13 @@ function EventTable({ events = [], onDelete }) {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Link
-                        to={`/participants/${event?._id}`}
+                        to={`/clubs/participants/${event?._id}`}
                         className="px-3 py-1.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition"
                       >
                         Participants
                       </Link>
                       <Link
-                        to={`/club/edit-event/${event?._id}`}
+                        to={`/clubs/edit-event/${event?._id}`}
                         className="p-1.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-blue-600 transition"
                         title="Edit Event"
                       >

@@ -6,7 +6,7 @@ const testimonials = [
     name: "Sarah Jenkins",
     role: "President, Tech Club",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
-    quote: "CampusPulse completely transformed how we organize hackathons. We reached twice as many students and managed RSVPs seamlessly in one place.",
+    quote: "CampusConnect completely transformed how we organize hackathons. We reached twice as many students and managed RSVPs seamlessly in one place.",
     rating: 5,
   },
   {
@@ -36,7 +36,7 @@ function Testimonials() {
             Loved by Students and Clubs Alike
           </h2>
           <p className="text-gray-500 mt-3 max-w-lg mx-auto">
-            Hear from the student leaders and active campus members who use CampusPulse daily.
+            Hear from the student leaders and active campus members who use CampusConnect daily.
           </p>
         </div>
 

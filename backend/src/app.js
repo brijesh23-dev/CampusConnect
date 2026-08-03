@@ -8,6 +8,8 @@ const userRoutes = require('./routes/user.routes');
 const notificationRoutes = require('./routes/notifincatrion.routes');
 const registrationRoutes = require('./routes/registration.routes')
 const dashboardRoutes = require('./routes/Dashboard.routes')
+const adminRoutes = require('./routes/admin.routes')
+const clubRoutes = require('./routes/club.routes')
 const morgan = require('morgan');
 
 const app = express();
@@ -26,6 +28,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use('/api/registration',registrationRoutes)
 app.use('/api/dashboard',dashboardRoutes)
+app.use('/api/admin',adminRoutes)
+app.use('/api/clubs', clubRoutes)
 app.get("/", (req, res) => {
   res.send("College Event API running");
 });

@@ -1,5 +1,5 @@
 const registrationModel = require('../models/Registration.model');
-const { getParticipants } = require('./event.controller');
+const EventModel = require('../models/event.model');
 
 const registerForEvent = async (req, res) => {
   try {
@@ -76,9 +76,32 @@ try{
 }
 }
 
-module.exports =  {
-    getMyRegistration,
-    registerForEvent,
-    getParticipants,
-    getEventParticipants
+const cancelRegistration = async (req, res) => {
+  try {
+    const registration = await registrationModel.findOne({
+      _id: req.params.id,
+      student: req.user._id,
+    });
+
+    if (!registration) {
+      return res.status(404).json({ message: "Registration not found" });
+    }
+
+    await registrationModel.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Registration cancelled successfully",
+      cancelledId: req.params.id,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  getMyRegistration,
+  registerForEvent,
+  getEventParticipants,
+  cancelRegistration,
 }

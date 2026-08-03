@@ -8,7 +8,7 @@ function PublicFooter() {
           {/* Brand */}
           <div>
             <Link to="/" className="text-xl font-extrabold text-blue-600">
-              CampusPulse
+              CampusConnect
             </Link>
             <p className="mt-3 text-sm text-gray-500 max-w-xs leading-relaxed">
               Empowering student life through connection and shared experiences.
@@ -19,13 +19,13 @@ function PublicFooter() {
           <div>
             <p className="text-sm font-semibold text-gray-700 mb-4">Platform</p>
             <ul className="space-y-2.5">
-              {["About Us", "Privacy Policy", "Contact Support"].map((item) => (
-                <li key={item}>
+              {[{ label: "Browse events", to: "/events" }, { label: "Explore clubs", to: "/clubs-directory" }, { label: "Create an account", to: "/register" }].map((item) => (
+                <li key={item.label}>
                   <Link
-                    to="#"
+                    to={item.to}
                     className="text-sm text-gray-500 hover:text-blue-600 transition"
                   >
-                    {item}
+                    {item.label}
                   </Link>
                 </li>
               ))}
