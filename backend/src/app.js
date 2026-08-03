@@ -15,8 +15,8 @@ const morgan = require('morgan');
 const app = express();
 app.use(cors({
   origin:[
-    "http://localhost:5173",
-    "https://campus-connect-liart-six.vercel.app"
+     "http://localhost:5173",
+      "https://campus-connect-git-main-asfjldsajf.vercel.app",
   ],
   credentials: true,
 }));
