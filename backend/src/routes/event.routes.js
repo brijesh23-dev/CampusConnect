@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const eventController = require("../controllers/event.controller");
 const { protect, authorizeRoles } = require("../middleware/auth.middleware");
-const { storage } = require("../config/CoudinaryConfig");
+const { storage } = require("../config/CloudinaryConfig");
 const multer = require("multer");
 const upload = multer({ storage });
 

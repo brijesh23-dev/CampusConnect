@@ -4,9 +4,7 @@ const UserModel = require("../models/user.model");
 const RegistrationModel = require("../models/Registration.model");
 
 const createEvent = async (req, res) => {
-  console.log("body:", req.body);
-  console.log("file:", req.file);
-  console.log("user:", req.user);
+
   try {
     let { title, description, category, date,startTime,endTime, venue } = req.body;
     let newEvent = new EventModel({
