@@ -4,7 +4,7 @@ const router = express.Router();
 const {
   protect,
   authorizeRoles,
-} = require("../middleware/auth.Middleware");
+} = require("../middleware/auth.middleware");
 
 router.get(
   "/student",
