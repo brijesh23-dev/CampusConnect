@@ -5,8 +5,6 @@ const API = axios.create({
   withCredentials: true,
 });
 
-// ── Response interceptor: redirect to /login on expired sessions ──────────────
-//
 // We only act on 401 if:
 //  1. The failing request is NOT an auth endpoint (login, register, getme).
 //     Those are expected to return 401 for unauthenticated users.
