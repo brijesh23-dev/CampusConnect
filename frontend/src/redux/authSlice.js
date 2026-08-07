@@ -1,12 +1,13 @@
-import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../api/axios";
 
-export const checkUser = createAsyncThunk("auth/checkUser", async () => {
-  const res = await API.get("/auth/getme", {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  }); //getme
-  console.log("checkUser response:", res.data);
-  return res.data.user;
+export const checkUser = createAsyncThunk("auth/checkUser", async (_, thunkAPI) => {
+  try {
+    const res = await API.get("/auth/getme");
+    return res.data.user;
+  } catch {
+    return thunkAPI.rejectWithValue(null);
+  }
 });
 
 export const loginUser = createAsyncThunk(
@@ -14,12 +15,13 @@ export const loginUser = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const res = await API.post("/auth/login", data);
-      console.log("loginUser response:", res.data);
       return res.data.user;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Invalid credentials"
+      );
     }
-  },
+  }
 );
 
 export const registerUser = createAsyncThunk(
@@ -31,7 +33,7 @@ export const registerUser = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message);
     }
-  },
+  }
 );
 
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
@@ -41,27 +43,67 @@ export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
 export const updateInterests = createAsyncThunk(
   "auth/updateInterests",
   async (interests, thunkAPI) => {
-    console.log("reach to updateinterest thunk");
     try {
       const res = await API.put("/users/interests", { interests });
       return res.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to update interests"
+      );
     }
-  },
+  }
+);
+
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async ({ name }, thunkAPI) => {
+    try {
+      const res = await API.put("/users/profile", { name });
+      return res.data.user;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to update profile"
+      );
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async ({ currentPassword, newPassword }, thunkAPI) => {
+    try {
+      const res = await API.put("/users/password", { currentPassword, newPassword });
+      return res.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to change password"
+      );
+    }
+  }
 );
 
 const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
+    // Start as true — AppRoutes dispatches checkUser immediately on mount.
+    // We keep loading=true until checkUser resolves (success OR failure) so
+    // ProtectedRoute never flashes a redirect before we know the session status.
     loading: true,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    // Allows other parts of the app to manually clear auth state
+    clearAuth(state) {
+      state.user = null;
+      state.loading = false;
+      state.error = null;
+    },
+  },
 
   extraReducers: (builder) => {
     builder
+      // ── checkUser ──────────────────────────────────────────────
       .addCase(checkUser.pending, (state) => {
         state.loading = true;
       })
@@ -74,34 +116,45 @@ const authSlice = createSlice({
         state.loading = false;
       })
 
+      // ── loginUser ──────────────────────────────────────────────
+      // NOTE: loginUser does NOT touch `loading` — the ProtectedRoute
+      // loading flag is only for the initial session check (checkUser).
+      // The login form uses its own `isSubmitting` from react-hook-form.
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
         state.user = action.payload;
-      })
-      .addCase(loginUser.rejected,(state,action)=>{
-        state.error = action.payload;
-      })
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
+      .addCase(loginUser.rejected, (state, action) => {
         state.error = action.payload;
       })
 
+      // ── registerUser ───────────────────────────────────────────
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // ── logoutUser ─────────────────────────────────────────────
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
       })
+
+      // ── updateInterests ────────────────────────────────────────
       .addCase(updateInterests.fulfilled, (state, action) => {
-        console.log(action.payload);
-        state.user = action.payload.user;
+        if (action.payload?.user) {
+          state.user = action.payload.user;
+        }
+      })
+
+      // ── updateProfile ──────────────────────────────────────────
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
       });
   },
 });
 
+export const { clearAuth } = authSlice.actions;
 export default authSlice.reducer;

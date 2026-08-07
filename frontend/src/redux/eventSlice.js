@@ -2,42 +2,34 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../api/axios";
 
 export const fetchEvents = createAsyncThunk("events/fetchEvents", async (params) => {
-  const query = new URLSearchParams(params)
+  const query = new URLSearchParams(params);
   const res = await API.get(`/events/all?${query}`);
   return res.data.events;
 });
 
 export const createEvent = createAsyncThunk(
   "events/createEvent",
-  async (formData, thunkApi) => {
-    console.log(formData)
+  async (formData, thunkAPI) => {
     try {
       const res = await API.post("/events/create", formData);
       return res.data.events;
     } catch (error) {
-      console.log("error:", error.response?.data);
-      return thunkApi.rejectWithValue(
-        error.response?.data ||
-          error.response ||
-          error.response.data.message ||
-          "Failed to create event",
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to create event",
       );
     }
   },
 );
+
 export const fetchMyEvents = createAsyncThunk(
   "events/fetchMyEvents",
-  async (thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await API.get("/events/my-events");
-      console.log(res.data.events);
       return res.data.events;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data ||
-          error.response ||
-          error.response.data.message ||
-          "Failed to fetch events",
+        error.response?.data?.message || "Failed to fetch events",
       );
     }
   },
@@ -51,10 +43,7 @@ export const deleteEvent = createAsyncThunk(
       return id;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data ||
-          error.response ||
-          error.response.data.message ||
-          "Failed to delete event",
+        error.response?.data?.message || "Failed to delete event",
       );
     }
   },
@@ -68,23 +57,26 @@ export const fetchSingleEvent = createAsyncThunk(
   },
 );
 
+// Sends FormData so multer can parse the optional image on PUT /events/update/:id
 export const updateEvent = createAsyncThunk(
   "events/updateEvent",
-  async ({ id, data, thunkAPI }) => {
+  async ({ id, data, imageFile }, thunkAPI) => {
     try {
-      const res = await API.put(`/events/update/${id}`, data);
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) formData.append(key, val);
+      });
+      if (imageFile) formData.append("image", imageFile);
+
+      const res = await API.put(`/events/update/${id}`, formData);
       return res.data.event;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data ||
-          error.response ||
-          error.response.data.message ||
-          "faild to update event",
+        error.response?.data?.message || "Failed to update event",
       );
     }
   },
 );
-
 
 export const fetchParticipants = createAsyncThunk(
   "events/fetchParticipants",
@@ -94,10 +86,7 @@ export const fetchParticipants = createAsyncThunk(
       return res.data.participants;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data ||
-          error.response ||
-          error.response.data.message ||
-          "Failed to fetch participants",
+        error.response?.data?.message || "Failed to fetch participants",
       );
     }
   },
@@ -122,7 +111,6 @@ const eventSlice = createSlice({
       .addCase(fetchEvents.pending, (state) => {
         state.loading = true;
       })
-
       .addCase(fetchEvents.fulfilled, (state, action) => {
         state.loading = false;
         state.events = action.payload;
@@ -134,11 +122,12 @@ const eventSlice = createSlice({
 
       .addCase(createEvent.fulfilled, (state, action) => {
         state.loading = false;
-        state.events.push(action.payload);
+        if (action.payload) state.events.push(action.payload);
       })
       .addCase(createEvent.rejected, (state, action) => {
         state.error = action.payload || "Failed to create event";
       })
+
       .addCase(fetchMyEvents.fulfilled, (state, action) => {
         state.loading = false;
         state.events = action.payload;
@@ -150,13 +139,12 @@ const eventSlice = createSlice({
 
       .addCase(deleteEvent.fulfilled, (state, action) => {
         state.loading = false;
-        state.events = state.events.filter(
-          (event) => event._id !== action.payload,
-        );
+        state.events = state.events.filter((event) => event._id !== action.payload);
       })
       .addCase(deleteEvent.rejected, (state, action) => {
         state.error = action.payload;
       })
+
       .addCase(fetchSingleEvent.pending, (state) => {
         state.eventLoading = true;
         state.singleEvent = null;
@@ -174,12 +162,14 @@ const eventSlice = createSlice({
 
       .addCase(updateEvent.fulfilled, (state, action) => {
         state.events = state.events.map((event) =>
-          event._id === action.payload._id ? action.payload : event,
+          event._id === action.payload?._id ? action.payload : event,
         );
+        state.singleEvent = action.payload;
       })
       .addCase(updateEvent.rejected, (state, action) => {
         state.error = action.payload;
       })
+
       .addCase(fetchParticipants.fulfilled, (state, action) => {
         state.loading = false;
         state.participants = action.payload;
@@ -188,7 +178,7 @@ const eventSlice = createSlice({
       .addCase(fetchParticipants.rejected, (state, action) => {
         state.error = action.payload;
         state.participants = [];
-      })
+      });
   },
 });
 

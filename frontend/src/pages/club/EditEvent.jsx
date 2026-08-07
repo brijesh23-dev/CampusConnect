@@ -11,6 +11,8 @@ import {
   MdArrowBack,
   MdSave,
   MdCheckCircle,
+  MdCloudUpload,
+  MdClose,
 } from "react-icons/md";
 
 const CATEGORIES = [
@@ -30,6 +32,8 @@ function EditEvent() {
   const navigate = useNavigate();
   const { singleEvent } = useSelector((state) => state.events);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [imageFile, setImageFile] = useState(null);       // newly selected file
+  const [imagePreview, setImagePreview] = useState(null); // blob URL for preview
 
   const {
     register,
@@ -54,17 +58,31 @@ function EditEvent() {
         maxParticipants: singleEvent.maxParticipants || "",
         tags: singleEvent.tags?.join(", ") || "",
       });
+      // Show existing Cloudinary image as default preview
+      if (singleEvent.image) setImagePreview(singleEvent.image);
     }
   }, [singleEvent, reset]);
 
   const onSubmit = async (data) => {
     try {
-      await dispatch(updateEvent({ id, data })).unwrap();
+      await dispatch(updateEvent({ id, data, imageFile })).unwrap();
       setSaveSuccess(true);
       setTimeout(() => navigate("/clubs/events"), 1200);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(singleEvent?.image || null);
   };
 
   if (!singleEvent) {
@@ -235,6 +253,55 @@ function EditEvent() {
               />
               {errors.maxParticipants && <p className={errorText}>{errors.maxParticipants.message}</p>}
             </div>
+          </div>
+        </div>
+
+        {/* Section: Event Poster */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+              <MdCloudUpload className="text-base" />
+            </div>
+            <h2 className="text-sm font-bold text-gray-700">Event Poster</h2>
+          </div>
+          <div className="p-6">
+            <label
+              htmlFor="editImage"
+              className="relative border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition flex flex-col items-center justify-center h-52"
+            >
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Event poster preview"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <>
+                  <MdCloudUpload className="text-4xl text-gray-300 mb-2" />
+                  <p className="text-xs font-semibold text-gray-500">Click to upload poster</p>
+                  <p className="text-[11px] text-gray-400 mt-1">PNG, JPG or JPEG · Max 5 MB</p>
+                </>
+              )}
+            </label>
+            <input
+              id="editImage"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+            {imageFile && (
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-red-500 transition"
+              >
+                <MdClose className="text-sm" /> Remove new image
+              </button>
+            )}
+            {!imageFile && singleEvent?.image && (
+              <p className="mt-2 text-xs text-gray-400">Current poster shown above. Upload a new one to replace it.</p>
+            )}
           </div>
         </div>
 

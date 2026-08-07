@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { updateProfile, changePassword } from "../../redux/authSlice";
 import {
   MdPerson,
   MdLock,
@@ -39,11 +40,14 @@ function Toggle({ label, description, checked, onChange }) {
 }
 
 function StudentSettings() {
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
   // Profile state
   const [name, setName] = useState(user?.name || "");
   const [profileSaved, setProfileSaved] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState(null);
 
   // Password state
   const [currentPw, setCurrentPw] = useState("");
@@ -53,6 +57,7 @@ function StudentSettings() {
   const [showNew, setShowNew] = useState(false);
   const [pwError, setPwError] = useState(null);
   const [pwSaved, setPwSaved] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
 
   // Notification prefs state
   const [notifPrefs, setNotifPrefs] = useState({
@@ -72,23 +77,36 @@ function StudentSettings() {
   const labelBase =
     "block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5";
 
-  const handleProfileSave = () => {
-    // In a real app: dispatch(updateProfile({ name }))
-    setProfileSaved(true);
-    setTimeout(() => setProfileSaved(false), 2500);
+  const handleProfileSave = async () => {
+    setProfileError(null);
+    setProfileLoading(true);
+    const result = await dispatch(updateProfile({ name }));
+    setProfileLoading(false);
+    if (updateProfile.rejected.match(result)) {
+      setProfileError(result.payload || "Failed to save profile.");
+    } else {
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 2500);
+    }
   };
 
-  const handlePasswordSave = () => {
+  const handlePasswordSave = async () => {
     setPwError(null);
     if (!currentPw) return setPwError("Enter your current password.");
     if (newPw.length < 6) return setPwError("New password must be at least 6 characters.");
     if (newPw !== confirmPw) return setPwError("Passwords do not match.");
-    // In a real app: dispatch(changePassword({ currentPw, newPw }))
-    setPwSaved(true);
-    setCurrentPw("");
-    setNewPw("");
-    setConfirmPw("");
-    setTimeout(() => setPwSaved(false), 2500);
+    setPwLoading(true);
+    const result = await dispatch(changePassword({ currentPassword: currentPw, newPassword: newPw }));
+    setPwLoading(false);
+    if (changePassword.rejected.match(result)) {
+      setPwError(result.payload || "Failed to update password.");
+    } else {
+      setPwSaved(true);
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+      setTimeout(() => setPwSaved(false), 2500);
+    }
   };
 
   const handleNotifSave = () => {
@@ -120,18 +138,29 @@ function StudentSettings() {
     </div>
   );
 
-  const SaveButton = ({ saved, onClick, label = "Save Changes" }) => (
+  const SaveButton = ({ saved, onClick, label = "Save Changes", loading = false }) => (
     <button
       type="button"
       onClick={onClick}
+      disabled={loading || saved}
       className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all ${
         saved
           ? "bg-emerald-500 text-white"
+          : loading
+          ? "bg-gradient-to-r from-violet-400 to-blue-400 text-white cursor-not-allowed"
           : "bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-90"
       }`}
     >
       {saved ? (
         <><MdCheckCircle className="text-base" /> Saved!</>
+      ) : loading ? (
+        <>
+          <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+          Saving…
+        </>
       ) : (
         <><MdSave className="text-base" /> {label}</>
       )}
@@ -198,8 +227,16 @@ function StudentSettings() {
             <p className="text-xs text-gray-400 mt-1">Email cannot be changed. Contact support if needed.</p>
           </div>
         </div>
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-          <SaveButton saved={profileSaved} onClick={handleProfileSave} label="Save Profile" />
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          {profileError && (
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 border border-red-200 mb-3">
+              <MdErrorOutline className="text-red-500 flex-shrink-0 text-sm" />
+              <p className="text-xs text-red-600 font-medium">{profileError}</p>
+            </div>
+          )}
+          <div className="flex justify-end">
+            <SaveButton saved={profileSaved} onClick={handleProfileSave} label="Save Profile" loading={profileLoading} />
+          </div>
         </div>
       </div>
 
@@ -252,7 +289,7 @@ function StudentSettings() {
           )}
         </div>
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-          <SaveButton saved={pwSaved} onClick={handlePasswordSave} label="Update Password" />
+          <SaveButton saved={pwSaved} onClick={handlePasswordSave} label="Update Password" loading={pwLoading} />
         </div>
       </div>
 

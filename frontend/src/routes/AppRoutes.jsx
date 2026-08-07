@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import { checkUser } from "../redux/authSlice";
 
@@ -47,6 +47,24 @@ import AdminReports from "../pages/admin/AdminReports";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import PageNotfound from "../components/common/PageNotfound";
 
+// ── GuestRoute: Redirect already-logged-in users away from auth pages ──────────
+// Prevents authenticated users from visiting /login or /register and getting stuck.
+function GuestRoute({ children }) {
+  const { user, loading } = useSelector((state) => state.auth);
+
+  // Still checking session — wait before redirecting
+  if (loading) return null;
+
+  if (user) {
+    // Redirect to the appropriate dashboard based on role
+    if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
+    if (user.role === "club") return <Navigate to="/clubs" replace />;
+    return <Navigate to="/student/dashboard" replace />;
+  }
+
+  return children;
+}
+
 function AppRoutes() {
   const dispatch = useDispatch();
 
@@ -63,8 +81,25 @@ function AppRoutes() {
         <Route path="events/:id" element={<EventDetails />} />
         <Route path="clubs-directory" element={<Clubs />} />
         <Route path="clubs-directory/:id" element={<ClubDetails />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
+
+        {/* Auth pages — redirect if already logged in */}
+        <Route
+          path="login"
+          element={
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="register"
+          element={
+            <GuestRoute>
+              <Register />
+            </GuestRoute>
+          }
+        />
+
         <Route path="*" element={<PageNotfound />} />
       </Route>
 

@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema(
         type: String,
       },
     ],
+
+    // Club-only profile fields
+    description: { type: String, default: "" },
+    category:    { type: String, default: "" },
+    website:     { type: String, default: "" },
   },
   { timestamps: true },
 );

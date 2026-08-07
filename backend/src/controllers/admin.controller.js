@@ -90,6 +90,26 @@ const deleteAdminEvent = async (req, res) => {
   }
 };
 
+// PATCH /api/admin/users/:id/role  — toggle user role (student ↔ club)
+const updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    if (!["student", "club"].includes(role)) {
+      return res.status(400).json({ message: "Role must be 'student' or 'club'" });
+    }
+    const user = await UserModel.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.role === "admin") {
+      return res.status(403).json({ message: "Cannot change admin role" });
+    }
+    user.role = role;
+    await user.save();
+    res.json({ message: "Role updated", user: { _id: user._id, role: user.role } });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // GET /api/admin/analytics  — platform-wide analytics
 const getPlatformAnalytics = async (req, res) => {
   try {
@@ -154,4 +174,5 @@ module.exports = {
   getAllEvents,
   deleteAdminEvent,
   getPlatformAnalytics,
+  updateUserRole,
 };

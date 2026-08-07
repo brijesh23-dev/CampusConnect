@@ -30,15 +30,28 @@ export const fetchParticipants = createAsyncThunk("registration/fetchParticipant
   async(eventId,thunkAPI)=>{
     try{
       const res = await API.get(`/registration/participants/${eventId}`);
-      console.log(res)
       return res.data;
     }catch(error){
       return thunkAPI.rejectWithValue(
-        error.response.data.message
-      )
+        error.response?.data?.message || "Failed to fetch participants"
+      );
     }
   }
-)
+);
+
+export const cancelRegistration = createAsyncThunk(
+  "registration/cancelRegistration",
+  async (registrationId, thunkAPI) => {
+    try {
+      await API.delete(`/registration/${registrationId}`);
+      return registrationId;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to cancel registration"
+      );
+    }
+  }
+);
 
 const initialState = {
   registrations: [],
@@ -51,7 +64,14 @@ const initialState = {
 const registrationSlice = createSlice({
   name: "registrations",
   initialState,
-  reducers: {},
+  reducers: {
+    // optimistic removal (if needed elsewhere)
+    removeRegistration(state, action) {
+      state.registrations = state.registrations.filter(
+        (r) => r._id !== action.payload
+      );
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(registerForEvent.pending, (state) => {
@@ -88,6 +108,20 @@ const registrationSlice = createSlice({
       })
       .addCase(fetchParticipants.rejected, (state) => {
         state.loading = false;
+      })
+
+      // cancel registration
+      .addCase(cancelRegistration.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(cancelRegistration.fulfilled, (state, action) => {
+        // remove from local list immediately
+        state.registrations = state.registrations.filter(
+          (r) => r._id !== action.payload
+        );
+      })
+      .addCase(cancelRegistration.rejected, (state, action) => {
+        state.error = action.payload;
       });
   },
 });

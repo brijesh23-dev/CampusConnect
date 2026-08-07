@@ -65,6 +65,18 @@ export const deleteAdminEvent = createAsyncThunk(
   }
 );
 
+export const updateUserRole = createAsyncThunk(
+  "admin/updateUserRole",
+  async ({ id, role }, thunkAPI) => {
+    try {
+      const res = await API.patch(`/admin/users/${id}/role`, { role });
+      return res.data.user; // { _id, role }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to update role");
+    }
+  }
+);
+
 export const fetchPlatformAnalytics = createAsyncThunk(
   "admin/fetchPlatformAnalytics",
   async (_, thunkAPI) => {
@@ -123,6 +135,13 @@ const adminSlice = createSlice({
       .addCase(fetchAllAdminEvents.rejected, setError)
       .addCase(deleteAdminEvent.fulfilled, (state, action) => {
         state.events = state.events.filter((e) => e._id !== action.payload);
+      })
+
+      // role toggle
+      .addCase(updateUserRole.fulfilled, (state, action) => {
+        const { _id, role } = action.payload;
+        const user = state.users.find((u) => u._id === _id);
+        if (user) user.role = role;
       })
 
       // analytics

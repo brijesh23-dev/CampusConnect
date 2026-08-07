@@ -8,6 +8,7 @@ const adminOnly = [protect, authorizeRoles("admin")];
 router.get("/stats", ...adminOnly, adminController.getStats);
 router.get("/users", ...adminOnly, adminController.getAllUsers);
 router.delete("/users/:id", ...adminOnly, adminController.deleteUser);
+router.patch("/users/:id/role", ...adminOnly, adminController.updateUserRole);
 router.get("/events", ...adminOnly, adminController.getAllEvents);
 router.delete("/events/:id", ...adminOnly, adminController.deleteAdminEvent);
 router.get("/analytics", ...adminOnly, adminController.getPlatformAnalytics);

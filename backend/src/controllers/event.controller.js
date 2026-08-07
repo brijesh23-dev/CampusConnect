@@ -102,9 +102,20 @@ const updateEvent = async (req, res) => {
       return res.status(403).json({ message: "Not allowed" });
     }
 
+    // Build update object from body fields (FormData-safe)
+    const { title, description, category, date, startTime, endTime, venue } = req.body;
+    const updateData = { title, description, category, date, startTime, endTime, venue };
+
+    // If a new image was uploaded via multer → Cloudinary, use its URL
+    if (req.file?.path) {
+      updateData.image = req.file.path;
+    }
+    // Remove undefined fields to avoid overwriting with undefined
+    Object.keys(updateData).forEach((k) => updateData[k] === undefined && delete updateData[k]);
+
     const updatedEvent = await EventModel.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true },
     );
 
@@ -116,6 +127,7 @@ const updateEvent = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const deleteEvent = async (req, res) => {
   try {

@@ -1,16 +1,15 @@
 
 import AppRoutes from "./routes/AppRoutes";
-import { ToastContainer,Bounce } from "react-toastify";
-import { cn } from "@/lib/utils";
+import { ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const App = () => {
-  console.log(cn("p-2", "p-4"));
   return (
     <>
       <AppRoutes />
-      <ToastContainer />
       <ToastContainer
         position="bottom-right"
-        autoClose={5000}
+        autoClose={4000}
         hideProgressBar={false}
         newestOnTop
         closeOnClick={false}

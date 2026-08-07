@@ -29,7 +29,7 @@ const register = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -54,7 +54,6 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await UserModel.findOne({ email });
-    const token = generateToken(user._id, user.role);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
@@ -65,14 +64,16 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-    
+
+    const token = generateToken(user._id, user.role);
+
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-    res.status(201).json({
+    res.status(200).json({
       message: "Login successful",
       user: {
         id: user._id,
@@ -81,7 +82,7 @@ const login = async (req, res) => {
         role: user.role,
         interests: user.interests,
       },
-      token ,
+      token,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

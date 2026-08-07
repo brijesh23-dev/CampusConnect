@@ -24,6 +24,7 @@ router.put(
   "/update/:id",
   protect,
   authorizeRoles("club", "admin"),
+  upload.single("image"),
   eventController.updateEvent,
 );
 router.delete(

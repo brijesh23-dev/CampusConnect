@@ -1,9 +1,9 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { fetchMyregistration } from "../../redux/RegistrationSlice";
+import { useEffect, useState } from "react";
+import { fetchMyregistration, cancelRegistration } from "../../redux/RegistrationSlice";
 import RegistrationCard from "../../components/common/student/RegistrationCard";
 import { Link } from "react-router-dom";
-import { MdEventAvailable, MdCalendarToday } from "react-icons/md";
+import { MdEventAvailable, MdCalendarToday, MdErrorOutline } from "react-icons/md";
 
 // Loading skeleton card
 function SkeletonCard() {
@@ -21,10 +21,22 @@ function SkeletonCard() {
 function MyRegistrations() {
   const dispatch = useDispatch();
   const { registrations, loading } = useSelector((state) => state.registrations);
+  const [cancelError, setCancelError] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => {
     dispatch(fetchMyregistration());
   }, [dispatch]);
+
+  const handleCancel = async (registrationId) => {
+    setCancelError(null);
+    setCancellingId(registrationId);
+    const result = await dispatch(cancelRegistration(registrationId));
+    setCancellingId(null);
+    if (cancelRegistration.rejected.match(result)) {
+      setCancelError(result.payload || "Failed to cancel. Please try again.");
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4">
@@ -44,6 +56,18 @@ function MyRegistrations() {
           </p>
         </div>
       </div>
+
+      {/* Cancel error banner */}
+      {cancelError && (
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 mb-4">
+          <MdErrorOutline className="text-red-500 flex-shrink-0" />
+          <p className="text-xs text-red-600 font-medium">{cancelError}</p>
+          <button
+            onClick={() => setCancelError(null)}
+            className="ml-auto text-xs text-red-400 hover:text-red-600 font-semibold"
+          >Dismiss</button>
+        </div>
+      )}
 
       {/* Loading skeletons */}
       {loading && (
@@ -77,7 +101,12 @@ function MyRegistrations() {
       {!loading && registrations.length > 0 && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {registrations.map((reg) => (
-            <RegistrationCard key={reg._id} registration={reg} />
+            <RegistrationCard
+              key={reg._id}
+              registration={reg}
+              onCancel={handleCancel}
+              cancelling={cancellingId === reg._id}
+            />
           ))}
         </div>
       )}

@@ -114,8 +114,59 @@ The next implementation pass will complete and verify the public-facing CampusCo
 - Add responsive and accessibility checks across public, student, club, and admin routes.
 - Review security, environment configuration, and deployment documentation before release.
 
-What's left in roadmap
-Wire Cancel RSVP to API when backend endpoint exists
-Connect StudentSettings save to API dispatch
-Live data for Admin AnalyticsChart / RecentActivity
-Release readiness checks
+---
+
+## Current Milestone: Roadmap Completion Pass
+
+### Completed in Current Milestone
+- **Cancel RSVP wired to API** (`frontend/src/redux/RegistrationSlice.js`, `frontend/src/pages/student/MyRegistrations.jsx`, `frontend/src/components/common/student/RegistrationCard.jsx`): Added `cancelRegistration` Redux thunk (`DELETE /registration/:id`) with `pending/fulfilled/rejected` cases. `MyRegistrations` now dispatches it on `onCancel`, shows an inline error banner on failure, and removes the card immediately on success. `RegistrationCard` shows a spinner and disables the button while cancelling.
+- **StudentSettings save wired to API** (`backend/src/controllers/user.controller.js`, `backend/src/routes/user.routes.js`, `frontend/src/redux/authSlice.js`, `frontend/src/pages/student/StudentSettings.jsx`): Added `PUT /api/users/profile` (name update) and `PUT /api/users/password` (bcrypt-verified password change) backend endpoints. Added `updateProfile` and `changePassword` async thunks in authSlice. StudentSettings save handlers now dispatch real API calls, show inline error messages from the server, and show a spinner on the Save button while in-flight. Successful profile save reflects immediately in the Redux user state and avatar.
+- **Admin AnalyticsChart live data** (`frontend/src/components/common/admin/AnalyticsChart.jsx`): Replaced hardcoded mock data with a bar chart driven by `analytics.registrationsByEvent` from the existing `/api/admin/analytics` endpoint. Shows per-event RSVP counts with color-coded bars, loading skeleton, and empty state.
+- **Admin RecentActivity live data** (`frontend/src/components/common/admin/RecentActivity.jsx`): Replaced static hardcoded activity list with a `buildActivityFeed` function that derives insights from `analytics.registrationsByEvent`, `analytics.categoryBreakdown`, `analytics.topClubs`, and `stats.totalStudents`. Shows loading skeleton and empty state.
+- **AdminDashboard** (`frontend/src/pages/admin/AdminDashboard.jsx`): Now dispatches `fetchPlatformAnalytics` alongside `fetchAdminStats` on mount, extracts `analytics` from Redux state, and passes `analytics`/`stats`/`loading` as props to the chart and activity components.
+- **Build verification**: `npm run build` ✅ — 804 modules, 1.10 MB JS bundle (gzip: 306 KB), 92.7 KB CSS. Zero errors.
+
+## Current Milestone: Feature Completion Pass
+
+### Completed in Current Milestone
+- **Club Profile backend** (`backend/src/models/user.model.js`, `backend/src/controllers/club.controller.js`, `backend/src/routes/club.routes.js`): Added `description`, `category`, `website` fields to the User schema. Added `GET /clubs/profile` and `PUT /clubs/profile` protected endpoints (club-role only). Routes registered before the public `/:id` wildcard to avoid conflicts. ClubProfile page now fully persists data to the DB.
+- **AdminAnalytics live data** (`frontend/src/pages/admin/AdminAnalytics.jsx`): Full rewrite — removed all 4 hardcoded mock data arrays. Dispatches `fetchPlatformAnalytics` + `fetchAdminStats` on mount. Stat cards show live user/club/event/RSVP totals. Bar chart shows real `registrationsByEvent`. Pie chart shows real `categoryBreakdown`. Leaderboard shows real `topClubs` with animated progress bars. Skeleton loaders + empty states throughout.
+- **Admin role toggle** (`backend/src/controllers/admin.controller.js`, `backend/src/routes/admin.routes.js`, `frontend/src/redux/adminSlice.js`, `frontend/src/components/common/admin/UsersTable.jsx`): Added `PATCH /admin/users/:id/role` endpoint (protects admin accounts from having their role changed). Added `updateUserRole` Redux thunk — patches role in state immediately on success. `UsersTable` now shows a `→ Club` / `→ Student` toggle button next to Delete for non-admin users with a spinner during in-flight state.
+- **`.env.example`** (`backend/.env.example`): Documents all required environment variables with descriptions.
+- **`DEPLOYMENT.md`**: Comprehensive deployment guide — local setup, env config, seeding an admin account, production build instructions, hosting recommendations, and a go-live checklist.
+- **Build verification**: `npm run build` ✅ — 804 modules, 1.09 MB JS bundle (gzip: 303 KB), 92.9 KB CSS. Zero errors.
+
+## Remaining Roadmap
+
+### Authentication and Platform Hardening
+- Confirm cookie-based JWT behavior across browser refreshes and protected routes.
+- Improve unauthorized-session recovery (auto-redirect to login on 401).
+
+### Club Portal
+---
+
+## Current Milestone: Final Feature Pass
+
+### Completed in Current Milestone
+- **401 auto-redirect** (`frontend/src/api/axios.js`): Added a response interceptor that catches any `401 Unauthorized` response, dispatches `logoutUser()` to clear Redux state, and redirects to `/login`. Uses dynamic `import()` inside the handler to break the circular dependency between `axios.js → store.js → authSlice.js → axios.js`. Build passes with only an informational Vite `INEFFECTIVE_DYNAMIC_IMPORT` warning (no functional impact).
+- **Event image upload on Edit** (`backend/src/routes/event.routes.js`, `backend/src/controllers/event.controller.js`, `frontend/src/redux/eventSlice.js`, `frontend/src/pages/club/EditEvent.jsx`): Cloudinary + multer-storage-cloudinary was already installed. Added `upload.single("image")` middleware to `PUT /events/update/:id`. Rewrote `updateEvent` controller to build a clean update object from FormData fields and use `req.file.path` (Cloudinary URL) when a new image is uploaded. `updateEvent` Redux thunk now sends FormData (supporting an optional `imageFile` argument). `EditEvent.jsx` gets a full "Event Poster" section: shows the existing Cloudinary image on load, lets the club select a new file with a local preview, and includes a "Remove new image" revert button.
+- **eventSlice cleanup** (`frontend/src/redux/eventSlice.js`): Full clean rewrite — fixed the `thunkAPI` destructuring bug (it was inside the payload arg), fixed `fetchMyEvents` (first arg was `thunkAPI` instead of `_`), and added `singleEvent` update on `updateEvent.fulfilled`.
+- **`.env.example` updated** (`backend/.env.example`): Added `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` documentation.
+- **Build verification**: `npm run build` ✅ — 804 modules, 1.10 MB bundle (gzip: 304 KB). Zero errors.
+
+## Current Milestone: Login Fix & Final Polish
+
+### Completed in Current Milestone
+- **Login redirect bug fixed** (`frontend/src/redux/authSlice.js`): Root cause was two-fold: (1) `checkUser` thunk had no `try/catch`, so a 401 from the `/getme` endpoint caused an unhandled promise rejection that never resolved the `loading=true` state; (2) `loginUser.fulfilled` set `loading=false` but `loginUser.pending` had no `loading=true` handler — the race condition between `checkUser` (still loading) and `loginUser` (succeeded) caused `ProtectedRoute` to block navigation. Fixed by wrapping `checkUser` in try/catch with `rejectWithValue`, keeping `loginUser` from touching the global `loading` flag, and decoupling login loading state from session loading state.
+- **Backend login crash fixed** (`backend/src/controllers/auth.controller.js`): `generateToken(user._id, user.role)` was called on line 57 *before* the `!user` null check on line 59 — logging in with a non-existent email crashed the server with a `TypeError: Cannot read properties of null`. Fixed by moving the user existence check before the token generation. Also changed response status from `201` (Created) to `200` (OK) which is more semantically correct for a login operation.
+- **GuestRoute guard added** (`frontend/src/routes/AppRoutes.jsx`): Added a `GuestRoute` wrapper component that redirects already-authenticated users away from `/login` and `/register` to their role-appropriate dashboard. This prevents the confusing UX where a logged-in user visits `/login` and stays stuck on the auth page.
+- **Duplicate ToastContainer removed** (`frontend/src/App.jsx`): Was rendering two `ToastContainer` instances simultaneously (one unstyled, one configured). Consolidated into a single properly configured instance. Added missing `react-toastify/dist/ReactToastify.css` import so toast notifications are styled correctly.
+- **MyEvents.jsx polished** (`frontend/src/pages/club/MyEvents.jsx`): Replaced native browser `confirm()` and `alert()` dialogs (which are blocked in many secure contexts) with a proper modal `ConfirmDeleteDialog` component and `react-toastify` notifications. Improved loading state to use a spinner instead of plain text. Empty state now uses a premium card layout matching the rest of the portal.
+- **Build verification**: `npm run build` ✅ — 805 modules, 1.10 MB JS bundle (gzip: 305 KB). Zero errors.
+
+## Remaining Roadmap
+
+### Release Readiness
+- Responsive and accessibility audit across all 4 portals (mobile breakpoints, ARIA labels, focus management).
+- HTTPS configuration for production deployment.
+- Event lifecycle controls (draft / published / cancelled status) — optional enhancement.

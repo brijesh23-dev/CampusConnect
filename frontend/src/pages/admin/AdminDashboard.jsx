@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { MdPeople, MdEvent, MdGroups, MdPoll, MdWarning } from "react-icons/md";
-import { fetchAdminStats, deleteUser, deleteAdminEvent } from "../../redux/adminSlice";
+import { fetchAdminStats, deleteUser, deleteAdminEvent, fetchPlatformAnalytics } from "../../redux/adminSlice";
 import DashboardCard from "../../components/common/admin/DashboardCard";
 import UsersTable from "../../components/common/admin/UsersTable";
 import EventsTable from "../../components/common/admin/EventsTable";
@@ -46,7 +46,7 @@ function ConfirmDialog({ open, title, message, onConfirm, onCancel }) {
 
 function AdminDashboard() {
   const dispatch = useDispatch();
-  const { stats, loading } = useSelector((state) => state.admin);
+  const { stats, analytics, loading } = useSelector((state) => state.admin);
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = searchParams.get("tab") || "overview";
 
@@ -60,6 +60,7 @@ function AdminDashboard() {
 
   useEffect(() => {
     dispatch(fetchAdminStats());
+    dispatch(fetchPlatformAnalytics());
   }, [dispatch]);
 
   const handleTabChange = (tabName) => {
@@ -177,9 +178,9 @@ function AdminDashboard() {
               {/* Analytics + Activity row */}
               <div className="grid lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
-                  <AnalyticsChart />
+                  <AnalyticsChart analytics={analytics} loading={loading} />
                 </div>
-                <RecentActivity />
+                <RecentActivity analytics={analytics} stats={stats} loading={loading} />
               </div>
 
               {/* Compact tables */}

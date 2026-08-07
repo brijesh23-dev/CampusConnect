@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { MdCalendarToday, MdLocationOn, MdCategory, MdEventBusy } from "react-icons/md";
 
-function RegistrationCard({ registration, onCancel }) {
+function RegistrationCard({ registration, onCancel, cancelling }) {
   const event = registration?.event || {};
   const dateStr = event.date
     ? new Date(event.date).toLocaleDateString("en-US", {
@@ -73,11 +73,25 @@ function RegistrationCard({ registration, onCancel }) {
         {onCancel && !isPast && (
           <button
             onClick={() => onCancel(registration._id)}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl border border-red-200 text-xs font-semibold text-red-500 hover:bg-red-50 transition flex-shrink-0"
+            disabled={cancelling}
+            className={`flex items-center gap-1 px-3 py-2 rounded-xl border text-xs font-semibold transition flex-shrink-0 ${
+              cancelling
+                ? "border-red-100 text-red-300 bg-red-50 cursor-not-allowed"
+                : "border-red-200 text-red-500 hover:bg-red-50"
+            }`}
             title="Cancel RSVP"
           >
-            <MdEventBusy className="text-sm" />
-            Cancel
+            {cancelling ? (
+              <>
+                <svg className="animate-spin w-3.5 h-3.5 text-red-400" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+                Cancelling…
+              </>
+            ) : (
+              <><MdEventBusy className="text-sm" />Cancel</>
+            )}
           </button>
         )}
       </div>

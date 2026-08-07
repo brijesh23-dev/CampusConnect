@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllUsers, deleteUser } from "../../../redux/adminSlice";
-import { MdSearch, MdDelete, MdShield, MdPerson, MdGroups, MdRefresh } from "react-icons/md";
+import { fetchAllUsers, deleteUser, updateUserRole } from "../../../redux/adminSlice";
+import { MdSearch, MdDelete, MdShield, MdPerson, MdGroups, MdRefresh, MdSwapHoriz } from "react-icons/md";
 
 function UsersTable({ onDeleteRequest, compact }) {
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector((state) => state.admin);
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
+  const [togglingId, setTogglingId] = useState(null); // which user's role is being changed
 
   useEffect(() => {
     dispatch(fetchAllUsers());
@@ -25,6 +26,13 @@ function UsersTable({ onDeleteRequest, compact }) {
     } else {
       dispatch(deleteUser(id));
     }
+  };
+
+  const handleRoleToggle = async (user) => {
+    const newRole = user.role === "student" ? "club" : "student";
+    setTogglingId(user._id);
+    await dispatch(updateUserRole({ id: user._id, role: newRole }));
+    setTogglingId(null);
   };
 
   // Client-side search filter on top of server data
@@ -149,16 +157,37 @@ function UsersTable({ onDeleteRequest, compact }) {
                   {/* Joined date */}
                   <td className="px-6 py-4 text-xs text-gray-400">{formatDate(u.createdAt)}</td>
 
-                  {/* Delete */}
+                  {/* Actions */}
                   <td className="px-6 py-4 text-right">
                     {u.role !== "admin" ? (
-                      <button
-                        onClick={() => handleDelete(u._id, u.name)}
-                        className="p-1.5 rounded-xl border border-gray-200 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition"
-                        title="Delete User"
-                      >
-                        <MdDelete className="text-base" />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        {/* Role toggle */}
+                        <button
+                          onClick={() => handleRoleToggle(u)}
+                          disabled={togglingId === u._id}
+                          title={`Switch to ${u.role === "student" ? "club" : "student"}`}
+                          className={`flex items-center gap-1 px-2 py-1.5 rounded-lg border text-xs font-semibold transition ${
+                            togglingId === u._id
+                              ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                              : "border-violet-200 text-violet-600 hover:bg-violet-50"
+                          }`}
+                        >
+                          {togglingId === u._id ? (
+                            <span className="w-3 h-3 border-2 border-violet-300 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <MdSwapHoriz className="text-sm" />
+                          )}
+                          {u.role === "student" ? "→ Club" : "→ Student"}
+                        </button>
+                        {/* Delete */}
+                        <button
+                          onClick={() => handleDelete(u._id, u.name)}
+                          className="p-1.5 rounded-xl border border-gray-200 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition"
+                          title="Delete User"
+                        >
+                          <MdDelete className="text-base" />
+                        </button>
+                      </div>
                     ) : (
                       <span className="text-xs text-gray-400 italic">Protected</span>
                     )}
