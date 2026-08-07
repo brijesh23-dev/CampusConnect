@@ -3,16 +3,28 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 
+const isProd = process.env.NODE_ENV === "production";
 
 const generateToken = (userId, role) => {
   return jwt.sign({ id: userId, role }, config.JWT_SECRET, { expiresIn: "7d" });
+};
+
+// Cookie options:
+//  - Local dev  (localhost → localhost): sameSite "lax",  secure false
+//  - Production (Vercel  → Render):      sameSite "none", secure true
+//    Cross-origin cookies REQUIRE sameSite:"none" + secure:true in browsers.
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
 const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
     const existingUser = await UserModel.findOne({ email });
-    
+
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -25,13 +37,9 @@ const register = async (req, res) => {
       password: hashedPassword,
       role,
     });
+
     const token = generateToken(user._id, user.role);
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie("token", token, cookieOptions);
 
     res.status(201).json({
       message: "User registered successfully",
@@ -66,13 +74,8 @@ const login = async (req, res) => {
     }
 
     const token = generateToken(user._id, user.role);
+    res.cookie("token", token, cookieOptions);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -96,10 +99,11 @@ const getMe = async (req, res) => {
 };
 
 const logout = async (req, res) => {
+  // Must pass the same sameSite/secure options to correctly clear the cookie
   res.clearCookie("token", {
-    httpOnly: true, 
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
   });
   res.json({ message: "Logout successful" });
 };
