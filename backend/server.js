@@ -11,6 +11,8 @@ const socketService = require("./src/socket/socketService");
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "https://campus-connect-6j9w3exer-asfjldsajf.vercel.app",
+  "https://campus-connect-git-main-asfjldsajf.vercel.app",
   "https://campus-connect-liart-six.vercel.app",
 ];
 
