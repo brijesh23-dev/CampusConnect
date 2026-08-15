@@ -96,7 +96,53 @@ function EventDetails() {
           </div>
 
           <aside className="space-y-5">
-            <section className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"><h2 className="text-lg font-bold text-gray-900">Registration</h2><p className="mt-1 text-sm text-gray-600">General admission is free. Bring your student ID for check-in.</p><div className="my-5 border-y border-gray-100 py-3 text-sm font-semibold text-green-700">Free admission</div>{user?.role === "student" ? isRegistered ? <div className="flex items-center justify-center gap-2 rounded-xl bg-green-50 py-3 text-sm font-semibold text-green-800"><MdCheckCircle /> You’re registered</div> : <button onClick={handleRegister} disabled={registrationLoading} className="w-full rounded-xl bg-blue-700 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">{registrationLoading ? "Registering…" : "Register now"}</button> : user ? <p className="rounded-xl bg-gray-100 p-3 text-sm text-gray-700">Sign in as a student to register for this event.</p> : <Link to={`/login?redirect=${encodeURIComponent(`/events/${id}`)}`} className="block w-full rounded-xl bg-blue-700 py-3 text-center text-sm font-semibold text-white transition hover:bg-blue-800">Sign in to register</Link>}{registrationMessage && <p className={`mt-3 text-sm ${isRegistered ? "text-green-700" : "text-red-700"}`}>{registrationMessage}</p>}</section>
+            <section className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900">Registration</h2>
+              <p className="mt-1 text-sm text-gray-600">General admission is free. Bring your student ID for check-in.</p>
+              <div className="my-5 border-y border-gray-100 py-3 text-sm font-semibold text-green-700">Free admission</div>
+
+              {/* --- Registration action block --- */}
+              {user?.role === "admin" ? (
+                // Admins: no register button, just a neutral label
+                <p className="rounded-xl bg-gray-100 p-3 text-sm text-gray-500 text-center">
+                  Admin view — registration not applicable.
+                </p>
+              ) : user?.role === "club" ? (
+                // Club accounts: cannot register for events
+                <p className="rounded-xl bg-gray-100 p-3 text-sm text-gray-500 text-center">
+                  Club accounts cannot register for events.
+                </p>
+              ) : user?.role === "student" ? (
+                // Students: show registered state or register button
+                isRegistered ? (
+                  <div className="flex items-center justify-center gap-2 rounded-xl bg-green-50 py-3 text-sm font-semibold text-green-800">
+                    <MdCheckCircle /> You're registered
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleRegister}
+                    disabled={registrationLoading}
+                    className="w-full rounded-xl bg-blue-700 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {registrationLoading ? "Registering…" : "Register now"}
+                  </button>
+                )
+              ) : (
+                // Not logged in: prompt to sign in
+                <Link
+                  to={`/login?redirect=${encodeURIComponent(`/events/${id}`)}`}
+                  className="block w-full rounded-xl bg-blue-700 py-3 text-center text-sm font-semibold text-white transition hover:bg-blue-800"
+                >
+                  Sign in to register
+                </Link>
+              )}
+
+              {registrationMessage && (
+                <p className={`mt-3 text-sm ${isRegistered ? "text-green-700" : "text-red-700"}`}>
+                  {registrationMessage}
+                </p>
+              )}
+            </section>
             <section className="rounded-2xl border border-gray-200 bg-white p-6"><p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Organized by</p><div className="mt-4 flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-100 font-bold text-violet-800">{singleEvent.club?.name?.[0] || "C"}</div><div><p className="text-sm font-bold text-gray-900">{singleEvent.club?.name || "Campus club"}</p><p className="text-xs text-gray-600">Campus event organizer</p></div></div><div className="mt-4 flex items-center gap-2 text-sm text-gray-600"><MdPeopleOutline /> Discover more campus activities</div></section>
           </aside>
         </div>

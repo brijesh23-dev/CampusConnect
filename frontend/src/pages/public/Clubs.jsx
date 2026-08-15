@@ -10,17 +10,6 @@ import {
   MdExplore,
 } from "react-icons/md";
 
-// Fallback mock data shown while API is connected
-const MOCK_CLUBS = [
-  { _id: "c1", name: "Campus Tech Society", description: "Building the next generation of engineers and innovators through hands-on workshops, hackathons, and industry connections.", category: "Technology", eventsCount: 24, membersCount: 312, avatar: "T" },
-  { _id: "c2", name: "Fine Arts Collective", description: "A vibrant creative community hosting exhibitions, life drawing sessions, and collaborative art projects throughout the year.", category: "Arts", eventsCount: 18, membersCount: 156, avatar: "A" },
-  { _id: "c3", name: "Coding Club", description: "Weekly coding challenges, competitive programming sessions, and collaborative open-source projects for all skill levels.", category: "Technology", eventsCount: 31, membersCount: 248, avatar: "C" },
-  { _id: "c4", name: "Music Society", description: "From classical to contemporary — we celebrate all genres. Join jam sessions, open-mic nights, and annual concerts.", category: "Music", eventsCount: 14, membersCount: 198, avatar: "M" },
-  { _id: "c5", name: "Entrepreneurship Cell", description: "Connect with founders, investors, and mentors. We run pitch competitions, speaker sessions, and startup incubation programs.", category: "Business", eventsCount: 20, membersCount: 290, avatar: "E" },
-  { _id: "c6", name: "Sports Federation", description: "Coordinating inter-college sports events, tournaments, and fitness bootcamps to keep campus life active and healthy.", category: "Sports", eventsCount: 38, membersCount: 420, avatar: "S" },
-  { _id: "c7", name: "Photography Club", description: "Explore the art of visual storytelling. Weekly photo walks, editing workshops, and a thriving campus gallery.", category: "Arts", eventsCount: 12, membersCount: 134, avatar: "P" },
-  { _id: "c8", name: "Robotics & AI Lab", description: "Designing autonomous systems, competing in national robotics competitions, and pushing the boundaries of machine intelligence.", category: "Technology", eventsCount: 16, membersCount: 112, avatar: "R" },
-];
 
 const CATEGORIES = ["All", "Technology", "Arts", "Music", "Business", "Sports"];
 
@@ -45,11 +34,9 @@ function Clubs() {
     dispatch(fetchAllClubs());
   }, [dispatch]);
 
-  // Use real data if available, otherwise mock
-  const sourceData = clubs?.length > 0 ? clubs : MOCK_CLUBS;
-
+  // Always use real API data; show empty state if no clubs yet
   const filtered = useMemo(() => {
-    return sourceData.filter((club) => {
+    return (clubs || []).filter((club) => {
       const name = club.name || "";
       const desc = club.description || "";
       const matchesSearch =
@@ -59,7 +46,7 @@ function Clubs() {
         activeCategory === "All" || club.category === activeCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [sourceData, search, activeCategory]);
+  }, [clubs, search, activeCategory]);
 
   const gradientClass = (cat) => categoryGradients[cat] || categoryGradients.Default;
 

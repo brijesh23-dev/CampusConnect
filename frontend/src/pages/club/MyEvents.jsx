@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { MdAdd, MdWarning } from "react-icons/md";
-import { fetchMyEvents, deleteEvent } from "../../redux/eventSlice";
+import { fetchMyEvents, deleteEvent, updateEventStatus } from "../../redux/eventSlice";
 import EventTable from "../../components/common/club/EventTable";
 import { toast } from "react-toastify";
 
@@ -67,6 +67,15 @@ function MyEvents() {
     }
   };
 
+  const handleStatusChange = async (id, status) => {
+    try {
+      await dispatch(updateEventStatus({ id, status })).unwrap();
+      toast.success(`Event marked as ${status}.`);
+    } catch {
+      toast.error("Failed to update event status.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-64 gap-4">
@@ -123,7 +132,7 @@ function MyEvents() {
             </Link>
           </div>
         ) : (
-          <EventTable events={events} onDelete={requestDelete} />
+          <EventTable events={events} onDelete={requestDelete} onStatusChange={handleStatusChange} />
         )}
       </div>
     </>

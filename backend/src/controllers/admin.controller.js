@@ -167,12 +167,26 @@ const getPlatformAnalytics = async (req, res) => {
   }
 };
 
+// PATCH /api/admin/events/:id/approve — approve a pending event
+const approveEvent = async (req, res) => {
+  try {
+    const event = await EventModel.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+    event.status = "approved";
+    await event.save();
+    res.json({ message: "Event approved", event });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getStats,
   getAllUsers,
   deleteUser,
   getAllEvents,
   deleteAdminEvent,
+  approveEvent,
   getPlatformAnalytics,
   updateUserRole,
 };

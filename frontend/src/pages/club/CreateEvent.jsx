@@ -60,8 +60,9 @@ const imagePreview = image?.[0]
     setCatInput("");
   };
 
-  const onSubmit = async (data) => {
-    console.log(data);
+  const [isDrafting, setIsDrafting] = useState(false);
+
+  const submitWithStatus = async (data, status) => {
     try {
       const formData = new FormData();
       formData.append("title", data.title);
@@ -71,6 +72,7 @@ const imagePreview = image?.[0]
       formData.append("startTime", data.startTime);
       formData.append("endTime", data.endTime);
       formData.append("venue", data.venue);
+      formData.append("status", status);
       if (data.image?.[0]) formData.append("image", data.image[0]);
       formData.append("requireRSVP", requireRSVP);
       formData.append("attendeeLimit", data.attendeeLimit || "");
@@ -82,6 +84,17 @@ const imagePreview = image?.[0]
       console.log("create event", error);
     }
   };
+
+  const onSubmit = async (data) => submitWithStatus(data, "published");
+
+  const onSaveDraft = handleSubmit(async (data) => {
+    setIsDrafting(true);
+    try {
+      await submitWithStatus(data, "draft");
+    } finally {
+      setIsDrafting(false);
+    }
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -374,27 +387,29 @@ const imagePreview = image?.[0]
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-end gap-3 mt-8 pb-8">
+          <div className="flex flex-wrap items-center justify-end gap-3 mt-8 pb-8">
             <Link
-              to="/club"
+              to="/clubs/events"
               className="px-6 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
             >
               Cancel
             </Link>
             <button
               type="button"
-              className="flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+              onClick={onSaveDraft}
+              disabled={isDrafting || isSubmitting}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl border border-amber-300 bg-amber-50 text-sm font-semibold text-amber-700 hover:bg-amber-100 transition disabled:opacity-60"
             >
               <MdSave className="text-lg" />
-              Save as Draft
+              {isDrafting ? "Saving Draft…" : "Save as Draft"}
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isDrafting}
               className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold hover:opacity-90 transition shadow-md disabled:opacity-60"
             >
               <MdSend className="text-lg" />
-              {isSubmitting ? "Submitting..." : "Submit Event"}
+              {isSubmitting ? "Submitting…" : "Publish Event"}
             </button>
           </div>
         </form>

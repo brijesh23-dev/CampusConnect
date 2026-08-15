@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { MdNotificationsNone, MdSearch } from "react-icons/md";
+import { MdNotificationsNone, MdSearch, MdMenu } from "react-icons/md";
 
 const PAGE_TITLES = {
   "/admin/dashboard": "Dashboard",
@@ -9,7 +9,7 @@ const PAGE_TITLES = {
   "/admin/settings": "Settings",
 };
 
-function AdminNavbar() {
+function AdminNavbar({ onMenuClick }) {
   const { user } = useSelector((state) => state.auth);
   const { pathname } = useLocation();
 
@@ -23,12 +23,24 @@ function AdminNavbar() {
     : "A";
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0 shadow-sm">
+    <header className="h-14 bg-white border-b border-slate-200 flex items-center gap-3 px-4 sm:px-6 flex-shrink-0 shadow-sm">
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={onMenuClick}
+        className="lg:hidden p-2 rounded-xl hover:bg-slate-100 text-slate-600 transition flex-shrink-0"
+        aria-label="Open navigation menu"
+      >
+        <MdMenu className="text-2xl" />
+      </button>
+
       {/* Page title */}
-      <div>
-        <h1 className="text-base font-bold text-slate-900">{pageTitle}</h1>
-        <p className="text-xs text-slate-400 leading-none mt-0.5">CampusConnect Admin</p>
+      <div className="min-w-0">
+        <h1 className="text-base font-bold text-slate-900 truncate">{pageTitle}</h1>
+        <p className="text-xs text-slate-400 leading-none mt-0.5 hidden sm:block">CampusConnect Admin</p>
       </div>
+
+      {/* Spacer */}
+      <div className="flex-1" />
 
       {/* Right side */}
       <div className="flex items-center gap-3">
@@ -39,6 +51,7 @@ function AdminNavbar() {
             type="text"
             placeholder="Quick search…"
             className="bg-transparent text-xs text-slate-700 w-36 outline-none placeholder:text-slate-400"
+            aria-label="Quick search"
           />
         </div>
 
@@ -54,7 +67,7 @@ function AdminNavbar() {
 
         {/* Avatar */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center text-white text-xs font-black">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center text-white text-xs font-black flex-shrink-0">
             {initials}
           </div>
           <div className="hidden sm:block">

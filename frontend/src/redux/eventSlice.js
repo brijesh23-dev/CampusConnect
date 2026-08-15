@@ -92,6 +92,21 @@ export const fetchParticipants = createAsyncThunk(
   },
 );
 
+// Quick status-only update (draft / published / cancelled)
+export const updateEventStatus = createAsyncThunk(
+  "events/updateEventStatus",
+  async ({ id, status }, thunkAPI) => {
+    try {
+      const res = await API.patch(`/events/${id}/status`, { status });
+      return res.data.event;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to update status",
+      );
+    }
+  },
+);
+
 const eventSlice = createSlice({
   name: "events",
 
@@ -178,6 +193,26 @@ const eventSlice = createSlice({
       .addCase(fetchParticipants.rejected, (state, action) => {
         state.error = action.payload;
         state.participants = [];
+      })
+
+      // updateEventStatus: patch the event in both `events` list and `singleEvent`
+      .addCase(updateEventStatus.pending, (state, action) => {
+        // Optimistic UI: mark the event as updating
+        const id = action.meta.arg.id;
+        const evt = state.events.find((e) => e._id === id);
+        if (evt) evt._statusLoading = true;
+      })
+      .addCase(updateEventStatus.fulfilled, (state, action) => {
+        const updated = action.payload;
+        state.events = state.events.map((e) =>
+          e._id === updated._id ? { ...updated, _statusLoading: false } : e,
+        );
+        if (state.singleEvent?._id === updated._id) state.singleEvent = updated;
+      })
+      .addCase(updateEventStatus.rejected, (state, action) => {
+        state.error = action.payload;
+        // Clear loading flag
+        state.events = state.events.map((e) => ({ ...e, _statusLoading: false }));
       });
   },
 });

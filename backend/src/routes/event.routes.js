@@ -19,7 +19,6 @@ router.get(
   authorizeRoles("club", "admin"),
   eventController.getMyevents,
 );
-router.get("/:id", eventController.getsingleEvent);
 router.put(
   "/update/:id",
   protect,
@@ -40,9 +39,18 @@ router.post(
   eventController.registerForEvent
 );
 router.get(
-  "/:id/participants",        // /event id/participants
+  "/:id/participants",
   protect,
   authorizeRoles("club", "admin"),
   eventController.getParticipants,
 );
+router.patch(
+  "/:id/status",
+  protect,
+  authorizeRoles("club"),
+  eventController.updateEventStatus,
+);
+// /:id must come LAST — it is a wildcard catch-all
+router.get("/:id", eventController.getsingleEvent);
+
 module.exports = router;

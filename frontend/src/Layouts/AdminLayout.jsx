@@ -1,18 +1,20 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import AdminSidebar from "../components/common/admin/AdminSidebar";
 import AdminNavbar from "../components/common/admin/AdminNavbar";
+
 function AdminLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50">
-      {/* Admin Sidebar */}
-      <AdminSidebar />
-      
+      <AdminSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <AdminNavbar />
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <AdminNavbar onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto overflow-x-hidden">
-          {/* page content */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <Outlet />
           </div>
         </main>

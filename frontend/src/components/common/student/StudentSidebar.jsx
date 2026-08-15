@@ -10,8 +10,8 @@ import {
   MdSettings,
   MdHelp,
   MdLogout,
-  MdAddCircleOutline,
   MdStar,
+  MdClose,
 } from "react-icons/md";
 
 const navLinks = [
@@ -28,7 +28,7 @@ const bottomLinks = [
   { id: "help", name: "Help", path: "/help", icon: <MdHelp className="text-xl flex-shrink-0" /> },
 ];
 
-function StudentSidebar() {
+function StudentSidebar({ open, setOpen }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
@@ -38,34 +38,31 @@ function StudentSidebar() {
     navigate("/login");
   };
 
-  return (
-    <aside className="w-56 h-screen bg-white border-r border-gray-100 flex flex-col shadow-sm flex-shrink-0">
+  const close = () => setOpen?.(false);
+
+  const sidebarContent = (
+    <aside className="w-56 h-full bg-white border-r border-gray-100 flex flex-col shadow-sm">
       {/* Logo / Header */}
-      <div className="p-5 border-b border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-white font-bold text-sm shadow">
+      <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-white font-bold text-sm shadow flex-shrink-0">
             {user?.name?.[0]?.toUpperCase() || "C"}
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold text-gray-900 truncate">
-              {user?.name || "Event Manager"}
+              {user?.name || "Student"}
             </p>
-            <p className="text-xs text-gray-400 truncate">
-              {user?.role === "student" ? "Student" : "Admin Access"}
-            </p>
+            <p className="text-xs text-gray-400 truncate">Student</p>
           </div>
         </div>
-      </div>
-
-      {/* New Event CTA */}
-      <div className="px-4 pt-4">
-        <NavLink
-          to="/events"
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold hover:opacity-90 transition shadow-sm"
+        {/* Close button — mobile only */}
+        <button
+          onClick={close}
+          className="lg:hidden ml-2 p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition flex-shrink-0"
+          aria-label="Close menu"
         >
-          <MdAddCircleOutline className="text-lg" />
-          New Event
-        </NavLink>
+          <MdClose className="text-xl" />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -74,6 +71,7 @@ function StudentSidebar() {
           <NavLink
             key={link.id}
             to={link.path}
+            onClick={close}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive
@@ -94,6 +92,7 @@ function StudentSidebar() {
           <NavLink
             key={link.id}
             to={link.path}
+            onClick={close}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-all"
           >
             {link.icon}
@@ -109,6 +108,31 @@ function StudentSidebar() {
         </button>
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      {/* ── Desktop: always visible static sidebar ──────────────── */}
+      <div className="hidden lg:flex h-screen flex-shrink-0">
+        {sidebarContent}
+      </div>
+
+      {/* ── Mobile: backdrop + slide-in drawer ───────────────────── */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+          onClick={close}
+          aria-hidden="true"
+        />
+      )}
+      <div
+        className={`fixed top-0 left-0 z-50 h-full transition-transform duration-300 ease-in-out lg:hidden ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {sidebarContent}
+      </div>
+    </>
   );
 }
 

@@ -2,21 +2,26 @@ const EventModel = require("../models/event.model");
 const Notification = require("../models/notification.model");
 const UserModel = require("../models/user.model");
 const RegistrationModel = require("../models/Registration.model");
+const socketService = require("../socket/socketService");
+
 
 const createEvent = async (req, res) => {
 
   try {
-    let { title, description, category, date,startTime,endTime, venue } = req.body;
+    let { title, description, category, date, startTime, endTime, venue, status, maxParticipants } = req.body;
     let newEvent = new EventModel({
       title,
       description,
       category,
       date,
-       startTime,
-       endTime,
+      startTime,
+      endTime,
       venue,
       club: req.user._id,
       image: req.file ? req.file.path : null || req.body.image,
+      // If caller explicitly sets status (e.g. "draft"), honour it; otherwise default ("published")
+      ...(status && { status }),
+      ...(maxParticipants && { maxParticipants: Number(maxParticipants) }),
     });
 
     await newEvent.save();
@@ -31,7 +36,18 @@ const createEvent = async (req, res) => {
       message: `New ${category} event: ${title}`,
     }));
     if (notifications.length > 0) {
-      await Notification.insertMany(notifications);
+      const saved = await Notification.insertMany(notifications);
+
+      // Push each notification in real-time via Socket.IO
+      saved.forEach((notif) => {
+        socketService.sendToUser(notif.user, "new-notification", {
+          _id: notif._id,
+          message: notif.message,
+          event: { _id: newEvent._id, title: newEvent.title },
+          isRead: false,
+          createdAt: notif.createdAt,
+        });
+      });
     }
     res.status(201).json({
       message: "Event created successfully",
@@ -44,26 +60,29 @@ const createEvent = async (req, res) => {
 };
 
 const getAllEvents = async (req, res) => {
-  let filter = {};
-   let { search,category } = req.query;
-   if(category){
+  // Return published events (+ legacy "approved" value) to the public
+  let filter = { status: { $in: ["published", "approved"] } };
+  let { search, category } = req.query;
+  if (category) {
     filter.category = category;
-   }
-
-   if(search){
+  }
+  if (search) {
     filter.title = {
-    $regex:search,
-    $options:"i"
-    }
-   }
-   const events = await EventModel.find(filter);
-  let allevent = await EventModel.find().populate("club", "name email");
-  console.log(allevent);
-  res.status(200).json({
-    message: "All events fetched successfully",
-    events: allevent,
-    events
-  });
+      $regex: search,
+      $options: "i",
+    };
+  }
+  try {
+    const events = await EventModel.find(filter)
+      .populate("club", "name email")
+      .sort({ date: -1 });
+    res.status(200).json({
+      message: "All events fetched successfully",
+      events,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const getsingleEvent = async (req, res) => {
@@ -103,8 +122,12 @@ const updateEvent = async (req, res) => {
     }
 
     // Build update object from body fields (FormData-safe)
-    const { title, description, category, date, startTime, endTime, venue } = req.body;
+    const { title, description, category, date, startTime, endTime, venue, status, maxParticipants } = req.body;
     const updateData = { title, description, category, date, startTime, endTime, venue };
+
+    // Allow status changes via full edit form
+    if (status) updateData.status = status;
+    if (maxParticipants !== undefined) updateData.maxParticipants = maxParticipants ? Number(maxParticipants) : null;
 
     // If a new image was uploaded via multer → Cloudinary, use its URL
     if (req.file?.path) {
@@ -123,6 +146,31 @@ const updateEvent = async (req, res) => {
       message: "Event updated successfully",
       event: updatedEvent,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PATCH /events/:id/status — quick status-only update for club owners
+const updateEventStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ["draft", "published", "cancelled"];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const event = await EventModel.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    if (event.club.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    event.status = status;
+    await event.save();
+
+    res.json({ message: "Status updated", event });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -182,6 +230,16 @@ const registerForEvent = async (req, res) => {
       message: "Registration successful",
       registration,
     });
+
+    // Push a real-time confirmation to the registering student
+    const registeredEvent = await EventModel.findById(eventId).select("title");
+    socketService.sendToUser(req.user._id, "new-notification", {
+      _id: `reg-${registration._id}`,
+      message: `You're registered for "${registeredEvent?.title || "an event"}"!`,
+      event: { _id: eventId, title: registeredEvent?.title },
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -212,6 +270,7 @@ module.exports = {
   getsingleEvent,
   getMyevents,
   updateEvent,
+  updateEventStatus,
   deleteEvent,
   registerForEvent,
   getParticipants,

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAdminStats, fetchPlatformAnalytics } from "../../redux/adminSlice";
 import {
   MdDownload,
-  MdBarChart,
   MdPeople,
   MdEvent,
   MdGroups,
@@ -9,17 +10,9 @@ import {
   MdCheckCircle,
 } from "react-icons/md";
 
+
+// Report definitions (static metadata; data pulled dynamically on download)
 const REPORTS = [
-  {
-    id: "monthly-registrations",
-    title: "Monthly Registrations Report",
-    description: "Complete breakdown of student event registrations grouped by month, category, and club.",
-    icon: <MdBarChart className="text-xl" />,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-    lastGenerated: "Jul 30, 2026",
-    format: "CSV",
-  },
   {
     id: "top-events",
     title: "Top Events Report",
@@ -27,7 +20,6 @@ const REPORTS = [
     icon: <MdEvent className="text-xl" />,
     iconBg: "bg-violet-100",
     iconColor: "text-violet-600",
-    lastGenerated: "Jul 28, 2026",
     format: "CSV",
   },
   {
@@ -37,50 +29,110 @@ const REPORTS = [
     icon: <MdGroups className="text-xl" />,
     iconBg: "bg-emerald-100",
     iconColor: "text-emerald-600",
-    lastGenerated: "Jul 25, 2026",
     format: "CSV",
   },
   {
     id: "user-growth",
     title: "User Growth Report",
-    description: "New student and club registrations over time, segmented by role and registration source.",
+    description: "New student and club registrations over time, segmented by role.",
     icon: <MdPeople className="text-xl" />,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
-    lastGenerated: "Jul 20, 2026",
     format: "CSV",
   },
   {
     id: "event-calendar",
-    title: "Upcoming Events Calendar",
-    description: "Full calendar export of all approved events with date, time, venue, and organizer details.",
+    title: "Platform Statistics",
+    description: "Full snapshot of platform totals: users, clubs, events, and RSVPs.",
     icon: <MdCalendarToday className="text-xl" />,
     iconBg: "bg-pink-100",
     iconColor: "text-pink-600",
-    lastGenerated: "Jul 31, 2026",
-    format: "ICS",
+    format: "CSV",
   },
 ];
 
-const SUMMARY_STATS = [
-  { label: "Reports Generated", value: "148", sub: "This semester" },
-  { label: "Last Export", value: "Today", sub: "Jul 31, 2026" },
-  { label: "Active Exports", value: "3", sub: "CSV format" },
-  { label: "Data Coverage", value: "100%", sub: "All modules" },
-];
-
 function AdminReports() {
+  const dispatch = useDispatch();
+  const { stats, analytics, loading } = useSelector((state) => state.admin);
   const [downloading, setDownloading] = useState(null);
   const [downloaded, setDownloaded] = useState([]);
   const [dateRange, setDateRange] = useState("this-semester");
 
+  useEffect(() => {
+    dispatch(fetchAdminStats());
+    dispatch(fetchPlatformAnalytics());
+  }, [dispatch]);
+
+  // Build summary tiles from real API data
+  const summaryTiles = [
+    {
+      label: "Total Events",
+      value: loading ? "…" : (stats?.totalEvents ?? "—"),
+      sub: "All platform events",
+    },
+    {
+      label: "Total RSVPs",
+      value: loading ? "…" : (stats?.totalRegistrations ?? "—"),
+      sub: "Student registrations",
+    },
+    {
+      label: "Active Clubs",
+      value: loading ? "…" : (stats?.totalClubs ?? "—"),
+      sub: "Club accounts",
+    },
+    {
+      label: "Total Students",
+      value: loading ? "…" : (stats?.totalStudents ?? "—"),
+      sub: "Student accounts",
+    },
+  ];
+
+  // Generate and download a CSV from live analytics data
+  const generateCSV = (id) => {
+    let rows = [];
+    const now = new Date().toLocaleDateString("en-US");
+
+    if (id === "top-events") {
+      rows = [["Event Title", "Category", "RSVPs"]];
+      (analytics?.registrationsByEvent || []).forEach((item) => {
+        rows.push([item._id?.title || "Unknown", item._id?.category || "", item.count]);
+      });
+    } else if (id === "club-activity") {
+      rows = [["Club Name", "RSVPs"]];
+      (analytics?.topClubs || []).forEach((c) => {
+        rows.push([c._id?.name || "Unknown", c.registrations]);
+      });
+    } else if (id === "user-growth") {
+      rows = [["Role", "Count"]];
+      rows.push(["Students", stats?.totalStudents ?? 0]);
+      rows.push(["Clubs", stats?.totalClubs ?? 0]);
+      rows.push(["Total Users", stats?.totalUsers ?? 0]);
+    } else if (id === "event-calendar") {
+      rows = [["Metric", "Value", "As of"]];
+      rows.push(["Total Events", stats?.totalEvents ?? 0, now]);
+      rows.push(["Total RSVPs", stats?.totalRegistrations ?? 0, now]);
+      rows.push(["Active Clubs", stats?.totalClubs ?? 0, now]);
+      rows.push(["Total Students", stats?.totalStudents ?? 0, now]);
+    }
+
+    const csvContent = rows.map((r) => r.map(String).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${id}-${now.replace(/\//g, "-")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleDownload = (id) => {
     setDownloading(id);
     setTimeout(() => {
+      generateCSV(id);
       setDownloading(null);
       setDownloaded((prev) => [...prev, id]);
       setTimeout(() => setDownloaded((prev) => prev.filter((d) => d !== id)), 3000);
-    }, 1200);
+    }, 800);
   };
 
   return (
@@ -107,9 +159,9 @@ function AdminReports() {
         </select>
       </div>
 
-      {/* Summary tiles */}
+      {/* Summary tiles — real data from API */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {SUMMARY_STATS.map((s) => (
+        {summaryTiles.map((s) => (
           <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
             <p className="text-2xl font-extrabold text-gray-900">{s.value}</p>
             <p className="text-xs font-bold text-gray-500 mt-1">{s.label}</p>

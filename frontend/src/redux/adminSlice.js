@@ -40,6 +40,20 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+// Dedicated thunk for clubs — stores into state.clubs, not state.users
+export const fetchAllClubUsers = createAsyncThunk(
+  "admin/fetchAllClubUsers",
+  async (params = {}, thunkAPI) => {
+    try {
+      const query = new URLSearchParams({ role: "club", ...params });
+      const res = await API.get(`/admin/users?${query}`);
+      return res.data.users;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed");
+    }
+  }
+);
+
 export const fetchAllAdminEvents = createAsyncThunk(
   "admin/fetchAllAdminEvents",
   async (params = {}, thunkAPI) => {
@@ -77,6 +91,18 @@ export const updateUserRole = createAsyncThunk(
   }
 );
 
+export const approveAdminEvent = createAsyncThunk(
+  "admin/approveAdminEvent",
+  async (id, thunkAPI) => {
+    try {
+      const res = await API.patch(`/admin/events/${id}/approve`);
+      return res.data.event; // { _id, status, ... }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to approve event");
+    }
+  }
+);
+
 export const fetchPlatformAnalytics = createAsyncThunk(
   "admin/fetchPlatformAnalytics",
   async (_, thunkAPI) => {
@@ -96,6 +122,7 @@ const adminSlice = createSlice({
   initialState: {
     stats: null,
     users: [],
+    clubs: [],
     events: [],
     analytics: null,
     loading: false,
@@ -124,7 +151,16 @@ const adminSlice = createSlice({
       .addCase(fetchAllUsers.rejected, setError)
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.users = state.users.filter((u) => u._id !== action.payload);
+        state.clubs = state.clubs.filter((c) => c._id !== action.payload);
       })
+
+      // clubs (separate from users to avoid state conflict)
+      .addCase(fetchAllClubUsers.pending, setLoading)
+      .addCase(fetchAllClubUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.clubs = action.payload;
+      })
+      .addCase(fetchAllClubUsers.rejected, setError)
 
       // events
       .addCase(fetchAllAdminEvents.pending, setLoading)
@@ -135,6 +171,11 @@ const adminSlice = createSlice({
       .addCase(fetchAllAdminEvents.rejected, setError)
       .addCase(deleteAdminEvent.fulfilled, (state, action) => {
         state.events = state.events.filter((e) => e._id !== action.payload);
+      })
+      .addCase(approveAdminEvent.fulfilled, (state, action) => {
+        const updated = action.payload;
+        const idx = state.events.findIndex((e) => e._id === updated._id);
+        if (idx !== -1) state.events[idx] = updated;
       })
 
       // role toggle

@@ -79,6 +79,18 @@ function AdminDashboard() {
     });
   };
 
+  const requestDeleteClub = (id, name) => {
+    setConfirmDialog({
+      open: true,
+      title: "Delete Club",
+      message: `Permanently delete club "${name}"? This cannot be undone.`,
+      onConfirm: () => {
+        dispatch(deleteUser(id));
+        setConfirmDialog((prev) => ({ ...prev, open: false }));
+      },
+    });
+  };
+
   const requestDeleteEvent = (id, title) => {
     setConfirmDialog({
       open: true,
@@ -185,7 +197,7 @@ function AdminDashboard() {
 
               {/* Compact tables */}
               <UsersTable compact onDeleteRequest={requestDeleteUser} />
-              <ClubsTable compact />
+              <ClubsTable compact onDeleteRequest={requestDeleteClub} />
               <EventsTable compact onDeleteRequest={requestDeleteEvent} />
             </>
           )}
@@ -193,7 +205,7 @@ function AdminDashboard() {
           {currentTab === "users" && (
             <UsersTable onDeleteRequest={requestDeleteUser} />
           )}
-          {currentTab === "clubs" && <ClubsTable />}
+          {currentTab === "clubs" && <ClubsTable onDeleteRequest={requestDeleteClub} />}
           {currentTab === "events" && (
             <EventsTable onDeleteRequest={requestDeleteEvent} />
           )}

@@ -170,3 +170,31 @@ The next implementation pass will complete and verify the public-facing CampusCo
 - Responsive and accessibility audit across all 4 portals (mobile breakpoints, ARIA labels, focus management).
 - HTTPS configuration for production deployment.
 - Event lifecycle controls (draft / published / cancelled status) — optional enhancement.
+
+---
+
+## Current Milestone: Mobile Responsiveness & Event Lifecycle
+
+### Completed in Current Milestone
+- **StudentSidebar.jsx** (`frontend/src/components/common/student/StudentSidebar.jsx`): Full mobile drawer rewrite. On desktop (`lg+`) sidebar is a static panel; on mobile it slides in from the left as a full-screen overlay. Accepts `open`/`setOpen` props from `StudentLayout`. Close button inside sidebar + backdrop tap both dismiss it. Nav links close the drawer on tap.
+- **ClubSidebar.jsx** (`frontend/src/components/common/ClubSidebar.jsx`): Same mobile drawer pattern applied to club portal. Preserves expandable "My Events" sub-menu. Accepts `open`/`setOpen` props from `ClubLayout`.
+- **AdminSidebar.jsx** (`frontend/src/components/common/admin/AdminSidebar.jsx`): Same mobile drawer pattern, dark slate/950 theme preserved. Accepts `open`/`setOpen` props from `AdminLayout`.
+- **StudentLayout.jsx** (`frontend/src/Layouts/StudentLayout.jsx`): Lifts `sidebarOpen` state and passes `open`/`setOpen` to `StudentSidebar` and `onMenuClick` to `TopNavbar`. Content padding is responsive (`p-4 sm:p-6`).
+- **ClubLayout.jsx** (`frontend/src/Layouts/ClubLayout.jsx`): Lifts `sidebarOpen` state. Renders a mobile-only top bar (hidden `lg+`) with a hamburger icon and brand name.
+- **AdminLayout.jsx** (`frontend/src/Layouts/AdminLayout.jsx`): Lifts `sidebarOpen` state and wires `onMenuClick` to `AdminNavbar`. Content padding is responsive.
+- **TopNavbar.jsx** (`frontend/src/components/common/student/TopNavbar.jsx`): Accepts `onMenuClick` prop — hamburger icon (`lg:hidden`) triggers sidebar. Removed misplaced "Create Event" CTA (students shouldn't see it here). Responsive flex layout; search bar shrinks on small screens. Notifications icon now links to `/student/notifications`.
+- **AdminNavbar.jsx** (`frontend/src/components/common/admin/AdminNavbar.jsx`): Accepts `onMenuClick` prop — hamburger icon (`lg:hidden`) triggers admin sidebar. Page subtitle hidden on very small screens.
+- **event.model.js** (`backend/src/models/event.model.js`): Extended `status` enum from `["pending","approved"]` to `["draft","published","cancelled"]`. Default is `"published"` so existing events keep working unchanged. Added optional `maxParticipants` field.
+- **event.controller.js** (`backend/src/controllers/event.controller.js`): `createEvent` honours optional `status`/`maxParticipants` fields. `getAllEvents` (public endpoint) now filters to `{ status: "published" }` — draft and cancelled events are invisible to the public. `updateEvent` supports `status` and `maxParticipants` fields. New `updateEventStatus` handler for `PATCH /events/:id/status` (owner-only quick status change).
+- **event.routes.js** (`backend/src/routes/event.routes.js`): Registered `PATCH /events/:id/status` route (club role, protected).
+- **eventSlice.js** (`frontend/src/redux/eventSlice.js`): Added `updateEventStatus` async thunk (`PATCH /events/:id/status`). Added optimistic `_statusLoading` flag and `fulfilled`/`rejected` reducer cases.
+- **EventTable.jsx** (`frontend/src/components/common/club/EventTable.jsx`): Added a **Status** column. When `onStatusChange` prop is provided, renders a styled select dropdown with `draft / published / cancelled` options. Read-only badge when prop is absent. Table has `min-w-[700px]` so horizontal scroll works on narrow screens.
+- **MyEvents.jsx** (`frontend/src/pages/club/MyEvents.jsx`): Wires `updateEventStatus` to `EventTable.onStatusChange` with toast success/error feedback.
+- **CreateEvent.jsx** (`frontend/src/pages/club/CreateEvent.jsx`): "Save as Draft" button is now functional — calls `submitWithStatus(data, "draft")`. "Publish Event" button calls `submitWithStatus(data, "published")`. Cancel now links correctly to `/clubs/events`. Both buttons disabled while the other is submitting.
+- **Build verification**: `npm run build` ✅ — 805 modules, 1.10 MB JS bundle (gzip: 305 KB). Zero errors.
+
+## Remaining Roadmap
+
+### Release Readiness
+- Accessibility audit: ARIA labels on interactive elements (modals, dropdowns, nav), keyboard focus management.
+- HTTPS / production environment configuration.

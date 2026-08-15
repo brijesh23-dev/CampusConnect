@@ -11,6 +11,7 @@ router.delete("/users/:id", ...adminOnly, adminController.deleteUser);
 router.patch("/users/:id/role", ...adminOnly, adminController.updateUserRole);
 router.get("/events", ...adminOnly, adminController.getAllEvents);
 router.delete("/events/:id", ...adminOnly, adminController.deleteAdminEvent);
+router.patch("/events/:id/approve", ...adminOnly, adminController.approveEvent);
 router.get("/analytics", ...adminOnly, adminController.getPlatformAnalytics);
 
 module.exports = router;
