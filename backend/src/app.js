@@ -10,29 +10,25 @@ const registrationRoutes = require('./routes/registration.routes')
 const dashboardRoutes = require('./routes/Dashboard.routes')
 const adminRoutes = require('./routes/admin.routes')
 const clubRoutes = require('./routes/club.routes')
-const morgan = require('morgan');
 
 const app = express();
-
-// Allowed origins — local dev ports + any production Vercel deployment
+// place the deployed url of frontend in allowedOrigins after deployment of frontend
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://campus-connect-git-main-asfjldsajf.vercel.app",
-  "https://your-production-domain.vercel.app",
+  "https://campus-connect-liart-six.vercel.app/"
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. curl, Postman, server-to-server)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`CORS: origin '${origin}' not allowed`));
   },
-  credentials: true,   // Required for cross-origin cookies (sameSite:"none")
+  credentials: true,
 }));
 
-app.use(morgan('dev'));
 app.use(cookie_Parser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
