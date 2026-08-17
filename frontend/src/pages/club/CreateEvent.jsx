@@ -46,7 +46,7 @@ const imagePreview = image?.[0]
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState(["Academic", "Workshop"]);
+  const [categories, setCategories] = useState([]);
   const [catInput, setCatInput] = useState("");
   const [requireRSVP, setRequireRSVP] = useState(true);
 
@@ -61,13 +61,16 @@ const imagePreview = image?.[0]
   };
 
   const [isDrafting, setIsDrafting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const submitWithStatus = async (data, status) => {
+    setSubmitError("");
     try {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description);
-      formData.append("category", categories[0] || data.category);
+      // Send the first selected category as the primary one (backend stores a single string)
+      formData.append("category", categories[0] || "");
       formData.append("date", data.date);
       formData.append("startTime", data.startTime);
       formData.append("endTime", data.endTime);
@@ -75,13 +78,18 @@ const imagePreview = image?.[0]
       formData.append("status", status);
       if (data.image?.[0]) formData.append("image", data.image[0]);
       formData.append("requireRSVP", requireRSVP);
-      formData.append("attendeeLimit", data.attendeeLimit || "");
+      // Use maxParticipants — the field name the backend controller reads
+      if (data.maxParticipants) formData.append("maxParticipants", data.maxParticipants);
 
       await dispatch(createEvent(formData)).unwrap();
       reset();
       navigate("/clubs/events");
     } catch (error) {
-      console.log("create event", error);
+      const msg =
+        typeof error === "string"
+          ? error
+          : error?.message || "Failed to create event. Please try again.";
+      setSubmitError(msg);
     }
   };
 
@@ -373,7 +381,7 @@ const imagePreview = image?.[0]
                       <input
                         type="number"
                         placeholder="e.g. 50"
-                        {...register("attendeeLimit")}
+                        {...register("maxParticipants")}
                         className="w-24 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
                       />
                       <span className="text-xs text-gray-400">
@@ -386,8 +394,16 @@ const imagePreview = image?.[0]
             </div>
           </div>
 
+          {/* Error message */}
+          {submitError && (
+            <div className="mt-6 flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm font-medium px-4 py-3 rounded-xl">
+              <span className="text-base">⚠️</span>
+              {submitError}
+            </div>
+          )}
+
           {/* Action buttons */}
-          <div className="flex flex-wrap items-center justify-end gap-3 mt-8 pb-8">
+          <div className="flex flex-wrap items-center justify-end gap-3 mt-4 pb-8">
             <Link
               to="/clubs/events"
               className="px-6 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"

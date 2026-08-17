@@ -29,7 +29,13 @@ const notificationSlice = createSlice({
     loading: false,
   },
 
-  reducers: {},
+  reducers: {
+    // Called by useSocket hook when a real-time notification arrives via Socket.IO
+    addRealtimeNotification(state, action) {
+      // Prepend so the newest notification always appears at the top
+      state.notifications.unshift(action.payload);
+    },
+  },
 
   extraReducers: (builder) => {
     builder
@@ -56,4 +62,5 @@ const notificationSlice = createSlice({
   },
 });
 
+export const { addRealtimeNotification } = notificationSlice.actions;
 export default notificationSlice.reducer;

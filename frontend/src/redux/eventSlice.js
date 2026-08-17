@@ -12,7 +12,7 @@ export const createEvent = createAsyncThunk(
   async (formData, thunkAPI) => {
     try {
       const res = await API.post("/events/create", formData);
-      return res.data.events;
+      return res.data.event;
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Failed to create event",

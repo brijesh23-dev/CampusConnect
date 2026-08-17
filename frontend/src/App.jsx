@@ -2,8 +2,12 @@
 import AppRoutes from "./routes/AppRoutes";
 import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useSocket from "./hooks/useSocket";
 
 const App = () => {
+  // Manages Socket.IO lifecycle — connects when logged in, disconnects on logout
+  useSocket();
+
   return (
     <>
       <AppRoutes />
