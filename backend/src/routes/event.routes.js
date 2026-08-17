@@ -3,13 +3,28 @@ const eventController = require("../controllers/event.controller");
 const { protect, authorizeRoles } = require("../middleware/auth.middleware");
 const { storage } = require("../config/CloudinaryConfig");
 const multer = require("multer");
-const upload = multer({ storage });
+
+// Validate image MIME type before uploading to Cloudinary.
+// This replaces allowed_formats in CloudinaryConfig (which caused Invalid Signature).
+const imageUpload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files (jpg, png, gif, webp) are allowed"), false);
+    }
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
+});
+
 
 router.post(
   "/create",
   protect,
   authorizeRoles("club"),
-  upload.single("image"),
+  imageUpload.single("image"),
   eventController.createEvent,
 );
 router.get("/all", eventController.getAllEvents);
@@ -23,7 +38,7 @@ router.put(
   "/update/:id",
   protect,
   authorizeRoles("club", "admin"),
-  upload.single("image"),
+  imageUpload.single("image"),
   eventController.updateEvent,
 );
 router.delete(
