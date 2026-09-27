@@ -12,7 +12,6 @@ const adminRoutes = require('./routes/admin.routes')
 const clubRoutes = require('./routes/club.routes')
 
 const app = express();
-// place the deployed url of frontend in allowedOrigins after deployment of frontend
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -20,11 +19,7 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    callback(new Error(`CORS: origin '${origin}' not allowed`));
-  },
+  origin:allowedOrigins,
   credentials: true,
 }));
 
