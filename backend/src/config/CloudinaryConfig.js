@@ -5,6 +5,13 @@ const cloudName = config.Cloudinary.CLOUD_NAME;
 const apiKey = config.Cloudinary.API_KEY;
 const apiSecret = config.Cloudinary.API_SECRET;
 
+console.log({
+  cloudName,
+  apiKey,
+  hasApiSecret: !!apiSecret,
+  apiSecretLength: apiSecret?.length,
+});
+
 if (!cloudName || !apiKey || !apiSecret) {
   throw new Error(
     "Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in backend/.env before uploading images.",
