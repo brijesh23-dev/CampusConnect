@@ -5,12 +5,6 @@ const cloudName = config.Cloudinary.CLOUD_NAME;
 const apiKey = config.Cloudinary.API_KEY;
 const apiSecret = config.Cloudinary.API_SECRET;
 
-console.log({
-  cloudName,
-  apiKey,
-  hasApiSecret: !!apiSecret,
-  apiSecretLength: apiSecret?.length,
-});
 
 if (!cloudName || !apiKey || !apiSecret) {
   throw new Error(
@@ -25,14 +19,5 @@ Cloudinary.config({
   secure: true,
 });
 
-console.log("Cloudinary config:", {
-  cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-  apiKey: process.env.CLOUDINARY_API_KEY,
-  secretLength: process.env.CLOUDINARY_API_SECRET?.length,
-  secretTrimmedLength: process.env.CLOUDINARY_API_SECRET?.trim().length,
-  hasWhitespace:
-    process.env.CLOUDINARY_API_SECRET !==
-    process.env.CLOUDINARY_API_SECRET?.trim(),
-});
 
 module.exports = { Cloudinary };
