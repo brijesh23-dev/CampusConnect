@@ -198,12 +198,16 @@ textarea:focus-visible {
 
 }
 
-    html.dark [class~="bg-white"]:not(a):not(button),
-    html.dark [class~="bg-gray-50"],
-    html.dark [class~="bg-gray-100"],
-    html.dark [class~="bg-slate-50"],
-    html.dark [class~="bg-slate-100"] {
+    html.dark [class~="bg-gray-50"]:not([class*="dark:bg-"]),
+    html.dark [class~="bg-slate-50"]:not([class*="dark:bg-"]) {
         background-color: #0f172a;
+    }
+
+    html.dark [class~="bg-gray-100"]:not([class*="dark:bg-"]),
+    html.dark [class~="bg-slate-100"]:not([class*="dark:bg-"]),
+    html.dark [class~="bg-white"]:not(a):not(button):not([class*="dark:bg-"]),
+    html.dark [data-slot="card"]:not([class*="dark:bg-"]) {
+        background-color: #1e293b;
     }
 
     html.dark [class~="text-gray-900"]:not(a):not(button),
