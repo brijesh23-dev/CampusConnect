@@ -10,6 +10,9 @@ const App = () => {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
       <AppRoutes />
       <ToastContainer
         position="bottom-right"

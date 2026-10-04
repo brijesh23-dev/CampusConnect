@@ -29,15 +29,20 @@ cd ../frontend && npm install
 cd backend
 cp .env.example .env
 ```
-Open `.env` and fill in:
+Open `.env` and fill in the values below. These names match the app configuration in `backend/src/config/config.js`.
 
 | Variable | Description |
 |---|---|
-| `PORT` | Port for the Express server (default `5000`) |
-| `MONGO_URI` | MongoDB connection string |
-| `JWT_SECRET` | Long random secret for JWT signing |
-| `CLIENT_URL` | Frontend origin for CORS (e.g. `http://localhost:5173`) |
-| `NODE_ENV` | `development` or `production` |
+| `PORT` | Backend port to run the API on. Default: `5000` |
+| `DB_URI` | MongoDB connection string |
+| `JWT_SECRET` | Long random string for JWT signing |
+| `JWT_EXPIRES_IN` | JWT lifetime, usually `7d` |
+| `SALT_ROUNDS` | bcrypt salt rounds, usually `10` |
+| `FRONTEND_URL` | Frontend origin for CORS, e.g. `http://localhost:5173` |
+| `NODE_ENV` | Set to `development` or `production` |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
 
 Generate a strong JWT secret:
 ```bash
@@ -48,6 +53,11 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 Create `frontend/.env`:
 ```env
 VITE_API_URL=http://localhost:5000/api
+```
+
+For production hosting, set the frontend build to the deployed backend URL, for example:
+```env
+VITE_API_URL=https://api.your-domain.com/api
 ```
 
 ---
@@ -125,10 +135,12 @@ npm run build          # outputs to frontend/dist/
 
 Set these in your hosting dashboard (never commit `.env` to git):
 
-- `MONGO_URI` — Atlas connection string
+- `DB_URI` — Atlas connection string
 - `JWT_SECRET` — strong random value (different from dev)
-- `CLIENT_URL` — your deployed frontend URL
+- `FRONTEND_URL` — your deployed frontend URL
 - `NODE_ENV=production`
+- `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` — image upload config
+- `PORT` — the port your host expects for the API server
 
 ---
 
@@ -136,8 +148,9 @@ Set these in your hosting dashboard (never commit `.env` to git):
 
 - [ ] `NODE_ENV=production` set on server
 - [ ] `JWT_SECRET` is a long, unique random string
-- [ ] CORS `CLIENT_URL` matches deployed frontend domain
+- [ ] CORS `FRONTEND_URL` matches the deployed frontend domain
 - [ ] MongoDB Atlas IP whitelist includes server IP (or `0.0.0.0/0` with auth)
 - [ ] `npm run build` passes with zero errors
 - [ ] Admin account created in production DB
 - [ ] HTTPS enabled on both frontend and backend origins
+- [ ] `frontend/.env` and `backend/.env` are not committed to version control

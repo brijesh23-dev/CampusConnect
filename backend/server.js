@@ -30,7 +30,7 @@ const io = new Server(server, {
 // JWT authentication middleware for Socket.IO
 // The client sends the token either as a handshake auth field or query param.
 
-const startServer = async() => {
+const startServer = async() => {  config.validateProductionConfig();
   io.use(socketAuth);
 
   // Register socket handlers via socketService

@@ -73,122 +73,124 @@ function AppRoutes() {
   }, [dispatch]);
 
   return (
-    <Routes>
-      {/* ── Public routes (with Navbar + Footer) ── */}
-      <Route element={<PublicLayout />}>
-        <Route index element={<LandingPage />} />
-        <Route path="events" element={<Events />} />
-        <Route path="events/:id" element={<EventDetails />} />
-        <Route path="clubs-directory" element={<Clubs />} />
-        <Route path="clubs-directory/:id" element={<ClubDetails />} />
+    <main id="main-content" role="main" className="min-h-screen">
+      <Routes>
+        {/* ── Public routes (with Navbar + Footer) ── */}
+        <Route element={<PublicLayout />}>
+          <Route index element={<LandingPage />} />
+          <Route path="events" element={<Events />} />
+          <Route path="events/:id" element={<EventDetails />} />
+          <Route path="clubs-directory" element={<Clubs />} />
+          <Route path="clubs-directory/:id" element={<ClubDetails />} />
 
-        {/* Auth pages — redirect if already logged in */}
+          {/* Auth pages — redirect if already logged in */}
+          <Route
+            path="login"
+            element={
+              <GuestRoute>
+                <Login />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="register"
+            element={
+              <GuestRoute>
+                <Register />
+              </GuestRoute>
+            }
+          />
+
+          <Route path="*" element={<PageNotfound />} />
+        </Route>
+
+        {/* ── Student routes (with StudentSidebar) ── */}
         <Route
-          path="login"
+          path="/student"
           element={
-            <GuestRoute>
-              <Login />
-            </GuestRoute>
+            <ProtectedRoute role="student">
+              <StudentLayout />
+            </ProtectedRoute>
           }
-        />
+        >
+          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="interests" element={<ManageInterests />} />
+          <Route path="registrations" element={<MyRegistrations />} />
+          <Route path="recommended" element={<RecommendedEvents />} />
+          <Route path="settings" element={<StudentSettings />} />
+        </Route>
+
+        {/* Backward-compatible student routes */}
         <Route
-          path="register"
+          path="/notifications"
           element={
-            <GuestRoute>
-              <Register />
-            </GuestRoute>
+            <ProtectedRoute role="student">
+              <StudentLayout />
+            </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<Notifications />} />
+        </Route>
 
-        <Route path="*" element={<PageNotfound />} />
-      </Route>
+        <Route
+          path="/my-registrations"
+          element={
+            <ProtectedRoute role="student">
+              <StudentLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<MyRegistrations />} />
+        </Route>
 
-      {/* ── Student routes (with StudentSidebar) ── */}
-      <Route
-        path="/student"
-        element={
-          <ProtectedRoute role="student">
-            <StudentLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="dashboard" element={<StudentDashboard />} />
-        <Route path="notifications" element={<Notifications />} />
-        <Route path="interests" element={<ManageInterests />} />
-        <Route path="registrations" element={<MyRegistrations />} />
-        <Route path="recommended" element={<RecommendedEvents />} />
-        <Route path="settings" element={<StudentSettings />} />
-      </Route>
+        <Route
+          path="/manage-interests"
+          element={
+            <ProtectedRoute role="student">
+              <StudentLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ManageInterests />} />
+        </Route>
 
-      {/* Backward-compatible student routes */}
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute role="student">
-            <StudentLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Notifications />} />
-      </Route>
+        {/* ── Club routes (with ClubSidebar) ── */}
+        <Route
+          path="/clubs"
+          element={
+            <ProtectedRoute role="club">
+              <ClubLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ClubDashboard />} />
+          <Route path="events" element={<MyEvents />} />
+          <Route path="create-event" element={<CreateEvent />} />
+          <Route path="edit-event/:id" element={<EditEvent />} />
+          <Route path="participants/:eventId" element={<Participants />} />
+          <Route path="profile" element={<ClubProfile />} />
+          <Route path="notifications" element={<ClubNotifications />} />
+          <Route path="settings" element={<ClubSettings />} />
+        </Route>
 
-      <Route
-        path="/my-registrations"
-        element={
-          <ProtectedRoute role="student">
-            <StudentLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<MyRegistrations />} />
-      </Route>
-
-      <Route
-        path="/manage-interests"
-        element={
-          <ProtectedRoute role="student">
-            <StudentLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<ManageInterests />} />
-      </Route>
-
-      {/* ── Club routes (with ClubSidebar) ── */}
-      <Route
-        path="/clubs"
-        element={
-          <ProtectedRoute role="club">
-            <ClubLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<ClubDashboard />} />
-        <Route path="events" element={<MyEvents />} />
-        <Route path="create-event" element={<CreateEvent />} />
-        <Route path="edit-event/:id" element={<EditEvent />} />
-        <Route path="participants/:eventId" element={<Participants />} />
-        <Route path="profile" element={<ClubProfile />} />
-        <Route path="notifications" element={<ClubNotifications />} />
-        <Route path="settings" element={<ClubSettings />} />
-      </Route>
-
-      {/* ── Admin routes (with AdminSidebar) ── */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute role="admin">
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="analytics" element={<AdminAnalytics />} />
-        <Route path="reports" element={<AdminReports />} />
-        <Route path="settings" element={<AdminSettings />} />
-      </Route>
-    </Routes>
+        {/* ── Admin routes (with AdminSidebar) ── */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+      </Routes>
+    </main>
   );
 }
 
