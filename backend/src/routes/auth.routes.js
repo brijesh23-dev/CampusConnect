@@ -10,7 +10,7 @@ const registerSchema = require('../validations/auth.validation');
 const validate = require('../middleware/validation.middleware');
 
 router.post('/register',validate(registerSchema),catchAsync(authController.register));
-router.post('/login',authController.login);
+router.post('/login',catchAsync(authController.login));
 router.post('/logout', authController.logout);
 router.get('/getme',protect, authController.getMe);
 
