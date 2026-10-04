@@ -1,75 +1,86 @@
 import { Link } from "react-router-dom";
-import { MdArrowForward } from "react-icons/md";
-import { BsBell } from "react-icons/bs";
+import { MdArrowForward, MdCheck } from "react-icons/md";
+
+const highlights = ["Campus events", "Club communities", "Student-only updates"];
 
 function Hero() {
   return (
-    <section className="min-h-[92vh] flex items-center bg-white">
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left Content */}
+    <section className="relative overflow-hidden bg-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.12),transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.12),transparent_30%)]" />
+
+      <div className="relative mx-auto max-w-7xl px-6 py-16 lg:py-24">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-sm font-medium mb-8">
-              <BsBell className="text-base" />
-              Over 500+ events this week
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 backdrop-blur-sm shadow-sm">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              500+ events this week on campus
             </div>
 
-            <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900 mb-6">
-              Discover College Events That Match Your{" "}
-              <span className="text-blue-600">Interests</span>
+            <h1 className="max-w-xl text-4xl font-black tracking-[-0.06em] text-slate-900 sm:text-5xl lg:text-6xl">
+              Your campus life,
+              <span className="block bg-gradient-to-r from-blue-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent">
+                organized beautifully.
+              </span>
             </h1>
 
-            <p className="text-lg text-gray-500 leading-relaxed mb-10 max-w-lg">
-              Never miss out on campus life. Connect with clubs, find workshops,
-              and join social events tailored specifically to your academic and
-              personal passions.
+            <p className="mt-6 max-w-lg text-base leading-7 text-slate-600 sm:text-lg">
+              Discover the right events, follow the clubs you care about, and stay connected to everything happening around you.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 to="/events"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md shadow-blue-200"
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-200 transition hover:-translate-y-0.5 hover:bg-slate-800"
               >
-                Explore Events
-                <MdArrowForward className="text-lg" />
+                Explore events
+                <MdArrowForward className="text-base" />
               </Link>
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
               >
-                Join as Club
+                Start a club
               </Link>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              {highlights.map((item) => (
+                <div key={item} className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-600">
+                  <MdCheck className="text-blue-600" />
+                  {item}
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Right – Preview card */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-sm">
-              {/* Main card */}
-              <div className="rounded-3xl overflow-hidden bg-gray-100 shadow-2xl border border-gray-200 aspect-[4/5] flex items-center justify-center">
-                <img
-                  src="https://images.pexels.com/photos/38269597/pexels-photo-38269597.jpeg"
-                  alt="Campus events"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
-                />
+          <div className="relative">
+            <div className="absolute -left-6 top-10 h-32 w-32 rounded-full bg-blue-200/60 blur-3xl" />
+            <div className="absolute -right-8 bottom-0 h-32 w-32 rounded-full bg-violet-200/60 blur-3xl" />
+
+            <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-3 shadow-[0_35px_80px_rgba(15,23,42,0.12)]">
+              <img
+                src="https://images.pexels.com/photos/38269597/pexels-photo-38269597.jpeg"
+                alt="Students at a campus event"
+                className="h-[540px] w-full rounded-[1.5rem] object-cover"
+              />
+
+              <div className="absolute left-8 right-8 top-8 flex items-center justify-between rounded-2xl border border-white/40 bg-white/75 px-4 py-3 shadow-lg backdrop-blur-md">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">This week</p>
+                  <p className="mt-1 text-sm font-bold text-slate-900">Campus Week</p>
+                </div>
+                <div className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                  Live
+                </div>
               </div>
 
-              {/* Floating event preview */}
-              <div className="absolute -bottom-5 left-0 right-4 mx-4 bg-white rounded-2xl shadow-xl p-4 border border-gray-100 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-lg">🎓</span>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-gray-900 truncate">
-                    Tech Symposium 2024
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Today at 2:00 PM • Main Hall
-                  </p>
+              <div className="absolute bottom-8 left-8 right-8 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-xl backdrop-blur-md">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">Featured event</p>
+                    <p className="mt-1 text-lg font-bold text-slate-900">Tech Symposium</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white">Today 2:00 PM</div>
                 </div>
               </div>
             </div>

@@ -1,110 +1,54 @@
-import { Link } from "react-router-dom";
-import {
-  MdSearch,
-  MdBolt,
-  MdNotificationsActive,
-  MdPeopleAlt,
-  MdDashboard,
-} from "react-icons/md";
+import { MdSearch, MdNotificationsActive, MdPeopleAlt, MdDashboard } from "react-icons/md";
 
 const features = [
   {
-    id: 1,
-    icon: <MdSearch className="text-2xl text-blue-600" />,
-    bg: "bg-blue-100",
-    title: "Intelligent Event Discovery",
-    description:
-      "Find events that matter to you. Our algorithm learns your preferences and highlights workshops, parties, and study groups you'll love.",
-    accent: false,
+    title: "Smart discovery",
+    description: "Browse events tailored to your interests, clubs, and study life in one clean feed.",
+    icon: <MdSearch className="text-xl text-blue-600" />,
+    accent: "bg-blue-50 text-blue-600",
   },
   {
-    id: 2,
-    icon: <MdNotificationsActive className="text-2xl text-white" />,
-    bg: "bg-violet-600",
-    title: "Interest-Based Alerts",
-    description:
-      "Never miss an RSVP deadline. Get personalized push notifications for events matching your academic major or hobbies.",
-    bullets: ["Hackathon Registration Open", "Design Club Meeting Today"],
-    accent: true,
+    title: "Live updates",
+    description: "Stay on top of RSVP deadlines, club announcements, and event reminders without the noise.",
+    icon: <MdNotificationsActive className="text-xl text-violet-600" />,
+    accent: "bg-violet-50 text-violet-600",
   },
   {
-    id: 3,
-    icon: <MdPeopleAlt className="text-2xl text-pink-600" />,
-    bg: "bg-pink-100",
-    title: "Club Management",
-    description:
-      "Streamline organization tasks, manage member rosters, and track event attendance all in one place.",
-    accent: false,
+    title: "Organized communities",
+    description: "Track clubs, members, and upcoming activities from a simple dashboard built for campus life.",
+    icon: <MdPeopleAlt className="text-xl text-pink-600" />,
+    accent: "bg-pink-50 text-pink-600",
   },
   {
-    id: 4,
-    icon: <MdDashboard className="text-2xl text-indigo-600" />,
-    bg: "bg-indigo-100",
-    title: "Student Dashboard",
-    description:
-      "View your upcoming schedule, past events, and saved interests on a clean, centralized calendar.",
-    accent: false,
+    title: "Everything in one place",
+    description: "Manage your schedule, interests, and registrations with a calm, focused student dashboard.",
+    icon: <MdDashboard className="text-xl text-slate-700" />,
+    accent: "bg-slate-100 text-slate-700",
   },
 ];
 
 function Features() {
   return (
-    <section className="py-24 bg-white">
+    <section className="bg-slate-50 py-20">
       <div className="mx-auto max-w-6xl px-6">
-        <div className="mb-14 text-center">
-          <h2 className="text-4xl font-bold text-gray-900">
-            Everything You Need for Campus Life
+        <div className="mb-12 max-w-2xl">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Why CampusConnect</p>
+          <h2 className="text-3xl font-black tracking-[-0.05em] text-slate-900 sm:text-4xl">
+            One place for your campus rhythm.
           </h2>
-          <p className="mt-4 text-gray-500 max-w-xl mx-auto">
-            A unified platform designed to bring students and organizations
-            together seamlessly.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto">
-          {features.map((feature, idx) => (
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {features.map((feature) => (
             <div
-              key={feature.id}
-              className={`rounded-2xl p-7 border transition hover:-translate-y-1 duration-200 ${
-                feature.accent
-                  ? "bg-violet-600 border-violet-500 text-white lg:row-span-2"
-                  : "bg-gray-50 border-gray-100 text-gray-900"
-              }`}
+              key={feature.title}
+              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_25px_55px_rgba(15,23,42,0.08)]"
             >
-              <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
-                  feature.accent ? "bg-white/20" : feature.bg
-                }`}
-              >
+              <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${feature.accent}`}>
                 {feature.icon}
               </div>
-              <h3
-                className={`text-lg font-bold mb-3 ${
-                  feature.accent ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {feature.title}
-              </h3>
-              <p
-                className={`text-sm leading-relaxed ${
-                  feature.accent ? "text-violet-100" : "text-gray-500"
-                }`}
-              >
-                {feature.description}
-              </p>
-              {feature.bullets && (
-                <ul className="mt-5 space-y-2">
-                  {feature.bullets.map((b) => (
-                    <li
-                      key={b}
-                      className="flex items-center gap-2 text-sm text-violet-100"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-violet-200 flex-shrink-0" />
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <h3 className="mb-3 text-xl font-bold text-slate-900">{feature.title}</h3>
+              <p className="text-sm leading-6 text-slate-600">{feature.description}</p>
             </div>
           ))}
         </div>
