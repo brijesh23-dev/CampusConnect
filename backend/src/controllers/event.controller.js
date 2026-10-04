@@ -129,11 +129,11 @@ const updateEvent = async (req, res) => {
   const event = await EventModel.findById(req.params.id);
 
   if (!event) {
-    return res.status(404).json({ message: "Event not found" });
+   throw new ApiError(404, "Event not found");
   }
 
   if (event.club.toString() !== req.user._id.toString()) {
-    return res.status(403).json({ message: "Not allowed" });
+    throw new ApiError(403,"Not allowed");
   }
 
   // Build update object from body fields (FormData-safe)

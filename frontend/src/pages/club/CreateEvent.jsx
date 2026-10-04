@@ -76,7 +76,11 @@ function CreateEvent() {
       formData.append("endTime", data.endTime);
       formData.append("venue", data.venue);
       formData.append("status", status);
-      formData.append("tags",JSON.stringify(data.tags));
+      const tags = (data.tags || "")
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+      formData.append("tags", JSON.stringify(tags));
       if (data.image?.[0]) formData.append("image", data.image[0]);
       formData.append("requireRSVP", requireRSVP);
       // Use maxParticipants — the field name the backend controller reads
@@ -193,6 +197,19 @@ function CreateEvent() {
                     placeholder="Describe what attendees can expect..."
                     {...register("description")}
                     className="w-full border border-gray-200 rounded-b-xl px-4 py-3 text-sm outline-none resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                  />
+                </div>
+
+                {/* Tags */}
+                <div className="mt-5">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Tags <span className="text-gray-400 font-normal">(comma-separated, optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. tech, coding, hackathon"
+                    {...register("tags")}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
                   />
                 </div>
               </div>
