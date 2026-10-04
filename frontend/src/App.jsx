@@ -35,7 +35,7 @@ const App = () => {
         type="button"
         onClick={toggleTheme}
         aria-label="Toggle theme"
-        className="fixed right-5 top-5 z-50 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 shadow-lg backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:bg-slate-900"
+        className="fixed right-5 top-20 z-[100] inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
       >
         {theme === "dark" ? <MdLightMode /> : <MdDarkMode />}
         <span>{theme === "dark" ? "Light" : "Dark"}</span>
