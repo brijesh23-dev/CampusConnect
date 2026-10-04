@@ -29,11 +29,11 @@ const features = [
 
 function Features() {
   return (
-    <section className="bg-slate-50 py-20">
+    <section className="bg-slate-50 py-20 dark:bg-slate-900">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mb-12 max-w-2xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Why CampusConnect</p>
-          <h2 className="text-3xl font-black tracking-[-0.05em] text-slate-900 sm:text-4xl">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Why CampusConnect</p>
+          <h2 className="text-3xl font-black tracking-[-0.05em] text-slate-900 dark:text-white sm:text-4xl">
             One place for your campus rhythm.
           </h2>
         </div>
@@ -42,13 +42,13 @@ function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_25px_55px_rgba(15,23,42,0.08)]"
+              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_25px_55px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-950"
             >
               <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${feature.accent}`}>
                 {feature.icon}
               </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">{feature.title}</h3>
-              <p className="text-sm leading-6 text-slate-600">{feature.description}</p>
+              <h3 className="mb-3 text-xl font-bold text-slate-900 dark:text-white">{feature.title}</h3>
+              <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">{feature.description}</p>
             </div>
           ))}
         </div>

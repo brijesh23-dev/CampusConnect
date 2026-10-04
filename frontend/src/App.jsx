@@ -3,43 +3,18 @@ import AppRoutes from "./routes/AppRoutes";
 import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useSocket from "./hooks/useSocket";
-import { useEffect, useState } from "react";
-import { MdDarkMode, MdLightMode } from "react-icons/md";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 
-const App = () => {
+const AppContent = () => {
   // Manages Socket.IO lifecycle — connects when logged in, disconnects on logout
   useSocket();
-
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem("campus-theme");
-    if (savedTheme) return savedTheme;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  });
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("campus-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
+  const { theme } = useTheme();
 
   return (
     <>
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-
-      <button
-        type="button"
-        onClick={toggleTheme}
-        aria-label="Toggle theme"
-        className="fixed right-5 top-20 z-[100] inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-      >
-        {theme === "dark" ? <MdLightMode /> : <MdDarkMode />}
-        <span>{theme === "dark" ? "Light" : "Dark"}</span>
-      </button>
 
       <AppRoutes />
       <ToastContainer
@@ -58,5 +33,11 @@ const App = () => {
     </>
   );
 };
+
+const App = () => (
+  <ThemeProvider>
+    <AppContent />
+  </ThemeProvider>
+);
 
 export default App;

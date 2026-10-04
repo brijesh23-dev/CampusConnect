@@ -16,14 +16,14 @@ function UpcomingEvents() {
   const upcoming = (events || []).slice(0, 3);
 
   return (
-    <section className="py-24 bg-gray-50/50">
+    <section className="py-24 bg-gray-50/50 dark:bg-slate-900">
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
-            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight dark:text-white">
               Featured Upcoming Events
             </h2>
-            <p className="text-gray-500 mt-2">
+            <p className="text-gray-500 mt-2 dark:text-slate-300">
               Catch the most anticipated gatherings and workshops on campus.
             </p>
           </div>
@@ -41,7 +41,7 @@ function UpcomingEvents() {
             <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : upcoming.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
+          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm dark:bg-slate-950 dark:border-slate-800">
             <p className="text-gray-400 font-medium">No upcoming events listed yet.</p>
             <Link
               to="/clubs/create-event"
@@ -55,7 +55,7 @@ function UpcomingEvents() {
             {upcoming.map((event) => (
               <div
                 key={event._id}
-                className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group"
+                className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group dark:bg-slate-950 dark:border-slate-800"
               >
                 {/* Event Image */}
                 <div className="relative h-48 bg-gray-100 overflow-hidden">
@@ -80,11 +80,11 @@ function UpcomingEvents() {
                   <p className="text-xs font-semibold text-violet-600 mb-1.5 uppercase tracking-wide">
                     {event.club?.name || "Campus Organizer"}
                   </p>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4 leading-snug line-clamp-2">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 leading-snug line-clamp-2 dark:text-white">
                     {event.title}
                   </h3>
 
-                  <div className="space-y-2 mb-6 text-sm text-gray-500 mt-auto">
+                  <div className="space-y-2 mb-6 text-sm text-gray-500 mt-auto dark:text-slate-300">
                     <div className="flex items-center gap-2">
                       <MdCalendarToday className="text-base text-gray-400" />
                       <span>

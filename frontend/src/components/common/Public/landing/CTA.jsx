@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 function CTA() {
   return (
-    <section className="bg-white py-20">
+    <section className="bg-white py-20 dark:bg-slate-950">
       <div className="mx-auto max-w-5xl px-6">
         <div className="rounded-[2rem] border border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-violet-900 px-6 py-10 text-center shadow-[0_30px_80px_rgba(15,23,42,0.2)] sm:px-10 lg:px-16">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-slate-300">Start now</p>

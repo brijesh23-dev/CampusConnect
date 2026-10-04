@@ -29,13 +29,13 @@ const testimonials = [
 
 function Testimonials() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white dark:bg-slate-950">
       <div className="mx-auto max-w-6xl px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+          <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight dark:text-white">
             Loved by Students and Clubs Alike
           </h2>
-          <p className="text-gray-500 mt-3 max-w-lg mx-auto">
+          <p className="text-gray-500 mt-3 max-w-lg mx-auto dark:text-slate-300">
             Hear from the student leaders and active campus members who use CampusConnect daily.
           </p>
         </div>
@@ -44,7 +44,7 @@ function Testimonials() {
           {testimonials.map((t) => (
             <div
               key={t.id}
-              className="bg-gray-50 rounded-2xl p-8 border border-gray-100 flex flex-col justify-between hover:shadow-lg transition duration-300"
+              className="bg-gray-50 rounded-2xl p-8 border border-gray-100 flex flex-col justify-between hover:shadow-lg transition duration-300 dark:bg-slate-900 dark:border-slate-800"
             >
               <div>
                 {/* Rating stars */}
@@ -53,7 +53,7 @@ function Testimonials() {
                     <MdStar key={i} className="text-lg" />
                   ))}
                 </div>
-                <p className="text-gray-600 leading-relaxed italic mb-6">
+                <p className="text-gray-600 leading-relaxed italic mb-6 dark:text-slate-300">
                   "{t.quote}"
                 </p>
               </div>
@@ -66,7 +66,7 @@ function Testimonials() {
                   className="w-11 h-11 rounded-full object-cover border border-gray-200"
                 />
                 <div>
-                  <h4 className="font-bold text-gray-900 text-sm">{t.name}</h4>
+                  <h4 className="font-bold text-gray-900 text-sm dark:text-white">{t.name}</h4>
                   <p className="text-gray-400 text-xs font-medium">{t.role}</p>
                 </div>
               </div>
