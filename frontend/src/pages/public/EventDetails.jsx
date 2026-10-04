@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   MdAccessTime,
@@ -16,6 +16,7 @@ import { fetchMyregistration, registerForEvent } from "../../redux/RegistrationS
 
 function EventDetails() {
   const { id } = useParams();
+  const { hash } = useLocation();
   const dispatch = useDispatch();
   const { singleEvent, eventLoading, events = [], error: eventError } = useSelector((state) => state.events);
   const { registrations = [], loading: registrationLoading } = useSelector((state) => state.registrations);
@@ -27,6 +28,11 @@ function EventDetails() {
     dispatch(fetchEvents());
     if (user?.role === "student") dispatch(fetchMyregistration());
   }, [dispatch, id, user?.role]);
+
+  useEffect(() => {
+    if (hash !== "#registration" || eventLoading || !singleEvent) return;
+    document.getElementById("registration")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [eventLoading, hash, singleEvent]);
 
   const relatedEvents = useMemo(() => events
     .filter((event) => event._id !== id)
@@ -92,11 +98,11 @@ function EventDetails() {
 
             <section className="rounded-2xl border border-gray-200 bg-white p-6"><h2 className="text-lg font-bold text-gray-900">About this event</h2><p className="mt-3 whitespace-pre-line text-sm leading-7 text-gray-700">{singleEvent.description || "More event details will be shared by the organizer."}</p></section>
 
-            {relatedEvents.length > 0 && <section><div className="mb-5 flex items-center justify-between gap-4"><div><h2 className="text-xl font-bold text-gray-900">More to explore</h2><p className="mt-1 text-sm text-gray-600">Other events happening around campus.</p></div><Link to="/events" className="inline-flex items-center gap-1 text-sm font-semibold text-blue-700 hover:underline">View all <MdOpenInNew /></Link></div><div className="grid gap-4 sm:grid-cols-3">{relatedEvents.map((event) => <Link key={event._id} to={`/events/${event._id}`} className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition-shadow hover:shadow-md"><div className="flex h-28 items-center justify-center bg-blue-50">{event.image ? <img src={event.image} alt="" className="h-full w-full object-cover" /> : <MdEvent className="text-3xl text-blue-500" />}</div><div className="p-4"><p className="text-xs font-semibold capitalize text-violet-700">{event.category || "Event"}</p><h3 className="mt-1 text-sm font-bold leading-snug text-gray-900 group-hover:text-blue-700">{event.title}</h3><p className="mt-2 flex items-center gap-1 text-xs text-gray-600"><MdAccessTime /> {event.startTime || "Time TBA"}</p></div></Link>)}</div></section>}
+            {relatedEvents.length > 0 && <section><div className="mb-5 flex items-center justify-between gap-4"><div><h2 className="text-xl font-bold text-gray-900">More to explore</h2><p className="mt-1 text-sm text-gray-600">Other events happening around campus.</p></div><Link to="/events" className="inline-flex items-center gap-1 text-sm font-semibold text-blue-700 hover:underline">View all <MdOpenInNew /></Link></div><div className="grid gap-4 sm:grid-cols-3">{relatedEvents.map((event) => <Link key={event._id} to={`/events/${event._id}`} className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-slate-900"><div className="flex h-28 items-center justify-center bg-blue-50">{event.image ? <img src={event.image} alt="" className="h-full w-full object-cover" /> : <MdEvent className="text-3xl text-blue-500" />}</div><div className="p-4"><p className="text-xs font-semibold capitalize text-violet-700">{event.category || "Event"}</p><h3 className="mt-1 text-sm font-bold leading-snug text-gray-900 group-hover:text-blue-700">{event.title}</h3><p className="mt-2 flex items-center gap-1 text-xs text-gray-600"><MdAccessTime /> {event.startTime || "Time TBA"}</p></div></Link>)}</div></section>}
           </div>
 
           <aside className="space-y-5">
-            <section className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section id="registration" className="sticky top-24 scroll-mt-24 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900">Registration</h2>
               <p className="mt-1 text-sm text-gray-600">General admission is free. Bring your student ID for check-in.</p>
               <div className="my-5 border-y border-gray-100 py-3 text-sm font-semibold text-green-700">Free admission</div>

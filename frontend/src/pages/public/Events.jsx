@@ -95,7 +95,7 @@ function Events() {
   };
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white dark:bg-slate-950">
       <section className="mx-auto max-w-7xl px-6 pb-6 pt-12">
         <h1 className="mb-2 text-4xl font-extrabold text-gray-900">Discover campus events</h1>
         <p className="max-w-2xl text-gray-600">
@@ -105,7 +105,7 @@ function Events() {
 
       <section className="mx-auto max-w-7xl px-6" aria-label="Event filters">
         <div className="mb-4 flex flex-col gap-3 md:flex-row">
-          <label className="flex flex-1 items-center gap-2 rounded-xl bg-gray-100 px-4 py-3">
+          <label className="flex flex-1 items-center gap-2 rounded-xl bg-gray-100 px-4 py-3 dark:bg-slate-800">
             <MdSearch className="shrink-0 text-xl text-gray-500" aria-hidden="true" />
             <span className="sr-only">Search events</span>
             <input
@@ -113,7 +113,7 @@ function Events() {
               placeholder="Search by event name, venue, or keyword"
               value={search}
               onChange={(event) => updateSearch(event.target.value)}
-              className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-500"
+              className="w-full bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-500 dark:text-slate-100 dark:placeholder:text-slate-400"
             />
           </label>
 
@@ -122,7 +122,7 @@ function Events() {
             id="event-category"
             value={category}
             onChange={(event) => { setCategory(event.target.value); setPage(1); }}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-300"
+            className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             {categories.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
             <option value="music">Music</option>
@@ -135,7 +135,7 @@ function Events() {
             id="event-date"
             value={dateRange}
             onChange={(event) => { setDateRange(event.target.value); setPage(1); }}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-300"
+            className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <option value="all">Any date</option>
             <option value="today">Today</option>
@@ -143,7 +143,7 @@ function Events() {
             <option value="month">Next 30 days</option>
           </select>
 
-          <button onClick={clearFilters} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300">
+          <button onClick={clearFilters} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
             <MdTune className="text-lg" aria-hidden="true" /> Clear filters
           </button>
         </div>
@@ -154,7 +154,7 @@ function Events() {
               key={item.value}
               onClick={() => { setCategory(item.value); setPage(1); }}
               aria-pressed={category === item.value}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${category === item.value ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${category === item.value ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"}`}
             >
               {item.label}
             </button>
@@ -177,12 +177,12 @@ function Events() {
             <MdEvent className="mx-auto mb-3 text-4xl text-gray-400" aria-hidden="true" />
             <p className="text-lg font-bold text-gray-900">No events match those filters</p>
             <p className="mt-1 text-sm text-gray-600">Try a different search term or clear the filters.</p>
-            <button onClick={clearFilters} className="mt-5 text-sm font-semibold text-blue-700 hover:underline">Clear all filters</button>
+            <button onClick={clearFilters} className="mt-5 text-sm font-semibold text-blue-700 hover:underline dark:text-blue-400">Clear all filters</button>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {pagedEvents.map((event) => (
-              <article key={event._id} className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-shadow duration-200 hover:shadow-lg">
+              <article key={event._id} className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-shadow duration-200 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900">
                 <div className="relative flex h-48 items-center justify-center overflow-hidden bg-blue-50">
                   {event.image ? <img src={event.image} alt="" className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" /> : <MdEvent className="text-5xl text-blue-500" aria-hidden="true" />}
                   <span className="absolute left-3 top-3 rounded-full bg-blue-700 px-3 py-1 text-xs font-bold capitalize text-white">{event.category || "Campus event"}</span>
@@ -195,8 +195,8 @@ function Events() {
                     <p className="flex items-center gap-2"><MdLocationOn aria-hidden="true" /> <span className="truncate">{event.venue || "Venue to be announced"}</span></p>
                   </div>
                   <div className="mt-auto flex gap-3">
-                    <Link to={`/events/${event._id}`} className="flex-1 rounded-xl border border-gray-300 py-2.5 text-center text-sm font-semibold text-gray-800 transition hover:bg-gray-50">Details</Link>
-                    <Link to={`/events/${event._id}`} className="flex-1 rounded-xl bg-blue-700 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-800">Register</Link>
+                    <Link to={`/events/${event._id}`} className="flex-1 rounded-xl border border-gray-300 py-2.5 text-center text-sm font-semibold text-gray-800 transition hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">Details</Link>
+                    <Link to={`/events/${event._id}#registration`} className="flex-1 rounded-xl bg-blue-700 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-800">Register</Link>
                   </div>
                 </div>
               </article>
@@ -206,9 +206,9 @@ function Events() {
 
         {!loading && totalPages > 1 && (
           <nav className="mt-12 flex items-center justify-center gap-2" aria-label="Event pagination">
-            <button onClick={() => setPage((value) => Math.max(1, value - 1))} disabled={currentPage === 1} className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-700 disabled:opacity-40"><HiChevronLeft /></button>
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => <button key={number} onClick={() => setPage(number)} aria-current={currentPage === number ? "page" : undefined} className={`h-9 w-9 rounded-xl text-sm font-semibold ${currentPage === number ? "bg-blue-700 text-white" : "border border-gray-200 text-gray-700 hover:bg-gray-50"}`}>{number}</button>)}
-            <button onClick={() => setPage((value) => Math.min(totalPages, value + 1))} disabled={currentPage === totalPages} className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-700 disabled:opacity-40"><HiChevronRight /></button>
+            <button onClick={() => setPage((value) => Math.max(1, value - 1))} disabled={currentPage === 1} className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-700 transition hover:bg-gray-50 disabled:opacity-40 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"><HiChevronLeft /></button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => <button key={number} onClick={() => setPage(number)} aria-current={currentPage === number ? "page" : undefined} className={`h-9 w-9 rounded-xl text-sm font-semibold ${currentPage === number ? "bg-blue-700 text-white" : "border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"}`}>{number}</button>)}
+            <button onClick={() => setPage((value) => Math.min(totalPages, value + 1))} disabled={currentPage === totalPages} className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-700 transition hover:bg-gray-50 disabled:opacity-40 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"><HiChevronRight /></button>
           </nav>
         )}
       </section>

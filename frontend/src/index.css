@@ -211,7 +211,9 @@ textarea:focus-visible {
     }
 
     html.dark [class~="text-gray-900"]:not(a):not(button),
-    html.dark [class~="text-slate-900"]:not(a):not(button) {
+    html.dark [class~="text-gray-800"]:not(a):not(button),
+    html.dark [class~="text-slate-900"]:not(a):not(button),
+    html.dark [class~="text-slate-800"]:not(a):not(button) {
         color: #f1f5f9;
     }
 
@@ -223,7 +225,21 @@ textarea:focus-visible {
     }
 
     html.dark [class~="text-gray-500"]:not(a):not(button),
-    html.dark [class~="text-slate-500"]:not(a):not(button) {
+    html.dark [class~="text-gray-400"]:not(a):not(button),
+    html.dark [class~="text-slate-500"]:not(a):not(button),
+    html.dark [class~="text-slate-400"]:not(a):not(button) {
+        color: #94a3b8;
+    }
+
+    html.dark :is(a, button):is([class~="text-gray-900"], [class~="text-gray-800"], [class~="text-slate-900"], [class~="text-slate-800"]):not([class~="bg-white"]:not([class*="dark:bg-"])) {
+        color: #f1f5f9;
+    }
+
+    html.dark :is(a, button):is([class~="text-gray-700"], [class~="text-gray-600"], [class~="text-slate-700"], [class~="text-slate-600"]):not([class~="bg-white"]:not([class*="dark:bg-"])) {
+        color: #cbd5e1;
+    }
+
+    html.dark :is(a, button):is([class~="text-gray-500"], [class~="text-gray-400"], [class~="text-slate-500"], [class~="text-slate-400"]):not([class~="bg-white"]:not([class*="dark:bg-"])) {
         color: #94a3b8;
     }
 
