@@ -37,7 +37,7 @@ function Hero() {
               </Link>
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
               >
                 Start a club
               </Link>
@@ -57,7 +57,7 @@ function Hero() {
             <div className="absolute -left-6 top-10 h-32 w-32 rounded-full bg-blue-200/60 blur-3xl" />
             <div className="absolute -right-8 bottom-0 h-32 w-32 rounded-full bg-violet-200/60 blur-3xl" />
 
-            <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-3 shadow-[0_35px_80px_rgba(15,23,42,0.12)] dark:border-slate-700 dark:bg-slate-900">
+            <div className="relative overflow-hidden rounded-[2rem] bg-white p-3 shadow-[0_35px_80px_rgba(15,23,42,0.12)] dark:bg-slate-900">
               <img
                 src="https://images.pexels.com/photos/38269597/pexels-photo-38269597.jpeg"
                 alt="Students at a campus event"

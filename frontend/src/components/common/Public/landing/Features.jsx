@@ -42,7 +42,7 @@ function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_25px_55px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-950"
+              className="rounded-2xl bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_25px_55px_rgba(15,23,42,0.12)] dark:bg-slate-950"
             >
               <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${feature.accent}`}>
                 {feature.icon}
