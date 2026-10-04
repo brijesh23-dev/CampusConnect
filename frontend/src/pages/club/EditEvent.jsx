@@ -16,14 +16,16 @@ import {
 } from "react-icons/md";
 
 const CATEGORIES = [
-  "Academic",
-  "Workshop",
-  "Technology",
-  "Social",
+  "Coding",
+  "AI",
+  "Web Development",
+  "Cyber Security",
   "Sports",
   "Music",
+  "Photography",
   "Business",
-  "Arts",
+  "Design",
+  "Robotics",
 ];
 
 function EditEvent() {
@@ -32,7 +34,7 @@ function EditEvent() {
   const navigate = useNavigate();
   const { singleEvent } = useSelector((state) => state.events);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [imageFile, setImageFile] = useState(null);       // newly selected file
+  const [imageFile, setImageFile] = useState(null); // newly selected file
   const [imagePreview, setImagePreview] = useState(null); // blob URL for preview
 
   const {
@@ -95,7 +97,8 @@ function EditEvent() {
 
   const inputBase =
     "w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition";
-  const labelBase = "block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5";
+  const labelBase =
+    "block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5";
   const errorText = "text-xs text-red-500 mt-1 font-medium";
 
   return (
@@ -124,7 +127,9 @@ function EditEvent() {
             <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
               <MdInfo className="text-base" />
             </div>
-            <h2 className="text-sm font-bold text-gray-700">Basic Information</h2>
+            <h2 className="text-sm font-bold text-gray-700">
+              Basic Information
+            </h2>
           </div>
 
           <div className="p-6 space-y-5">
@@ -135,9 +140,14 @@ function EditEvent() {
                 type="text"
                 placeholder="e.g., Annual Tech Hackathon 2026"
                 className={`${inputBase} ${errors.title ? "border-red-400 focus:ring-red-400/30 focus:border-red-400" : ""}`}
-                {...register("title", { required: "Title is required", minLength: { value: 5, message: "At least 5 characters" } })}
+                {...register("title", {
+                  required: "Title is required",
+                  minLength: { value: 5, message: "At least 5 characters" },
+                })}
               />
-              {errors.title && <p className={errorText}>{errors.title.message}</p>}
+              {errors.title && (
+                <p className={errorText}>{errors.title.message}</p>
+              )}
             </div>
 
             {/* Description */}
@@ -147,9 +157,14 @@ function EditEvent() {
                 rows={4}
                 placeholder="Describe your event — agenda, goals, who should attend…"
                 className={`${inputBase} resize-none ${errors.description ? "border-red-400" : ""}`}
-                {...register("description", { required: "Description is required", minLength: { value: 20, message: "At least 20 characters" } })}
+                {...register("description", {
+                  required: "Description is required",
+                  minLength: { value: 20, message: "At least 20 characters" },
+                })}
               />
-              {errors.description && <p className={errorText}>{errors.description.message}</p>}
+              {errors.description && (
+                <p className={errorText}>{errors.description.message}</p>
+              )}
             </div>
 
             {/* Category */}
@@ -157,7 +172,9 @@ function EditEvent() {
               <label className={labelBase}>Category *</label>
               <select
                 className={`${inputBase} ${errors.category ? "border-red-400" : ""}`}
-                {...register("category", { required: "Please select a category" })}
+                {...register("category", {
+                  required: "Please select a category",
+                })}
               >
                 <option value="">Select a category…</option>
                 {CATEGORIES.map((cat) => (
@@ -166,12 +183,19 @@ function EditEvent() {
                   </option>
                 ))}
               </select>
-              {errors.category && <p className={errorText}>{errors.category.message}</p>}
+              {errors.category && (
+                <p className={errorText}>{errors.category.message}</p>
+              )}
             </div>
 
             {/* Tags */}
             <div>
-              <label className={labelBase}>Tags <span className="normal-case font-normal text-gray-400">(comma-separated, optional)</span></label>
+              <label className={labelBase}>
+                Tags{" "}
+                <span className="normal-case font-normal text-gray-400">
+                  (comma-separated, optional)
+                </span>
+              </label>
               <input
                 type="text"
                 placeholder="e.g., tech, coding, hackathon"
@@ -188,7 +212,9 @@ function EditEvent() {
             <div className="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center">
               <MdDateRange className="text-base" />
             </div>
-            <h2 className="text-sm font-bold text-gray-700">Date, Time & Location</h2>
+            <h2 className="text-sm font-bold text-gray-700">
+              Date, Time & Location
+            </h2>
           </div>
 
           <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -204,7 +230,9 @@ function EditEvent() {
                 className={`${inputBase} ${errors.date ? "border-red-400" : ""}`}
                 {...register("date", { required: "Date is required" })}
               />
-              {errors.date && <p className={errorText}>{errors.date.message}</p>}
+              {errors.date && (
+                <p className={errorText}>{errors.date.message}</p>
+              )}
             </div>
 
             {/* Time */}
@@ -219,7 +247,9 @@ function EditEvent() {
                 className={`${inputBase} ${errors.time ? "border-red-400" : ""}`}
                 {...register("time", { required: "Time is required" })}
               />
-              {errors.time && <p className={errorText}>{errors.time.message}</p>}
+              {errors.time && (
+                <p className={errorText}>{errors.time.message}</p>
+              )}
             </div>
 
             {/* Venue */}
@@ -235,12 +265,19 @@ function EditEvent() {
                 className={`${inputBase} ${errors.venue ? "border-red-400" : ""}`}
                 {...register("venue", { required: "Venue is required" })}
               />
-              {errors.venue && <p className={errorText}>{errors.venue.message}</p>}
+              {errors.venue && (
+                <p className={errorText}>{errors.venue.message}</p>
+              )}
             </div>
 
             {/* Max participants */}
             <div>
-              <label className={labelBase}>Max Participants <span className="normal-case font-normal text-gray-400">(optional)</span></label>
+              <label className={labelBase}>
+                Max Participants{" "}
+                <span className="normal-case font-normal text-gray-400">
+                  (optional)
+                </span>
+              </label>
               <input
                 type="number"
                 min={1}
@@ -251,7 +288,9 @@ function EditEvent() {
                   valueAsNumber: true,
                 })}
               />
-              {errors.maxParticipants && <p className={errorText}>{errors.maxParticipants.message}</p>}
+              {errors.maxParticipants && (
+                <p className={errorText}>{errors.maxParticipants.message}</p>
+              )}
             </div>
           </div>
         </div>
@@ -278,8 +317,12 @@ function EditEvent() {
               ) : (
                 <>
                   <MdCloudUpload className="text-4xl text-gray-300 mb-2" />
-                  <p className="text-xs font-semibold text-gray-500">Click to upload poster</p>
-                  <p className="text-[11px] text-gray-400 mt-1">PNG, JPG or JPEG · Max 5 MB</p>
+                  <p className="text-xs font-semibold text-gray-500">
+                    Click to upload poster
+                  </p>
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    PNG, JPG or JPEG · Max 5 MB
+                  </p>
                 </>
               )}
             </label>
@@ -300,7 +343,9 @@ function EditEvent() {
               </button>
             )}
             {!imageFile && singleEvent?.image && (
-              <p className="mt-2 text-xs text-gray-400">Current poster shown above. Upload a new one to replace it.</p>
+              <p className="mt-2 text-xs text-gray-400">
+                Current poster shown above. Upload a new one to replace it.
+              </p>
             )}
           </div>
         </div>
@@ -318,9 +363,10 @@ function EditEvent() {
             type="submit"
             disabled={isSubmitting || saveSuccess}
             className={`flex items-center gap-2 px-7 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm
-              ${saveSuccess
-                ? "bg-emerald-500 text-white shadow-emerald-200"
-                : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200 disabled:opacity-60"
+              ${
+                saveSuccess
+                  ? "bg-emerald-500 text-white shadow-emerald-200"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200 disabled:opacity-60"
               }`}
           >
             {isSubmitting ? (

@@ -8,11 +8,22 @@ const socketService = require("../socket/socketService");
 const createEvent = async (req, res) => {
 
   try {
-    let { title, description, category, date, startTime, endTime, venue, status, maxParticipants } = req.body;
+    let { title, description, category, date, startTime, endTime, venue, status, maxParticipants,tags } = req.body;
+    let parseTags = [];
+    if(tags){
+      try{
+        parseTags = Array.isArray(tags)?tags:JSON.parse(tags)
+      }catch(error){
+        return res.status(400).json({
+          message:"Invalid tags format"
+        })
+      }
+    }
     let newEvent = new EventModel({
       title,
       description,
       category,
+      tags:parseTags,
       date,
       startTime,
       endTime,
@@ -26,15 +37,35 @@ const createEvent = async (req, res) => {
 
     await newEvent.save();
 
-    const interestedStudents = await UserModel.find({
-      role: "student",
-      interests: category,
-    });
-    const notifications = interestedStudents.map((student) => ({
-      user: student._id,
-      event: newEvent._id,
-      message: `New ${category} event: ${title}`,
-    }));
+    // const interestedStudents = await UserModel.find({
+    //   role: "student",
+    //   interests: category,
+    // });
+    // const notifications = interestedStudents.map((student) => ({
+    //   user: student._id,
+    //   event: newEvent._id,
+    //   message: `New ${category} event: ${title}`,
+    // }));
+
+    const students = await UserModel.find(
+  { role: "student" },
+  "_id interests"
+);
+
+
+const notifications = students.map((student) => {
+  const isInterested = student.interests?.includes(category);
+
+  return {
+    user: student._id,
+    event: newEvent._id,
+    message: isInterested
+      ? `New ${category} event: ${title} matches your interests.`
+      : `New ${category} event: ${title}`,
+    type: isInterested ? "interest" : "general",
+  };
+});
+
     if (notifications.length > 0) {
       const saved = await Notification.insertMany(notifications);
 
@@ -139,7 +170,7 @@ const updateEvent = async (req, res) => {
     const updatedEvent = await EventModel.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true, runValidators: true },
+      { returnDocument:"after", runValidators: true },
     );
 
     res.json({

@@ -6,12 +6,14 @@ const app = require("./src/app");
 const connectDatabase = require("./src/config/connectDatabse");
 const config = require("./src/config/config");
 const socketService = require("./src/socket/socketService");
+const socketAuth = require("./src/socket/socketAuth");
+const { token } = require("morgan");
 
 // ── Allowed origins (must match app.js CORS list) ─────────────────────────────
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  process.env.FRONTEND_URL
+  process.env.FRONTEND_URL,
 ];
 
 // ── HTTP server ────────────────────────────────────────────────────────────────
@@ -27,34 +29,18 @@ const io = new Server(server, {
 
 // JWT authentication middleware for Socket.IO
 // The client sends the token either as a handshake auth field or query param.
-io.use((socket, next) => {
-  try {
-    // Try auth.token first (socket.auth), then query, then cookie header
-    const token =
-      socket.handshake.auth?.token ||
-      socket.handshake.query?.token ||
-      (() => {
-        // Parse cookie header manually (no cookie-parser on the socket layer)
-        const cookieHeader = socket.handshake.headers.cookie || "";
-        const match = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
-        return match ? match[1] : null;
-      })();
 
-    if (!token) return next(new Error("Authentication required"));
+const startServer = async() => {
+  io.use(socketAuth);
 
-    const decoded = jwt.verify(token, config.JWT_SECRET || process.env.JWT_SECRET);
-    socket.data.userId = decoded.id || decoded._id || decoded.userId;
-    next();
-  } catch {
-    next(new Error("Invalid or expired token"));
-  }
-});
+  // Register socket handlers via socketService
+  socketService.init(io);
 
-// Register socket handlers via socketService
-socketService.init(io);
+  // ── Start ──────────────────────────────────────────────────────────────────────
+  await connectDatabase();
+  server.listen(config.PORT, () => {
+    console.log(`Server running on http://localhost:${config.PORT} (HTTP + Socket.IO)`);
+  });
+};
 
-// ── Start ──────────────────────────────────────────────────────────────────────
-connectDatabase();
-server.listen(config.PORT, () => {
-  console.log(`Server running on port ${config.PORT} (HTTP + Socket.IO)`);
-});
+startServer();

@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { useState} from "react";
+import { useState } from "react";
 import { createEvent } from "../../redux/eventSlice";
 import {
   MdInfo,
@@ -18,16 +18,19 @@ import {
   MdLink,
 } from "react-icons/md";
 import { MdAccessTime } from "react-icons/md";
+import { json } from "zod";
 
 const CATEGORIES = [
-  "Academic",
-  "Workshop",
-  "Technology",
-  "Social",
+  "Coding",
+  "AI",
+  "Web Development",
+  "Cyber Security",
   "Sports",
   "Music",
+  "Photography",
   "Business",
-  "Arts",
+  "Design",
+  "Robotics",
 ];
 
 function CreateEvent() {
@@ -37,12 +40,9 @@ function CreateEvent() {
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm(
-  );
+  } = useForm();
   const image = watch("image");
-const imagePreview = image?.[0]
-  ? URL.createObjectURL(image[0])
-  : null;
+  const imagePreview = image?.[0] ? URL.createObjectURL(image[0]) : null;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -76,10 +76,12 @@ const imagePreview = image?.[0]
       formData.append("endTime", data.endTime);
       formData.append("venue", data.venue);
       formData.append("status", status);
+      formData.append("tags",JSON.stringify(data.tags));
       if (data.image?.[0]) formData.append("image", data.image[0]);
       formData.append("requireRSVP", requireRSVP);
       // Use maxParticipants — the field name the backend controller reads
-      if (data.maxParticipants) formData.append("maxParticipants", data.maxParticipants);
+      if (data.maxParticipants)
+        formData.append("maxParticipants", data.maxParticipants);
 
       await dispatch(createEvent(formData)).unwrap();
       reset();

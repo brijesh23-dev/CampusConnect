@@ -18,25 +18,62 @@ const userSocketMap = new Map();
  * Called once in server.js after Socket.IO is created.
  * @param {import('socket.io').Server} io
  */
+// function init(io) {
+//   _io = io;
+
+// io.on("connection", (socket) => {
+//   const userId = socket.data.userId; // set during auth middleware
+//   if (userId) {
+//     userSocketMap.set(userId, socket.id);
+//     console.log(`[Socket] User connected: ${userId} → ${socket.id}`);
+//   }
+
+//   socket.on("disconnect", () => {
+//     if (userId) {
+//       userSocketMap.delete(userId);
+//       console.log(`[Socket] User disconnected: ${userId}`);
+//     }
+//   });
+// });
+
 function init(io) {
   _io = io;
 
   io.on("connection", (socket) => {
-    const userId = socket.data.userId; // set during auth middleware
-    if (userId) {
-      userSocketMap.set(userId, socket.id);
-      console.log(`[Socket] User connected: ${userId} → ${socket.id}`);
+    const userId = socket.data.userId;
+
+    if (!userId) {
+      console.log("[Socket] No user ID found");
+      return;
     }
 
+    const existingSocketId = userSocketMap.get(userId.toString());
+
+    // User is already connected somewhere else
+    if (existingSocketId && existingSocketId !== socket.id) {
+      console.log(`[Socket] Replacing old socket for user ${userId}`);
+
+      io.to(existingSocketId).emit("force_logout", {
+        message: "Your account was logged in from another device.",
+      });
+    }
+
+    // Store the new socket
+    userSocketMap.set(userId.toString(), socket.id);
+
+    console.log(`[Socket] User connected: ${userId} → ${socket.id}`);
+
     socket.on("disconnect", () => {
-      if (userId) {
-        userSocketMap.delete(userId);
+      // Only delete if THIS socket is still the
+      // active socket for this user
+      if (userSocketMap.get(userId.toString()) === socket.id) {
+        userSocketMap.delete(userId.toString());
+
         console.log(`[Socket] User disconnected: ${userId}`);
       }
     });
   });
 }
-
 /**
  * Emit an event to a specific user by their MongoDB _id.
  * @param {string|import('mongoose').Types.ObjectId} userId

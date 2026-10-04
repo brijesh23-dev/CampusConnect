@@ -18,10 +18,14 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     isRead: {
       type: Boolean,
       default: false,
+    },
+    type:{
+      type:String,
+      enum:["general","interest"],
+      required:true
     },
   },
   { timestamps: true }

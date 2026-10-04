@@ -9,10 +9,7 @@ const generateToken = (userId, role) => {
   return jwt.sign({ id: userId, role }, config.JWT_SECRET, { expiresIn: "7d" });
 };
 
-// Cookie options:
-//  - Local dev  (localhost → localhost): sameSite "lax",  secure false
-//  - Production (Vercel  → Render):      sameSite "none", secure true
-//    Cross-origin cookies REQUIRE sameSite:"none" + secure:true in browsers.
+
 const cookieOptions = {
   httpOnly: true,
   secure: isProd,

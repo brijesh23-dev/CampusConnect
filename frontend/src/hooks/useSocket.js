@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import socket from "../socket/socket";
 import { addRealtimeNotification } from "../redux/notificationSlice";
+import { logoutUser } from "@/redux/authSlice";
 
 /**
  * useSocket
@@ -54,22 +55,37 @@ function useSocket() {
       });
 
       // Real-time notification from server (new event, RSVP confirmation, etc.)
-      socket.on("new-notification", (notification) => {
-        // Add to Redux store so notification pages update immediately
-        dispatch(addRealtimeNotification(notification));
+      // socket.on("new-notification", (notification) => {
+      //   // Add to Redux store so notification pages update immediately
+      //   dispatch(addRealtimeNotification(notification));
 
-        // Show a toast so the user is aware even when not on the notifications page
-        toast.info(notification.message || "You have a new notification", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          icon: "🔔",
-        });
-      });
+      //   // Show a toast so the user is aware even when not on the notifications page
+      //   toast.info(notification.message || "You have a new notification", {
+      //     position: "top-right",
+      //     autoClose: 5000,
+      //     hideProgressBar: false,
+      //     closeOnClick: true,
+      //     pauseOnHover: true,
+      //     draggable: true,
+      //     icon: "🔔",
+      //   });
+      // });
     }
+
+    const handleForceLogout = (data) => {
+      toast.error(
+        data?.message || "your account was logged in from another device.",
+      );
+      dispatch(logoutUser());
+      socket.disconnect();
+    };
+
+    const handleNewNotification = (notification) => {
+      dispatch(addRealtimeNotification(notification));
+      toast.info(notification.message || "you have a new notification");
+    };
+    socket.on("force_logout", handleForceLogout);
+    socket.on("new-notification", handleNewNotification);
 
     // Cleanup: remove listeners and disconnect when component unmounts
     // (This only runs when the entire App unmounts, i.e., page close)
@@ -78,6 +94,7 @@ function useSocket() {
       socket.off("disconnect");
       socket.off("connect_error");
       socket.off("new-notification");
+      socket.off("force_logout", handleForceLogout);
       socket.disconnect();
       listenersAttached.current = false;
     };

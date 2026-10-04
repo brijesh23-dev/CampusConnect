@@ -8,9 +8,11 @@ export const fetchNotifications = createAsyncThunk(
       const res = await API.get("/notifications");
       return res.data.notifications;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch notifications");
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch notifications",
+      );
     }
-  }
+  },
 );
 
 export const markNotificationRead = createAsyncThunk(
@@ -18,7 +20,7 @@ export const markNotificationRead = createAsyncThunk(
   async (id) => {
     const res = await API.put(`/notifications/${id}`);
     return res.data.notification;
-  }
+  },
 );
 
 const notificationSlice = createSlice({
@@ -32,8 +34,13 @@ const notificationSlice = createSlice({
   reducers: {
     // Called by useSocket hook when a real-time notification arrives via Socket.IO
     addRealtimeNotification(state, action) {
-      // Prepend so the newest notification always appears at the top
-      state.notifications.unshift(action.payload);
+      const exists = state.notifications.some(
+        (notification) => notification._id === action.payload._id,
+      );
+
+      if (!exists) {
+        state.notifications.unshift(action.payload);
+      }
     },
   },
 
@@ -56,7 +63,7 @@ const notificationSlice = createSlice({
         state.notifications = state.notifications.map((notification) =>
           notification._id === updatedNotification._id
             ? updatedNotification
-            : notification
+            : notification,
         );
       });
   },
