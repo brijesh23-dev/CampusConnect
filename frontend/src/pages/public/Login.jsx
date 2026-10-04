@@ -139,42 +139,8 @@ function Login() {
             ))}
           </div>
 
-          {/* Social buttons */}
-          <div className="space-y-3 mb-6">
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-3 border border-gray-200 bg-white rounded-xl py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-            >
-              <img
-                src="https://www.svgrepo.com/show/475656/google-color.svg"
-                alt="Google"
-                className="w-5 h-5"
-              />
-              Continue with Google
-            </button>
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-3 border border-gray-200 bg-white rounded-xl py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-            >
-              <img
-                src="https://www.svgrepo.com/show/473731/microsoft.svg"
-                alt="Microsoft"
-                className="w-5 h-5"
-              />
-              Continue with Microsoft
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-gray-50 px-4 text-xs font-medium text-gray-400 uppercase tracking-widest">
-                or continue with email
-              </span>
-            </div>
+          <div className="mb-6 rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-600">
+            Use your university email and password to continue.
           </div>
 
           {/* Form */}
