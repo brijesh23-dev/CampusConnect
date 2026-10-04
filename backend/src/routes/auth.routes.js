@@ -11,7 +11,7 @@ const validate = require('../middleware/validation.middleware');
 
 router.post('/register',validate(registerSchema),catchAsync(authController.register));
 router.post('/login',catchAsync(authController.login));
-router.post('/logout', authController.logout);
-router.get('/getme',protect, authController.getMe);
+router.post('/logout', catchAsync(authController.logout));
+router.get('/getme',protect, catchAsync(authController.getMe));
 
 module.exports = router;

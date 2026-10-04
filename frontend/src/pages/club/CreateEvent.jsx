@@ -203,7 +203,10 @@ function CreateEvent() {
                 {/* Tags */}
                 <div className="mt-5">
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Tags <span className="text-gray-400 font-normal">(comma-separated, optional)</span>
+                    Tags{" "}
+                    <span className="text-gray-400 font-normal">
+                      (comma-separated, optional)
+                    </span>
                   </label>
                   <input
                     type="text"

@@ -22,10 +22,8 @@ const createEvent = async (req, res) => {
   if (tags) {
     try {
       parseTags = Array.isArray(tags) ? tags : JSON.parse(tags);
-    } catch (error) {
-      return res.status(400).json({
-        message: "Invalid tags format",
-      });
+    } catch {
+      throw new ApiError(400, "Invalid tags format");
     }
   }
   let newEvent = new EventModel({
@@ -93,17 +91,13 @@ const getAllEvents = async (req, res) => {
       $options: "i",
     };
   }
-  try {
-    const events = await EventModel.find(filter)
-      .populate("club", "name email")
-      .sort({ date: -1 });
-    res.status(200).json({
-      message: "All events fetched successfully",
-      events,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  const events = await EventModel.find(filter)
+    .populate("club", "name email")
+    .sort({ date: -1 });
+  res.status(200).json({
+    message: "All events fetched successfully",
+    events,
+  });
 };
 
 const getsingleEvent = async (req, res) => {

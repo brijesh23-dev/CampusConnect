@@ -55,7 +55,7 @@ router.post(
   catchAsync(eventController.createEvent),
 );
 
-router.get("/all", eventController.getAllEvents);
+router.get("/all", catchAsync(eventController.getAllEvents));
 
 router.get(
   "/my-events",
@@ -98,6 +98,6 @@ router.patch(
   catchAsync(eventController.updateEventStatus),
 );
 // /:id must come LAST — it is a wildcard catch-all
-router.get("/:id", eventController.getsingleEvent);
+router.get("/:id", catchAsync(eventController.getsingleEvent));
 
 module.exports = router;

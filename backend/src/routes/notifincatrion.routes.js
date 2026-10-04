@@ -7,9 +7,10 @@ const {
 } = require("../controllers/notification.controller");
 
 const { protect } = require("../middleware/auth.middleware");
+const catchAsync = require("../utils/catchAsync");
 
-router.get("/", protect, getNotifications);
+router.get("/", protect, catchAsync(getNotifications));
 
-router.put("/:id", protect, markAsRead);
+router.put("/:id", protect, catchAsync(markAsRead));
 
 module.exports = router;

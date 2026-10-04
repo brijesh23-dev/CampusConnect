@@ -1,421 +1,229 @@
----
-marp: true
----
-
 # CampusConnect
 
-CampusConnect is a MERN-style student event management project with a React frontend and an Express/MongoDB backend. It supports user registration, login, role-based routes, event management, notification delivery, and student interest tracking.
+CampusConnect is a full-stack campus engagement platform designed for university communities. It helps students discover events, register for activities, and track their interests, while clubs and administrators can create, manage, review, and approve events.
+
+## Tech Stack
+
+- Frontend: React, Vite, Redux Toolkit, Tailwind CSS, Material UI, React Router
+- Backend: Node.js, Express.js, MongoDB, Mongoose
+- Authentication: JWT with HTTP-only cookies
+- Real-time updates: Socket.IO
+- Media: Cloudinary
+- Validation: Joi
+
+## Core Features
+
+- Role-based access for student, club, and admin users
+- Secure registration and login flow
+- Club profile management and public club listing
+- Event creation, updates, approvals, and filtering
+- Student registration and participation tracking
+- Notification system for relevant activity updates
+- Admin analytics and moderation tools
+- Real-time socket-based communication for live updates
+
+## Role Overview
+
+### Student
+- Browse public events
+- Register for events
+- Update personal interests
+- View personal dashboard and notifications
+
+### Club
+- Manage club profile
+- Create and update event listings
+- View club-specific analytics and participants
+- Handle notification activity
+
+### Admin
+- Manage users and roles
+- Approve or remove events
+- Access platform-wide analytics and moderation tools
 
 ## Project Structure
 
-- `backend/` – Express API server
-  - `server.js` – entry point
-  - `src/app.js` – Express app and route registration
-  - `src/config/` – environment and database configuration
-  - `src/controllers/` – controller logic for auth, events, notifications, and users
-  - `src/middleware/` – authentication and role authorization
-  - `src/models/` – MongoDB schemas for User, Event, Notification, Club
-  - `src/routes/` – API routes for auth, test, events, users, notifications
-- `frontend/` – React app built with Vite
+```text
+CampusConnect/
+├── backend/
+│   ├── src/
+│   │   ├── app.js
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── socket/
+│   │   ├── utils/
+│   │   └── validations/
+│   ├── server.js
+│   ├── package.json
+│   └── .env
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   ├── vite.config.js
+│   └── .env
+├── README.md
+├── DEPLOYMENT.md
+├── PROGRESS.md
+└── package.json (if present in repo root)
+```
 
-## Key Features Implemented
+## Prerequisites
 
-- User registration and login
-- JWT authentication via HttpOnly cookies
-- Role-based access control for `student`, `club`, and `admin`
-- Event CRUD for clubs/admins
-- Student interest updates
-- Notification retrieval and marking notifications as read
-- CORS enabled for `http://localhost:5173`
+Before starting the project, make sure you have:
+
+- Node.js 18 or newer
+- npm or yarn
+- MongoDB running locally or access to a MongoDB Atlas cluster
+- A Cloudinary account for media upload support
 
 ## Backend Setup
 
-### Prerequisites
-
-- Node.js 18+
-- MongoDB running locally or accessible via a connection string
-
-### Install and Run Backend
+1. Navigate to the backend folder:
 
 ```bash
 cd backend
-npm install
-npm run dev
 ```
 
-### Environment Variables
+2. Install dependencies:
 
-Create a `.env` file inside `backend/`:
+```bash
+npm install
+```
+
+3. Create a `.env` file in the `backend` folder with the following values:
 
 ```env
 PORT=3000
-DB_URI=mongodb://localhost:27017/event-management
-JWT_SECRET=your_secret_key
+DB_URI=mongodb://localhost:27017/campusconnect
+JWT_SECRET=your_super_secret_jwt_key
 JWT_EXPIRES_IN=7d
 SALT_ROUNDS=10
+FRONTEND_URL=http://localhost:5173
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-### Start URL
+4. Run the backend in development mode:
 
-`http://localhost:3000`
+```bash
+npm run dev
+```
+
+The API will be available at:
+
+```text
+http://localhost:3000
+```
 
 ## Frontend Setup
 
-The frontend lives in `frontend/` and uses Vite plus React.
+1. Navigate to the frontend folder:
 
 ```bash
 cd frontend
-npm install
-npm run dev
 ```
 
-The default development server runs on `http://localhost:5173`.
-
-## API Reference
-
-### Base URL
-
-`http://localhost:3000`
-
-### Authentication Routes
-
-#### Register User
-
-`POST /api/auth/register`
-
-Body:
-
-```json
-{
-  "name": "Jane Doe",
-  "email": "jane@example.com",
-  "password": "password123",
-  "role": "student"
-}
-```
-
-Success response:
-
-```json
-{
-  "message": "User registered successfully",
-  "user": {
-    "_id": "...",
-    "name": "Jane Doe",
-    "email": "jane@example.com",
-    "role": "student",
-    "interests": []
-  },
-  "token": "<jwt-token>"
-}
-```
-
-Notes:
-- The API sets an HttpOnly `token` cookie on successful auth.
-- Allowed roles: `student`, `club`, `admin`.
-
-#### Login User
-
-`POST /api/auth/login`
-
-Body:
-
-```json
-{
-  "email": "jane@example.com",
-  "password": "password123"
-}
-```
-
-Success response:
-
-```json
-{
-  "message": "Login successful",
-  "user": {
-    "_id": "...",
-    "name": "Jane Doe",
-    "email": "jane@example.com",
-    "role": "student",
-    "interests": []
-  },
-  "token": "<jwt-token>"
-}
-```
-
-#### Get Current User
-
-`GET /api/auth/getme`
-
-Requires the `token` cookie.
-
-Response:
-
-```json
-{
-  "user": {
-    "_id": "...",
-    "name": "Jane Doe",
-    "email": "jane@example.com",
-    "role": "student",
-    "interests": [],
-    "createdAt": "...",
-    "updatedAt": "..."
-  }
-}
-```
-
-### Event Routes
-
-#### Create Event
-
-`POST /api/events/create`
-
-Requires authentication and role `club` or `admin`.
-
-Body:
-
-```json
-{
-  "title": "Coding Workshop",
-  "description": "Learn full-stack development.",
-  "category": "technology",
-  "date": "2026-06-01T00:00:00.000Z",
-  "time": "14:00",
-  "venue": "Room 101"
-}
-```
-
-Success response:
-
-```json
-{
-  "message": "Event created successfully",
-  "event": { ... }
-}
-```
-
-#### Get All Events
-
-`GET /api/events/all`
-
-Response:
-
-```json
-{
-  "message": "All events fetched successfully",
-  "events": [ ... ]
-}
-```
-
-#### Get Event by ID
-
-`GET /api/events/:id`
-
-Response:
-
-```json
-{
-  "message": "Event fetched successfully",
-  "event": { ... }
-}
-```
-
-#### Get My Events
-
-`GET /api/events/my-events`
-
-Requires authentication and role `club` or `admin`.
-
-Response:
-
-```json
-{
-  "events": [ ... ]
-}
-```
-
-#### Update Event
-
-`PUT /api/events/update/:id`
-
-Requires authentication and role `club` or `admin`.
-
-Body: any subset of event fields, for example:
-
-```json
-{
-  "description": "Updated description",
-  "venue": "Hall B"
-}
-```
-
-Success response:
-
-```json
-{
-  "message": "Event updated successfully",
-  "event": { ... }
-}
-```
-
-#### Delete Event
-
-`DELETE /api/events/delete/:id`
-
-Requires authentication and role `club` or `admin`.
-
-Response:
-
-```json
-{ "message": "Event deleted successfully" }
-```
-
-### User Routes
-
-#### Update Student Interests
-
-`PUT /api/users/interests`
-
-Requires authentication and role `student`.
-
-Body:
-
-```json
-{
-  "interests": ["technology", "sports", "art"]
-}
-```
-
-Response:
-
-```json
-{
-  "message": "Interests updated",
-  "user": { ... }
-}
-```
-
-### Notification Routes
-
-#### Get Notifications
-
-`GET /api/notifications`
-
-Requires authentication.
-
-Response:
-
-```json
-{
-  "notifications": [ ... ]
-}
-```
-
-#### Mark Notification as Read
-
-`PUT /api/notifications/:id`
-
-Requires authentication.
-
-Response:
-
-```json
-{
-  "message": "Notification marked as read",
-  "notification": { ... }
-}
-```
-
-### Protected Role Routes
-
-These routes verify the authenticated user's role.
-
-#### Student Route
-
-`GET /api/test/student`
-
-Response:
-
-```json
-{ "message": "Welcome Student" }
-```
-
-#### Club Route
-
-`GET /api/test/club`
-
-Response:
-
-```json
-{ "message": "Welcome Club" }
-```
-
-#### Admin Route
-
-`GET /api/test/admin`
-
-Response:
-
-```json
-{ "message": "Welcome Admin" }
-```
-
-## Notes
-
-- The backend uses cookie-based JWT authentication with `cookie-parser`.
-- Events belong to club users and include title, description, category, date, time, venue, and club reference.
-- Notifications are created for students that match event categories and can be marked as read.
-- The frontend is available in `frontend/` and should be configured to send credentials when calling backend APIs.
-
-## Future Improvements
-
-- Add frontend route documentation when UI is complete
-- Add tests for backend controllers and routes
-- Improve event filtering and search
-- Add real club profile management
-
-```json
-{ "message": "Welcome Admin" }
-```
-
-Possible unauthorized response:
-
-```json
-{ "message": "Role (student) is not allowed" }
-```
-
-## Authentication Details
-
-- Auth uses JWT tokens signed with `JWT_SECRET`.
-- The backend expects the token to be sent in an HttpOnly cookie named `token`.
-- CORS is configured to allow requests from `http://localhost:5173` with credentials.
-
-## Notes
-
-- The backend exposes a root route at `/` returning `College Event API running`.
-- The current protected routes are part of `backend/src/routes/test.routes.js`.
-- User models support `name`, `email`, `password`, `role`, and `interests`.
-
-## Recommended Frontend Integration
-
-- Send login/register requests with `credentials: "include"` so the browser stores the cookie.
-- Use `GET /api/auth/getme` to verify the authenticated user on page load.
-- Use role-specific client logic to protect frontend routes for students, clubs, and admins.
-
-## Project Structure
-
-- `backend/server.js` — server startup and DB connection
-- `backend/src/app.js` — Express app configuration
-- `backend/src/config/config.js` — environment configuration
-- `backend/src/controllers/auth.controller.js` — auth handlers
-- `backend/src/middleware/auth.middleware.js` — auth and role checks
-- `backend/src/models/` — Mongoose schemas for users, clubs, events, notifications
-- `backend/src/routes/` — API routes
-
-## Run with Nodemon
+2. Install dependencies:
 
 ```bash
-cd backend
+npm install
+```
+
+3. Create a `.env` file in the `frontend` folder:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+4. Start the Vite development server:
+
+```bash
 npm run dev
 ```
+
+The app will be available at:
+
+```text
+http://localhost:5173
+```
+
+## Common API Routes
+
+The backend exposes the app under the `/api` prefix.
+
+### Authentication
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/getme`
+
+### Events
+
+- `GET /api/events/all`
+- `GET /api/events/:id`
+- `POST /api/events/create`
+- `PUT /api/events/update/:id`
+- `DELETE /api/events/delete/:id`
+- `GET /api/events/my-events`
+- `PATCH /api/events/:id/approve`
+
+### Users and Interests
+
+- `PUT /api/users/profile`
+- `PUT /api/users/password`
+- `PUT /api/users/interests`
+
+### Clubs
+
+- `GET /api/clubs/all`
+- `GET /api/clubs/profile`
+- `PUT /api/clubs/profile`
+- `GET /api/clubs/:id`
+
+### Notifications
+
+- `GET /api/notifications`
+- `PUT /api/notifications/:id`
+
+### Registration
+
+- `GET /api/registration`
+- `GET /api/registration/participants/:eventId`
+- `DELETE /api/registration/:id`
+
+### Admin
+
+- `GET /api/admin/stats`
+- `GET /api/admin/users`
+- `GET /api/admin/events`
+- `PATCH /api/admin/users/:id/role`
+- `PATCH /api/admin/events/:id/approve`
+- `GET /api/admin/analytics`
+
+## Suggested Development Workflow
+
+1. Start MongoDB.
+2. Run the backend with `npm run dev` from `backend/`.
+3. Run the frontend with `npm run dev` from `frontend/`.
+4. Open the frontend in the browser and sign up as a student, club, or admin.
+
+## Production Notes
+
+- Frontend can be deployed to Vercel or any static host.
+- Backend should be deployed to a Node.js-compatible hosting provider.
+- Store all secrets in environment variables and avoid committing `.env` files to version control.
+
+## License
+
+This project is currently distributed without a formal license declaration in the repository. If you plan to share or deploy it publicly, add an appropriate license file and terms of use.
+
+## Contributing
+
+Pull requests and feature suggestions are welcome. For major changes, open an issue first so the implementation direction can be discussed clearly.
+

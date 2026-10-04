@@ -1,45 +1,34 @@
 const Notification = require("../models/notification.model");
+const ApiError = require("../utils/ApiError");
 
 const getNotifications = async (req, res) => {
-  try {
-    const notifications = await Notification.find({
-      user: req.user._id,
+  const notifications = await Notification.find({
+    user: req.user._id,
+  })
+    .populate({
+      path: "event",
+      populate: {
+        path: "club",
+        select: "name",
+      },
     })
-      .populate({
-        path:"event",
-        populate:{
-          path:"club",
-          select:"name"
-        }
-      })
-      .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 });
 
-    res.json({ notifications });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
+  res.json({ notifications });
 };
 
 const markAsRead = async (req, res) => {
-  try {
-    const notification =
-      await Notification.findByIdAndUpdate(
-        req.params.id,
-        { isRead: true },
-        { new: true }
-      );
+  const notification = await Notification.findOneAndUpdate(
+    { _id: req.params.id, user: req.user._id },
+    { isRead: true },
+    { new: true }
+  );
+  if (!notification) throw new ApiError(404, "Notification not found");
 
-    res.json({
-      message: "Notification marked as read",
-      notification,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
+  res.json({
+    message: "Notification marked as read",
+    notification,
+  });
 };
 
 module.exports = {
