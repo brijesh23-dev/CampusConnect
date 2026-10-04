@@ -4,13 +4,14 @@ const errorHandler = (err, req, res, next) => {
   if (process.env.NODE_ENV === "production") {
     if (err.isOperational) {
       return res.status(err.statusCode).json({
-        status: err.status,
+        success: err.success,
         message: err.message,
       });
     }
   }
+
   return res.status(500).json({
-    status: "error",
+    success:false,
     message: "something went wrong on the server",
   });
 };
