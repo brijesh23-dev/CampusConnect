@@ -104,7 +104,7 @@ function UpcomingEvents() {
 
                   <Link
                     to={`/events/${event._id}`}
-                    className="w-full text-center py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition"
+                    className="w-full text-center py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                   >
                     View Details
                   </Link>

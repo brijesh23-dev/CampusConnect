@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import ClubSidebar from "../components/common/ClubSidebar";
 import { MdMenu } from "react-icons/md";
+import ThemeToggle from "../components/ui/ThemeToggle";
 
 function ClubLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,7 +14,7 @@ function ClubLayout() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Mobile top bar — hamburger only, visible on mobile */}
-        <div className="lg:hidden flex items-center gap-3 px-4 h-14 bg-white border-b border-gray-100 shadow-sm flex-shrink-0">
+        <div className="lg:hidden flex items-center gap-3 px-4 h-14 bg-white border-b border-gray-100 shadow-sm flex-shrink-0 dark:bg-slate-950 dark:border-slate-800">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 transition"
@@ -22,6 +23,9 @@ function ClubLayout() {
             <MdMenu className="text-2xl" />
           </button>
           <span className="text-sm font-bold text-gray-900">CampusConnect</span>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto overflow-x-hidden">

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/authSlice";
+import ThemeToggle from "../ui/ThemeToggle";
 import {
   MdDashboard,
   MdEventNote,
@@ -73,6 +74,9 @@ function ClubSidebar({ open, setOpen }) {
         >
           <MdClose className="text-xl" />
         </button>
+        <div className="ml-2 hidden lg:block">
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* New Event CTA */}

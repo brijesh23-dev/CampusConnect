@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { MdNotificationsNone, MdSearch, MdMenu } from "react-icons/md";
+import ThemeToggle from "../../ui/ThemeToggle";
 
 const PAGE_TITLES = {
   "/admin/dashboard": "Dashboard",
@@ -44,6 +45,7 @@ function AdminNavbar({ onMenuClick }) {
 
       {/* Right side */}
       <div className="flex items-center gap-3">
+        <ThemeToggle />
         {/* Search */}
         <div className="hidden sm:flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-1.5">
           <MdSearch className="text-slate-400 text-base flex-shrink-0" />

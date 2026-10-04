@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 function PublicFooter() {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200">
+    <footer className="border-t border-gray-200 bg-gray-50 dark:border-slate-800 dark:bg-slate-950">
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           {/* Brand */}
@@ -17,13 +17,13 @@ function PublicFooter() {
 
           {/* Platform */}
           <div>
-            <p className="text-sm font-semibold text-gray-700 mb-4">Platform</p>
+            <p className="text-sm font-semibold text-gray-700 mb-4 dark:text-slate-200">Platform</p>
             <ul className="space-y-2.5">
               {[{ label: "Browse events", to: "/events" }, { label: "Explore clubs", to: "/clubs-directory" }, { label: "Create an account", to: "/register" }].map((item) => (
                 <li key={item.label}>
                   <Link
                     to={item.to}
-                    className="text-sm text-gray-500 hover:text-blue-600 transition"
+                    className="text-sm text-gray-500 hover:text-blue-600 transition dark:text-slate-400"
                   >
                     {item.label}
                   </Link>
@@ -34,13 +34,13 @@ function PublicFooter() {
 
           {/* Legal */}
           <div>
-            <p className="text-sm font-semibold text-gray-700 mb-4">Legal</p>
+            <p className="text-sm font-semibold text-gray-700 mb-4 dark:text-slate-200">Legal</p>
             <ul className="space-y-2.5">
               {["Privacy Policy", "Terms of Service"].map((item) => (
                 <li key={item}>
                   <Link
                     to="#"
-                    className="text-sm text-gray-500 hover:text-blue-600 transition"
+                    className="text-sm text-gray-500 hover:text-blue-600 transition dark:text-slate-400"
                   >
                     {item}
                   </Link>

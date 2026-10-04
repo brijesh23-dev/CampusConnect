@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { logoutUser } from "../../../redux/authSlice";
 import { MdSearch, MdNotifications, MdMenu } from "react-icons/md";
+import ThemeToggle from "../../ui/ThemeToggle";
 
 function TopNavbar({ onMenuClick }) {
   const { user } = useSelector((state) => state.auth);
@@ -44,6 +45,7 @@ function TopNavbar({ onMenuClick }) {
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         {/* Notifications */}
         <Link
           to="/student/notifications"

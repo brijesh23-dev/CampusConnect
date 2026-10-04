@@ -1,8 +1,8 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import { MdSearch, MdMenu, MdClose, MdAddCircleOutline, MdDarkMode, MdLightMode } from "react-icons/md";
-import { useTheme } from "../../../contexts/ThemeContext";
+import { MdSearch, MdMenu, MdClose, MdAddCircleOutline } from "react-icons/md";
+import ThemeToggle from "../../ui/ThemeToggle";
 
 const navItems = [
   { label: "Events", path: "/events" },
@@ -14,7 +14,6 @@ const PublicNavbar = () => {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const { theme, toggleTheme } = useTheme();
 
   const submitSearch = (event) => {
     event.preventDefault();
@@ -66,20 +65,12 @@ const PublicNavbar = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-lg text-gray-700 transition hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-          >
-            {theme === "dark" ? <MdLightMode /> : <MdDarkMode />}
-          </button>
+          <ThemeToggle />
           {user ? (
             <>
               <Link
                 to={user.role === "student" ? "/student/dashboard" : user.role === "admin" ? "/admin/dashboard" : "/clubs"}
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2 rounded-xl hover:bg-gray-100 transition"
+                className="hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2 rounded-xl hover:bg-gray-100 transition dark:text-slate-200 dark:hover:text-white dark:hover:bg-slate-800"
               >
                 Dashboard
               </Link>
@@ -88,13 +79,13 @@ const PublicNavbar = () => {
             <>
               <Link
                 to="/login"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2 rounded-xl hover:bg-gray-100 transition"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2 rounded-xl hover:bg-gray-100 transition dark:text-slate-200 dark:hover:text-white dark:hover:bg-slate-800"
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition shadow-sm"
+                className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition shadow-sm"
               >
                 Register
               </Link>
@@ -128,14 +119,14 @@ const PublicNavbar = () => {
               key={item.label}
               to={item.path}
               onClick={() => setMobileOpen(false)}
-              className="block text-sm font-medium text-gray-700 py-2 hover:text-blue-600"
+              className="block py-2 text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-slate-200"
             >
               {item.label}
             </NavLink>
           ))}
           {!user && (
             <>
-              <Link to="/login" className="block text-sm text-gray-700 py-2" onClick={() => setMobileOpen(false)}>Sign In</Link>
+              <Link to="/login" className="block py-2 text-sm text-gray-700 dark:text-slate-200" onClick={() => setMobileOpen(false)}>Sign In</Link>
               <Link to="/register" className="block text-sm text-blue-600 font-semibold py-2" onClick={() => setMobileOpen(false)}>Register</Link>
             </>
           )}
