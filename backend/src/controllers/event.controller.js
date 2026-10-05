@@ -96,6 +96,7 @@ const getAllEvents = async (req, res) => {
     .sort({ date: -1 });
   res.status(200).json({
     message: "All events fetched successfully",
+    success: true,
     events,
   });
 };
@@ -123,11 +124,11 @@ const updateEvent = async (req, res) => {
   const event = await EventModel.findById(req.params.id);
 
   if (!event) {
-   throw new ApiError(404, "Event not found");
+    throw new ApiError(404, "Event not found");
   }
 
   if (event.club.toString() !== req.user._id.toString()) {
-    throw new ApiError(403,"Not allowed");
+    throw new ApiError(403, "Not allowed");
   }
 
   // Build update object from body fields (FormData-safe)
@@ -256,14 +257,14 @@ const registerForEvent = async (req, res) => {
 };
 
 const getParticipants = async (req, res) => {
-    const registrations = await RegistrationModel.find({
-      event: req.params.id,
-    }).populate("student", "name email");
+  const registrations = await RegistrationModel.find({
+    event: req.params.id,
+  }).populate("student", "name email");
 
-    res.status(200).json({
-      success: true,
-      participants: registrations,
-    });
+  res.status(200).json({
+    success: true,
+    participants: registrations,
+  });
 };
 
 module.exports = {
