@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+ci.yaml
 
 # .env.local (and any *.local file) is gitignored — it's the local developer override
 # .env is committed — it holds the production API URL (no secrets)

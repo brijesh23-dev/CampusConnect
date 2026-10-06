@@ -20,18 +20,18 @@ describe("POST /api/auth/register", () => {
     expect(response.body.success).toBe(true);
 
     expect(response.body.message).toBe("User registered successfully");
-    
-    // these are optional because we already validate body by validator.
 
-    // expect(response.body.user).toBeDefined();
+    these are optional because we already validate body by validator.
 
-    // expect(response.body.user.name).toBe("Test Student");
+    expect(response.body.user).toBeDefined();
 
-    // expect(response.body.user.email).toBe("teststudent@gmail.com");
+    expect(response.body.user.name).toBe("Test Student");
 
-    // expect(response.body.user.role).toBe("student");
+    expect(response.body.user.email).toBe("teststudent@gmail.com");
 
-    // expect(response.body.token).toBeDefined();
+    expect(response.body.user.role).toBe("student");
+
+    expect(response.body.token).toBeDefined();
   });
 
   test("should return 400 when name is missing", async () => {

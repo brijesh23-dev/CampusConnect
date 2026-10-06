@@ -21,7 +21,6 @@ describe("POST api/auth/login", () => {
       email: "teststudent@gmail.com",
       password: "password123",
     });
-
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe("Login successful");
     expect(response.body.user).toBeDefined();
@@ -33,7 +32,7 @@ describe("POST api/auth/login", () => {
       name: "Test Student",
       email: "teststudent@gmail.com",
       password: "password123",
-      role: "Student",
+      role: "student",
     });
 
     //login with wrong pass
@@ -43,6 +42,20 @@ describe("POST api/auth/login", () => {
     });
 
     expect(response.statusCode).toBe(401);
-    expect(response.body.message).toBe("Invalid credentials.");
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Incorrect password.");
   });
+
+  test("should return 401 when user does not exist", async () => {
+  const response = await request(app)
+    .post("/api/auth/login")
+    .send({
+      email: "notfound@gmail.com",
+      password: "password123",
+    });
+
+  expect(response.statusCode).toBe(401);
+  expect(response.body.success).toBe(false);
+  expect(response.body.message).toBe("Invalid credentials.");
+});
 });
