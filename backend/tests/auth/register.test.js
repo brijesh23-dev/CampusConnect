@@ -21,7 +21,7 @@ describe("POST /api/auth/register", () => {
 
     expect(response.body.message).toBe("User registered successfully");
 
-    these are optional because we already validate body by validator.
+    // these are optional because we already validate body by validator.
 
     expect(response.body.user).toBeDefined();
 
