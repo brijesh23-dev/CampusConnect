@@ -74,11 +74,11 @@ function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f4f5fa] px-4 py-5 dark:bg-[#10131c] sm:px-6 lg:px-8">
-      <div className="flex w-full max-w-6xl overflow-hidden rounded-[28px] bg-white shadow-[0_28px_80px_-32px_rgba(34,27,82,0.32)] dark:bg-[#191d29] lg:min-h-[680px]">
+      <div className="flex w-full max-w-6xl overflow-hidden bg-white shadow-[0_20px_60px_-40px_rgba(34,27,82,0.3)] dark:bg-[#191d29] lg:min-h-[680px] rounded-lg">
         <aside className="relative hidden w-[43%] flex-col justify-between overflow-hidden bg-gradient-to-br from-[#30276d] via-[#403584] to-[#51419b] p-10 text-white lg:flex xl:p-12">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-28 -top-28 h-96 w-96 rounded-full border border-white/10"
+            className="pointer-events-none absolute -right-28 -top-28 h-96 w-96 rounded-full border border-white/10 bg-gradient-to-br from-[#30276d] via-[#403584] to-[#d0c5ff] opacity-70"
           />
           <div
             aria-hidden="true"
@@ -124,8 +124,8 @@ function Login() {
           </p>
         </aside>
 
-        <section className="flex flex-1 items-center justify-center px-6 py-9 sm:px-10 sm:py-12 lg:px-12 xl:px-16">
-          <div className="w-full max-w-md">
+        <section className="flex flex-1 items-center justify-center bg-white px-6 py-9 dark:bg-[#191d29] sm:px-10 sm:py-12 lg:px-12 xl:px-16 "> 
+          <div className="w-full max-w-md rounded-4xl">
             <Link
               to="/"
               className="mb-9 inline-flex items-center gap-2.5 rounded-md text-[#393078] dark:text-violet-300 lg:hidden"

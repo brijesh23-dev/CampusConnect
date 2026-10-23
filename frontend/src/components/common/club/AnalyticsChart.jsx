@@ -1,34 +1,50 @@
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
+import { MdInsights } from "react-icons/md";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 function AnalyticsChart({ eventStats = [] }) {
-  // Map analytics event stats to chart data
-  const chartData = (eventStats || []).map((stat) => ({
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const chartData = eventStats.map((stat) => ({
     name: stat._id?.title || "Unknown",
-    Registrations: stat.registrations || 0,
+    registrations: stat.registrations || 0,
   }));
+  const axisColor = isDark ? "#94a3b8" : "#737b8c";
+  const gridColor = isDark ? "#303747" : "#e9edf4";
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col h-[380px]">
-      <div className="mb-6">
-        <h3 className="text-lg font-bold text-gray-900">Registration Analytics</h3>
-        <p className="text-xs text-gray-400 mt-0.5">Attendee registrations per event hosted by your club</p>
+    <section className="flex h-[380px] flex-col rounded-2xl bg-white p-5 shadow-sm dark:bg-slate-900 sm:p-6">
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Registration analytics
+        </h2>
+        <p className="mt-1 text-xs text-gray-600 dark:text-slate-300">
+          Registrations by event
+        </p>
       </div>
 
-      <div className="flex-1 w-full text-xs">
+      <div className="w-full flex-1 text-xs">
         {chartData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-300">
-            <svg className="w-12 h-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <p className="text-xs font-medium text-gray-400">No registration data yet</p>
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <MdInsights
+              className="mb-3 text-4xl text-slate-400 dark:text-slate-500"
+              aria-hidden="true"
+            />
+            <p className="text-sm font-medium text-gray-700 dark:text-slate-200">
+              No registrations yet
+            </p>
+            <p className="mt-1 max-w-xs text-xs leading-5 text-gray-600 dark:text-slate-400">
+              Registration activity will appear here when students sign up for
+              your events.
+            </p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -37,46 +53,74 @@ function AnalyticsChart({ eventStats = [] }) {
               margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
             >
               <defs>
-                <linearGradient id="colorRegistrations" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <linearGradient
+                  id="clubRegistrationFill"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="0%"
+                    stopColor="#4f46e5"
+                    stopOpacity={isDark ? 0.35 : 0.2}
+                  />
+                  <stop offset="100%" stopColor="#4f46e5" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+              <CartesianGrid vertical={false} stroke={gridColor} />
               <XAxis
                 dataKey="name"
-                stroke="#9ca3af"
+                stroke={axisColor}
+                tick={{ fill: axisColor, fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
                 dy={10}
+                tickFormatter={(name) =>
+                  name.length > 14 ? `${name.slice(0, 12)}…` : name
+                }
+                interval="preserveStartEnd"
               />
               <YAxis
-                stroke="#9ca3af"
+                stroke={axisColor}
+                tick={{ fill: axisColor, fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
                 dx={-5}
+                allowDecimals={false}
               />
               <Tooltip
+                cursor={{
+                  stroke: isDark ? "#64748b" : "#a5b4fc",
+                  strokeWidth: 1,
+                }}
                 contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #f3f4f6",
-                  borderRadius: "12px",
-                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.05)",
+                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  border: `1px solid ${isDark ? "#334155" : "#e2e8f0"}`,
+                  borderRadius: "10px",
+                  color: isDark ? "#f1f5f9" : "#1e293b",
+                  boxShadow: "0 8px 20px -8px rgba(15, 23, 42, 0.25)",
                 }}
               />
               <Area
                 type="monotone"
-                dataKey="Registrations"
-                stroke="#8b5cf6"
-                strokeWidth={3}
+                dataKey="registrations"
+                name="Registrations"
+                stroke="#4f46e5"
+                strokeWidth={2.5}
+                activeDot={{
+                  r: 4,
+                  strokeWidth: 2,
+                  stroke: isDark ? "#1e293b" : "#ffffff",
+                }}
                 fillOpacity={1}
-                fill="url(#colorRegistrations)"
+                fill="url(#clubRegistrationFill)"
               />
             </AreaChart>
           </ResponsiveContainer>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 

@@ -53,23 +53,7 @@ function useSocket() {
       socket.on("connect_error", (err) => {
         console.warn("[Socket] Connection error:", err.message);
       });
-
-      // Real-time notification from server (new event, RSVP confirmation, etc.)
-      // socket.on("new-notification", (notification) => {
-      //   // Add to Redux store so notification pages update immediately
-      //   dispatch(addRealtimeNotification(notification));
-
-      //   // Show a toast so the user is aware even when not on the notifications page
-      //   toast.info(notification.message || "You have a new notification", {
-      //     position: "top-right",
-      //     autoClose: 5000,
-      //     hideProgressBar: false,
-      //     closeOnClick: true,
-      //     pauseOnHover: true,
-      //     draggable: true,
-      //     icon: "🔔",
-      //   });
-      // });
+      
     }
 
     const handleForceLogout = (data) => {
