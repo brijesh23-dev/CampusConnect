@@ -143,13 +143,18 @@ const eventSlice = createSlice({
         state.error = action.payload || "Failed to create event";
       })
 
+      .addCase(fetchMyEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchMyEvents.fulfilled, (state, action) => {
         state.loading = false;
+        state.error = null;
         state.events = action.payload;
       })
       .addCase(fetchMyEvents.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload || "Failed to fetch events";
-        state.events = [];
       })
 
       .addCase(deleteEvent.fulfilled, (state, action) => {
