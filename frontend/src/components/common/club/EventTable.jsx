@@ -4,6 +4,7 @@ import {
   MdDelete,
   MdPeople,
   MdCalendarToday,
+  MdEventAvailable,
   MdLocationOn,
   MdExpandMore,
 } from "react-icons/md";
@@ -32,7 +33,7 @@ function StatusBadge({ status }) {
 
 function EventTable({ events = [], onDelete, onStatusChange }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-900">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[700px]">
           <thead>
@@ -64,8 +65,8 @@ function EventTable({ events = [], onDelete, onStatusChange }) {
                           {event?.image ? (
                             <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-blue-100 to-violet-100 flex items-center justify-center text-lg">
-                              🎓
+                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-100 to-violet-100 text-blue-500 dark:from-slate-800 dark:to-slate-700 dark:text-blue-300">
+                              <MdEventAvailable aria-hidden="true" className="text-lg" />
                             </div>
                           )}
                         </div>

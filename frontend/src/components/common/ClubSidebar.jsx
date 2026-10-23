@@ -7,7 +7,6 @@ import {
   MdDashboard,
   MdEventNote,
   MdExplore,
-  MdSettings,
   MdHelp,
   MdLogout,
   MdAddCircleOutline,
@@ -32,7 +31,6 @@ const mainLinks = [
   { id: "profile", name: "Club Profile", path: "/clubs/profile", icon: <MdAccountCircle className="text-xl flex-shrink-0" /> },
   { id: "notifications", name: "Notifications", path: "/clubs/notifications", icon: <MdNotifications className="text-xl flex-shrink-0" /> },
   { id: "explore", name: "Explore", path: "/events", icon: <MdExplore className="text-xl flex-shrink-0" /> },
-  { id: "settings", name: "Settings", path: "/clubs/settings", icon: <MdSettings className="text-xl flex-shrink-0" /> },
 ];
 
 function ClubSidebar({ open, setOpen }) {

@@ -1,7 +1,6 @@
 
 import AppRoutes from "./routes/AppRoutes";
-import { ToastContainer, Bounce } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import {Toaster} from "react-hot-toast";
 import useSocket from "./hooks/useSocket";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 
@@ -17,18 +16,14 @@ const AppContent = () => {
       </a>
 
       <AppRoutes />
-      <ToastContainer
-        position="bottom-right"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme={theme}
-        transition={Bounce}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: theme === "dark" ? "#1f2937" : "#f3f4f6",
+            color: theme === "dark" ? "#f3f4f6" : "#1f2937",
+          },
+        }}
       />
     </>
   );

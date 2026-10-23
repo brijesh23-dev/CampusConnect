@@ -18,7 +18,6 @@ import {
   MdLink,
 } from "react-icons/md";
 import { MdAccessTime } from "react-icons/md";
-import { json } from "zod";
 
 const CATEGORIES = [
   "Coding",
@@ -41,6 +40,7 @@ function CreateEvent() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm();
+
   const image = watch("image");
   const imagePreview = image?.[0] ? URL.createObjectURL(image[0]) : null;
   const dispatch = useDispatch();
@@ -67,26 +67,28 @@ function CreateEvent() {
     setSubmitError("");
     try {
       const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("description", data.description);
-      // Send the first selected category as the primary one (backend stores a single string)
-      formData.append("category", categories[0] || "");
-      formData.append("date", data.date);
-      formData.append("startTime", data.startTime);
-      formData.append("endTime", data.endTime);
-      formData.append("venue", data.venue);
-      formData.append("status", status);
+      const fields = {
+        title: data.title,
+        description: data.description,
+        category: categories[0] || "",
+        date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        venue: data.venue,
+        status: status,
+        requireRSVP: String(requireRSVP),
+      };
+      Object.entries(fields).forEach(([key,value])=>{
+        formData.append(key, value);
+      })
       const tags = (data.tags || "")
         .split(",")
         .map((tag) => tag.trim())
         .filter(Boolean);
       formData.append("tags", JSON.stringify(tags));
       if (data.image?.[0]) formData.append("image", data.image[0]);
-      formData.append("requireRSVP", requireRSVP);
-      // Use maxParticipants — the field name the backend controller reads
       if (data.maxParticipants)
         formData.append("maxParticipants", data.maxParticipants);
-
       await dispatch(createEvent(formData)).unwrap();
       reset();
       navigate("/clubs/events");
@@ -361,6 +363,7 @@ function CreateEvent() {
                     className="flex-1 text-xs outline-none placeholder:text-gray-400"
                     list="category-suggestions"
                   />
+                  
                   <datalist id="category-suggestions">
                     {CATEGORIES.map((c) => (
                       <option key={c} value={c} />

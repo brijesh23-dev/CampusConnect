@@ -5,7 +5,6 @@ import {
   MdDashboard,
   MdPeople,
   MdEvent,
-  MdSettings,
   MdLogout,
   MdHelp,
   MdSecurity,
@@ -22,7 +21,6 @@ const navLinks = [
   { id: "events", name: "Events", path: "/admin/dashboard?tab=events", icon: <MdEvent className="text-xl flex-shrink-0" /> },
   { id: "analytics", name: "Analytics", path: "/admin/analytics", icon: <MdInsights className="text-xl flex-shrink-0" /> },
   { id: "reports", name: "Reports", path: "/admin/reports", icon: <MdAssessment className="text-xl flex-shrink-0" /> },
-  { id: "settings", name: "Settings", path: "/admin/settings", icon: <MdSettings className="text-xl flex-shrink-0" /> },
 ];
 
 function AdminSidebar({ open, setOpen }) {

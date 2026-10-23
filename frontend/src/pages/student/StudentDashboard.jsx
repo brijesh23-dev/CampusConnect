@@ -11,8 +11,9 @@ import {
   MdArrowForward,
   MdStar,
   MdExplore,
-  MdSettings,
   MdAdd,
+  MdEvent,
+  MdGroups,
 } from "react-icons/md";
 import DashboardCard from "../../components/common/student/DashboardCard";
 import ProfileCard from "../../components/common/student/ProfileCard";
@@ -27,10 +28,22 @@ function fmtDate(d) {
   });
 }
 
+function getGreeting() {
+  const hour = new Date().getHours();
+
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 // Compact event card for "For You" section
 function EventMiniCard({ event, featured }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col">
+    <div className={`flex flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-200 hover:-translate-y-0.5 dark:bg-slate-900 ${
+      featured
+        ? "border border-dashed border-blue-300 dark:border-blue-500/70"
+        : "border-gray-200 dark:border-slate-700"
+    }`}>
       {/* Image / gradient */}
       {event.image ? (
         <img
@@ -40,8 +53,8 @@ function EventMiniCard({ event, featured }) {
           onError={(e) => { e.target.style.display = "none"; }}
         />
       ) : (
-        <div className="h-32 w-full bg-gradient-to-br from-blue-400 to-violet-500 flex items-center justify-center text-3xl">
-          🎓
+        <div className="flex h-32 w-full items-center justify-center bg-gradient-to-br from-blue-400 to-violet-500">
+          <MdEventAvailable aria-hidden="true" className="text-4xl text-white/90" />
         </div>
       )}
       <div className="p-4 flex-1 flex flex-col">
@@ -81,6 +94,7 @@ function StudentDashboard() {
   const { events } = useSelector((state) => state.events);
 
   const interests = user?.interests || [];
+  const firstName = user?.name?.trim().split(/\s+/)[0] || "there";
 
   useEffect(() => {
     dispatch(fetchMyregistration());
@@ -122,34 +136,37 @@ function StudentDashboard() {
           <div className="lg:col-span-2 space-y-8">
 
             {/* Welcome banner */}
-            <div className="bg-gradient-to-br from-blue-50 to-violet-50 rounded-3xl p-8 border border-blue-100 relative overflow-hidden">
-              <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-violet-100 opacity-60 blur-3xl" />
-              <div className="relative z-10">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Welcome back, {user?.name?.split(" ")[0] || "there"}! 👋
+            <div className="flex flex-col gap-5 rounded-2xl border border-blue-100 bg-gradient-to-br from-white via-blue-50 to-violet-50 p-6 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+              <div className="max-w-xl">
+                <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-3xl">
+                  {getGreeting()}, {firstName}
                 </h1>
-                <p className="text-gray-500 text-sm max-w-md">
+                <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-slate-300">
                   {upcomingRegs.length > 0
-                    ? `You have ${upcomingRegs.length} upcoming event${upcomingRegs.length !== 1 ? "s" : ""}.`
-                    : "Discover events that match your interests below."}
+                    ? `You have ${upcomingRegs.length} event${upcomingRegs.length !== 1 ? "s" : ""} coming up.`
+                    : "Discover events and activities happening around campus."}
                   {interests.length > 0 &&
-                    ` Events tailored to your ${interests[0]} interest are highly recommended.`}
+                    ` Find more ${interests.slice(0, 2).join(" and ")} events picked for you.`}
                 </p>
-
-                {/* Interest tags */}
-                {interests.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {interests.map((interest) => (
-                      <span
-                        key={interest}
-                        className="px-3 py-1 rounded-full bg-white border border-blue-200 text-blue-700 text-xs font-semibold capitalize"
-                      >
-                        {interest}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
+
+              {upcomingRegs.length > 0 && (
+                <Link
+                  to="/student/registrations"
+                  className="inline-flex shrink-0 items-center gap-3 self-start rounded-xl border border-blue-100 bg-white px-4 py-3 text-left transition hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 sm:self-auto"
+                >
+                  <MdEvent className="text-xl text-blue-600 dark:text-blue-300" />
+                  <span>
+                    <span className="block text-lg font-bold leading-none text-gray-900 dark:text-white">
+                      {upcomingRegs.length}
+                    </span>
+                    <span className="mt-1 block text-xs font-medium text-gray-500 dark:text-slate-300">
+                      upcoming
+                    </span>
+                  </span>
+                  <MdArrowForward className="text-gray-400 dark:text-slate-400" />
+                </Link>
+              )}
             </div>
 
             {/* Stats row */}
@@ -240,7 +257,9 @@ function StudentDashboard() {
                     to="/student/registrations"
                     className="text-sm text-blue-600 font-semibold hover:underline"
                   >
-                    View all →
+                    <span className="inline-flex items-center gap-1">
+                      View all <MdArrowForward aria-hidden="true" />
+                    </span>
                   </Link>
                 </div>
                 <div className="space-y-3">
@@ -281,20 +300,19 @@ function StudentDashboard() {
             )}
 
             {/* Quick actions */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {[
-                { label: "Browse Events", to: "/events", icon: "🎉" },
-                { label: "Clubs Directory", to: "/clubs-directory", icon: "🏛️" },
-                { label: "My Interests", to: "/student/interests", icon: "⭐" },
-                { label: "Settings", to: "/student/settings", icon: "⚙️" },
+                { label: "Browse Events", to: "/events", icon: <MdEventAvailable /> },
+                { label: "Clubs Directory", to: "/clubs-directory", icon: <MdGroups /> },
+                { label: "My Interests", to: "/student/interests", icon: <MdFavoriteBorder /> },
               ].map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-center flex flex-col items-center gap-2"
+                  className="flex flex-col items-center gap-2 rounded-2xl border border-gray-100 bg-white p-4 text-center shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
                 >
-                  <span className="text-2xl">{item.icon}</span>
-                  <span className="text-xs font-semibold text-gray-600">{item.label}</span>
+                  <span className="text-2xl text-blue-600 dark:text-blue-300">{item.icon}</span>
+                  <span className="text-xs font-semibold text-gray-600 dark:text-slate-300">{item.label}</span>
                 </Link>
               ))}
             </div>
@@ -302,16 +320,7 @@ function StudentDashboard() {
 
           {/* ── Profile sidebar (1/3) ── */}
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">Your Profile</h2>
-              <Link
-                to="/student/settings"
-                className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
-                title="Settings"
-              >
-                <MdSettings className="text-lg" />
-              </Link>
-            </div>
+            <h2 className="text-xl font-bold text-gray-900">Your Profile</h2>
             <ProfileCard user={user} />
 
             {/* Manage interests CTA */}

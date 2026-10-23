@@ -154,7 +154,8 @@ const updateEvent = async (req, res) => {
   };
 
   // Allow status changes via full edit form
-  if (status) updateData.status = status;
+  // if (status) updateData.status = status;
+  
   if (maxParticipants !== undefined)
     updateData.maxParticipants = maxParticipants
       ? Number(maxParticipants)

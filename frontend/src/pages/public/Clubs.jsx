@@ -5,24 +5,13 @@ import { fetchAllClubs } from "../../redux/clubSlice";
 import {
   MdSearch,
   MdGroups,
-  MdEvent,
   MdArrowForward,
   MdExplore,
+  MdEventAvailable,
 } from "react-icons/md";
 
 
 const CATEGORIES = ["All", "Technology", "Arts", "Music", "Business", "Sports"];
-
-// Full Tailwind class strings must be written in full so Tailwind's scanner
-// can detect and include them in the production CSS bundle.
-const categoryGradients = {
-  Technology: "bg-gradient-to-br from-blue-500 to-indigo-600",
-  Arts:       "bg-gradient-to-br from-pink-500 to-rose-500",
-  Music:      "bg-gradient-to-br from-violet-500 to-purple-600",
-  Business:   "bg-gradient-to-br from-emerald-500 to-green-600",
-  Sports:     "bg-gradient-to-br from-orange-500 to-amber-600",
-  Default:    "bg-gradient-to-br from-slate-500 to-gray-600",
-};
 
 function Clubs() {
   const dispatch = useDispatch();
@@ -47,8 +36,6 @@ function Clubs() {
       return matchesSearch && matchesCategory;
     });
   }, [clubs, search, activeCategory]);
-
-  const gradientClass = (cat) => categoryGradients[cat] || categoryGradients.Default;
 
   return (
     <div className="min-h-screen bg-white">
@@ -130,55 +117,51 @@ function Clubs() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filtered.map((club) => (
-                <div
+                <article
                   key={club._id}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden group"
+                  className="group flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 transition-colors hover:border-blue-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-blue-500/60"
                 >
-                  {/* Club color bar */}
-                  <div className={`h-2 ${gradientClass(club.category)} w-full`} />
-
-                  <div className="p-5 flex-1 flex flex-col">
-                    {/* Avatar + name */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={`w-12 h-12 rounded-xl ${gradientClass(club.category)} flex items-center justify-center text-white text-lg font-black shadow-sm flex-shrink-0`}>
-                        {club.avatar || club.name?.[0]?.toUpperCase() || "C"}
+                  <div className="flex flex-1 flex-col">
+                    <div className="mb-4 flex items-start gap-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-lg font-bold text-blue-700 dark:bg-blue-950/50 dark:text-blue-200">
+                        {club.avatar || club.name?.trim()?.[0]?.toUpperCase() || (
+                          <MdGroups aria-hidden="true" className="text-xl" />
+                        )}
                       </div>
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-bold text-gray-900 leading-tight truncate">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="line-clamp-2 min-h-10 break-words text-sm font-semibold leading-5 text-gray-900 dark:text-white">
                           {club.name}
                         </h3>
-                        <span className="text-xs text-gray-400 font-medium capitalize">
-                          {club.category || "Club"}
-                        </span>
                       </div>
                     </div>
 
-                    {/* Description */}
-                    <p className="text-xs text-gray-500 leading-relaxed line-clamp-3 flex-1 mb-4">
-                      {club.description || "No description provided."}
+                    <span className="mb-2 w-fit rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-slate-800 dark:text-slate-300">
+                      {club.category || "Campus club"}
+                    </span>
+
+                    <p className="mb-5 line-clamp-3 min-h-[3.75rem] text-sm leading-5 text-gray-600 dark:text-slate-300">
+                      {club.description || "This club hasn’t added a description yet."}
                     </p>
 
-                    {/* Stats */}
-                    <div className="flex items-center gap-4 text-xs text-gray-400 mb-4">
-                      <span className="flex items-center gap-1">
-                        <MdEvent className="text-sm text-gray-300" />
+                    <div className="mb-4 mt-auto flex items-center gap-5 border-t border-gray-100 pt-3 text-xs text-gray-500 dark:border-slate-700 dark:text-slate-400">
+                      <span className="inline-flex items-center gap-1.5">
+                        <MdEventAvailable aria-hidden="true" className="text-base text-gray-400 dark:text-slate-400" />
                         {club.eventsCount ?? club.events?.length ?? 0} events
                       </span>
-                      <span className="flex items-center gap-1">
-                        <MdGroups className="text-sm text-gray-300" />
+                      <span className="inline-flex items-center gap-1.5">
+                        <MdGroups aria-hidden="true" className="text-base text-gray-400 dark:text-slate-400" />
                         {club.membersCount ?? club.members?.length ?? 0} members
                       </span>
                     </div>
 
-                    {/* CTA */}
                     <Link
                       to={`/clubs-directory/${club._id}`}
-                      className={`flex items-center justify-center gap-1.5 w-full py-2 rounded-xl ${gradientClass(club.category)} text-white text-xs font-bold hover:opacity-90 transition group-hover:shadow-md`}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-700 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
                     >
-                      View Club <MdArrowForward className="text-sm" />
+                      View club <MdArrowForward aria-hidden="true" className="text-base transition-transform group-hover:translate-x-0.5" />
                     </Link>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           </>

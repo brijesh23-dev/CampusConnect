@@ -178,7 +178,7 @@ function Register() {
                   type="text"
                   placeholder={activeRole === "club" ? "Club / Organisation name" : "Your full name"}
                   {...register("name")}
-                  className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 outline-none bg-transparent"
+                  className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 outline-none bg-transparent "
                 />
               </div>
               {errors.name && (

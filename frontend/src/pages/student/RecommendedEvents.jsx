@@ -10,6 +10,7 @@ import {
   MdArrowForward,
   MdCategory,
   MdExplore,
+  MdEventAvailable,
 } from "react-icons/md";
 
 const categoryColors = {
@@ -32,7 +33,7 @@ function RecommendedEvents() {
   const { events, loading } = useSelector((state) => state.events);
   const { user } = useSelector((state) => state.auth);
 
-  const interests = user?.interests || [];
+  const interests = useMemo(() => user?.interests || [], [user?.interests]);
 
   useEffect(() => {
     dispatch(fetchEvents());
@@ -68,14 +69,18 @@ function RecommendedEvents() {
     const style = getCategoryStyle(event.category);
     return (
       <div
-        className={`bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden ${featured ? "ring-2 ring-blue-100" : ""}`}
+        className={`flex flex-col overflow-hidden rounded-2xl bg-white transition-all duration-200 hover:-translate-y-0.5 dark:bg-slate-900 ${
+          featured
+            ? "border border-dashed border-blue-300 dark:border-blue-500/70"
+            : "border border-gray-200 dark:border-slate-700"
+        }`}
       >
         {/* Event image or gradient fallback */}
         {event.image ? (
           <img src={event.image} alt={event.title} className="h-36 w-full object-cover" />
         ) : (
-          <div className={`h-36 w-full bg-gradient-to-br from-blue-100 to-violet-100 flex items-center justify-center text-4xl`}>
-            🎓
+          <div className="flex h-36 w-full items-center justify-center bg-gradient-to-br from-blue-100 to-violet-100 dark:from-slate-800 dark:to-slate-700">
+            <MdEventAvailable aria-hidden="true" className="text-4xl text-blue-500 dark:text-blue-300" />
           </div>
         )}
 

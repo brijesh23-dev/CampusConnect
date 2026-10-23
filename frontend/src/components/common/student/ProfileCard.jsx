@@ -1,58 +1,72 @@
 import { Link } from "react-router-dom";
-import { MdEdit, MdEmail, MdPerson, MdCheckCircle } from "react-icons/md";
+import { MdEdit, MdEmail, MdPerson, MdFavoriteBorder } from "react-icons/md";
 import { Card } from "@/components/ui/card";
+
 function ProfileCard({ user }) {
-  const name = user?.name || "Student User";
-  const email = user?.email || "student@university.edu";
+  const name = user?.name?.trim() || "Student";
+  const initials = name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
   const interests = user?.interests || [];
 
   return (
-    <Card className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center text-center"  >
-      {/* Avatar */}
-      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-3xl font-bold shadow-md mb-4 border-2 border-white ring-4 ring-blue-50">
-        {name[0]?.toUpperCase() || "S"}
-      </div>
-
-      <h3 className="text-xl font-bold text-gray-900 mb-1">{name}</h3>
-      <p className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold uppercase mb-4 outline ">
-        <MdPerson className="text-xs" />
-        Student
-      </p>
-
-      {/* Info details */}
-      <div className="w-full space-y-3 mb-6 text-left border-t border-gray-100 pt-5">
-        <div className="flex items-center gap-2.5 text-sm text-gray-500">
-          <MdEmail className="text-lg text-gray-400 flex-shrink-0" />
-          <span className="truncate">{email}</span>
+    <Card className="gap-0 p-5 text-left">
+      <div className="flex min-w-0 items-center gap-4">
+        <div
+          aria-hidden="true"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white"
+        >
+          {initials}
         </div>
-        <div className="flex items-center gap-2.5 text-sm text-gray-500">
-          <MdCheckCircle className="text-lg text-gray-400 flex-shrink-0" />
-          <span>Status: Active Account</span>
+        <div className="min-w-0">
+          <h3 className="break-words text-base font-semibold leading-snug text-gray-900 dark:text-white">
+            {name}
+          </h3>
+          <span className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-slate-400">
+            <MdPerson aria-hidden="true" />
+            Student
+          </span>
         </div>
       </div>
 
-      {/* Interests list */}
-      <div className="w-full text-left border-t border-gray-100 pt-5">
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-            Interests ({interests.length})
+      {user?.email && (
+        <div className="mt-5 flex min-w-0 items-center gap-2.5 border-t border-gray-100 pt-4 text-sm text-gray-600 dark:border-slate-700 dark:text-slate-300">
+          <MdEmail aria-hidden="true" className="shrink-0 text-base text-gray-400 dark:text-slate-400" />
+          <span className="truncate" title={user.email}>{user.email}</span>
+        </div>
+      )}
+
+      <div className="mt-5 border-t border-gray-100 pt-4 dark:border-slate-700">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h4 className="inline-flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-slate-100">
+            <MdFavoriteBorder aria-hidden="true" className="text-base text-blue-600 dark:text-blue-300" />
+            Interests
+            <span className="text-xs font-medium text-gray-400 dark:text-slate-400">
+              {interests.length}
+            </span>
           </h4>
           <Link
-            to="/manage-interests"
-            className="text-xs text-blue-600 font-semibold hover:underline flex items-center gap-0.5 outline rounded-lg px-2 py-1"
+            to="/student/interests"
+            className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-blue-700 transition hover:bg-blue-50 hover:text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-blue-300 dark:hover:bg-blue-950/40 dark:hover:text-blue-200"
           >
-            <MdEdit /> Edit
+            <MdEdit aria-hidden="true" />
+            Edit
           </Link>
         </div>
 
         {interests.length === 0 ? (
-          <p className="text-xs text-gray-400 italic">No interests selected yet.</p>
+          <p className="text-sm leading-5 text-gray-500 dark:text-slate-400">
+            Choose interests to personalize your event recommendations.
+          </p>
         ) : (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {interests.map((item) => (
               <span
                 key={item}
-                className="px-2.5 py-0.8 rounded-full bg-violet-50 border border-violet-100 text-violet-700 text-xs font-medium capitalize"
+                className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-medium capitalize text-blue-800 dark:bg-blue-950/40 dark:text-blue-200"
               >
                 {item}
               </span>

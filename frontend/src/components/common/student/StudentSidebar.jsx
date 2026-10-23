@@ -7,7 +7,6 @@ import {
   MdExplore,
   MdPeopleOutline,
   MdNotifications,
-  MdSettings,
   MdHelp,
   MdLogout,
   MdStar,
@@ -21,7 +20,6 @@ const navLinks = [
   { id: "explore", name: "Explore", path: "/events", icon: <MdExplore className="text-xl flex-shrink-0" /> },
   { id: "clubs", name: "Clubs", path: "/clubs-directory", icon: <MdPeopleOutline className="text-xl flex-shrink-0" /> },
   { id: "notifications", name: "Notifications", path: "/notifications", icon: <MdNotifications className="text-xl flex-shrink-0" /> },
-  { id: "settings", name: "Settings", path: "/student/settings", icon: <MdSettings className="text-xl flex-shrink-0" /> },
 ];
 
 const bottomLinks = [

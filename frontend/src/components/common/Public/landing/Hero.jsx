@@ -30,7 +30,7 @@ function Hero() {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 to="/events"
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-200 transition hover:-translate-y-0.5 hover:bg-slate-800"
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-black/20 transition hover:-translate-y-0.5 hover:bg-slate-800"
               >
                 Explore events
                 <MdArrowForward className="text-base" />

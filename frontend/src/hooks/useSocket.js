@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import socket from "../socket/socket";
 import { addRealtimeNotification } from "../redux/notificationSlice";
 import { logoutUser } from "@/redux/authSlice";

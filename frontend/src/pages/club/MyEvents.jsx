@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { MdAdd, MdWarning } from "react-icons/md";
+import { MdAdd, MdWarning, MdCalendarToday } from "react-icons/md";
 import { fetchMyEvents, deleteEvent, updateEventStatus } from "../../redux/eventSlice";
 import EventTable from "../../components/common/club/EventTable";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 // ── Confirm Dialog ─────────────────────────────────────────────────────────────
 function ConfirmDeleteDialog({ open, onConfirm, onCancel }) {
@@ -115,7 +115,7 @@ function MyEvents() {
         {events.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
             <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-5">
-              <span className="text-3xl">📅</span>
+            <MdCalendarToday aria-hidden="true" className="text-3xl text-blue-500" />
             </div>
             <h2 className="text-xl font-extrabold text-gray-900 mb-2">
               No Events Yet
