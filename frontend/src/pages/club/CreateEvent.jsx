@@ -1,35 +1,27 @@
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createEvent } from "../../redux/eventSlice";
 import {
   MdInfo,
   MdDateRange,
   MdLocationOn,
   MdCloudUpload,
-  MdClose,
   MdSend,
   MdSave,
-  MdFormatBold,
-  MdFormatItalic,
-  MdFormatUnderlined,
-  MdFormatListBulleted,
-  MdLink,
+  MdAccessTime,
 } from "react-icons/md";
-import { MdAccessTime } from "react-icons/md";
 
 const CATEGORIES = [
-  "Coding",
-  "AI",
-  "Web Development",
-  "Cyber Security",
+  "Academic",
+  "Workshop",
+  "Technology",
+  "Social",
   "Sports",
   "Music",
-  "Photography",
   "Business",
-  "Design",
-  "Robotics",
+  "Arts",
 ];
 
 function CreateEvent() {
@@ -37,27 +29,26 @@ function CreateEvent() {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm();
+  const imageRegistration = register("image");
 
-  const image = watch("image");
-  const imagePreview = image?.[0] ? URL.createObjectURL(image[0]) : null;
+  const [imagePreview, setImagePreview] = useState(null);
+  const imagePreviewUrl = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState([]);
-  const [catInput, setCatInput] = useState("");
-  const [requireRSVP, setRequireRSVP] = useState(true);
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl.current) URL.revokeObjectURL(imagePreviewUrl.current);
+    };
+  }, []);
 
-  const removeCategory = (cat) =>
-    setCategories((prev) => prev.filter((c) => c !== cat));
-
-  const addCategory = (cat) => {
-    if (cat && !categories.includes(cat)) {
-      setCategories((prev) => [...prev, cat]);
-    }
-    setCatInput("");
+  const handleImageChange = (event) => {
+    if (imagePreviewUrl.current) URL.revokeObjectURL(imagePreviewUrl.current);
+    const file = event.target.files?.[0];
+    imagePreviewUrl.current = file ? URL.createObjectURL(file) : null;
+    setImagePreview(imagePreviewUrl.current);
   };
 
   const [isDrafting, setIsDrafting] = useState(false);
@@ -70,22 +61,16 @@ function CreateEvent() {
       const fields = {
         title: data.title,
         description: data.description,
-        category: categories[0] || "",
+        category: data.category,
         date: data.date,
         startTime: data.startTime,
         endTime: data.endTime,
         venue: data.venue,
-        status: status,
-        requireRSVP: String(requireRSVP),
+        status,
       };
-      Object.entries(fields).forEach(([key,value])=>{
+      Object.entries(fields).forEach(([key, value]) => {
         formData.append(key, value);
-      })
-      const tags = (data.tags || "")
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean);
-      formData.append("tags", JSON.stringify(tags));
+      });
       if (data.image?.[0]) formData.append("image", data.image[0]);
       if (data.maxParticipants)
         formData.append("maxParticipants", data.maxParticipants);
@@ -137,85 +122,114 @@ function CreateEvent() {
                   Basic Information
                 </h2>
 
-                {/* Title */}
-                <div className="mb-5">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Event Title <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Annual Tech Symposium 2024"
-                    {...register("title", { required: "Title is required" })}
-                    className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition ${
-                      errors.title
-                        ? "border-red-400 focus:ring-2 focus:ring-red-100"
-                        : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    }`}
-                  />
-                  {errors.title && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.title.message}
-                    </p>
-                  )}
+                <div className="mb-5 grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="event-title"
+                      className="mb-1.5 block text-sm font-semibold text-gray-700"
+                    >
+                      Event title <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="event-title"
+                      type="text"
+                      placeholder="e.g. Annual Tech Symposium"
+                      aria-invalid={Boolean(errors.title)}
+                      aria-describedby={
+                        errors.title ? "event-title-error" : undefined
+                      }
+                      {...register("title", {
+                        required: "Title is required",
+                        minLength: {
+                          value: 3,
+                          message: "At least 3 characters",
+                        },
+                        maxLength: {
+                          value: 100,
+                          message: "Maximum 100 characters",
+                        },
+                      })}
+                      className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                    {errors.title && (
+                      <p
+                        id="event-title-error"
+                        className="mt-1 text-xs text-red-600"
+                      >
+                        {errors.title.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="event-category"
+                      className="mb-1.5 block text-sm font-semibold text-gray-700"
+                    >
+                      Category <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="event-category"
+                      aria-invalid={Boolean(errors.category)}
+                      aria-describedby={
+                        errors.category ? "event-category-error" : undefined
+                      }
+                      {...register("category", { required: "Choose a category" })}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">Select a category</option>
+                      {CATEGORIES.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.category && (
+                      <p
+                        id="event-category-error"
+                        className="mt-1 text-xs text-red-600"
+                      >
+                        {errors.category.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                {/* Description rich text area */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Description
+                  <label
+                    htmlFor="event-description"
+                    className="mb-1.5 block text-sm font-semibold text-gray-700"
+                  >
+                    Description <span className="text-red-500">*</span>
                   </label>
-                  {/* Toolbar */}
-                  <div className="flex items-center gap-1 border border-b-0 border-gray-200 rounded-t-xl px-3 py-2 bg-gray-50">
-                    {[
-                      { icon: <MdFormatBold />, label: "Bold" },
-                      { icon: <MdFormatItalic />, label: "Italic" },
-                      { icon: <MdFormatUnderlined />, label: "Underline" },
-                    ].map((btn) => (
-                      <button
-                        key={btn.label}
-                        type="button"
-                        title={btn.label}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition text-lg"
-                      >
-                        {btn.icon}
-                      </button>
-                    ))}
-                    <div className="w-px h-5 bg-gray-200 mx-1" />
-                    <button
-                      type="button"
-                      className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-200 text-lg"
-                    >
-                      <MdFormatListBulleted />
-                    </button>
-                    <button
-                      type="button"
-                      className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-200 text-lg"
-                    >
-                      <MdLink />
-                    </button>
-                  </div>
                   <textarea
+                    id="event-description"
                     rows={5}
                     placeholder="Describe what attendees can expect..."
-                    {...register("description")}
-                    className="w-full border border-gray-200 rounded-b-xl px-4 py-3 text-sm outline-none resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                    aria-invalid={Boolean(errors.description)}
+                    aria-describedby={
+                      errors.description ? "event-description-error" : undefined
+                    }
+                    {...register("description", {
+                      required: "Description is required",
+                      minLength: {
+                        value: 10,
+                        message: "At least 10 characters",
+                      },
+                      maxLength: {
+                        value: 2000,
+                        message: "Maximum 2000 characters",
+                      },
+                    })}
+                    className="w-full resize-y rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
-                </div>
-
-                {/* Tags */}
-                <div className="mt-5">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Tags{" "}
-                    <span className="text-gray-400 font-normal">
-                      (comma-separated, optional)
-                    </span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. tech, coding, hackathon"
-                    {...register("tags")}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-                  />
+                  {errors.description && (
+                    <p
+                      id="event-description-error"
+                      className="mt-1 text-xs text-red-600"
+                    >
+                      {errors.description.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -228,59 +242,121 @@ function CreateEvent() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                      Date
+                    <label
+                      htmlFor="event-date"
+                      className="mb-1.5 block text-sm font-semibold text-gray-700"
+                    >
+                      Date <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <MdDateRange className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
                       <input
+                        id="event-date"
                         type="date"
+                        aria-invalid={Boolean(errors.date)}
+                        aria-describedby={
+                          errors.date ? "event-date-error" : undefined
+                        }
                         {...register("date", { required: "Date is required" })}
-                        className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                        className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                       />
                     </div>
+                    {errors.date && (
+                      <p
+                        id="event-date-error"
+                        className="mt-1 text-xs text-red-600"
+                      >
+                        {errors.date.message}
+                      </p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                      Start Time
+                    <label
+                      htmlFor="event-start-time"
+                      className="mb-1.5 block text-sm font-semibold text-gray-700"
+                    >
+                      Start time <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <MdAccessTime className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
                       <input
+                        id="event-start-time"
                         type="time"
-                        {...register("startTime")}
-                        className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                        aria-invalid={Boolean(errors.startTime)}
+                        {...register("startTime", {
+                          required: "Start time is required",
+                        })}
+                        className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                       />
                     </div>
+                    {errors.startTime && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {errors.startTime.message}
+                      </p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                      End Time
+                    <label
+                      htmlFor="event-end-time"
+                      className="mb-1.5 block text-sm font-semibold text-gray-700"
+                    >
+                      End time <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <MdAccessTime className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
                       <input
+                        id="event-end-time"
                         type="time"
-                        {...register("endTime")}
-                        className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                        aria-invalid={Boolean(errors.endTime)}
+                        {...register("endTime", {
+                          required: "End time is required",
+                          validate: (value, values) =>
+                            !values.startTime ||
+                            value > values.startTime ||
+                            "End time must be after start time",
+                        })}
+                        className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                       />
                     </div>
+                    {errors.endTime && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {errors.endTime.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Venue / Location
+                  <label
+                    htmlFor="event-venue"
+                    className="mb-1.5 block text-sm font-semibold text-gray-700"
+                  >
+                    Venue / location <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <MdLocationOn className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
                     <input
+                      id="event-venue"
                       type="text"
                       placeholder="Building, Room Number, or Virtual Link"
-                      {...register("venue", { required: "Venue is required" })}
-                      className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                      aria-invalid={Boolean(errors.venue)}
+                      aria-describedby={errors.venue ? "event-venue-error" : undefined}
+                      {...register("venue", {
+                        required: "Venue is required",
+                        minLength: { value: 2, message: "At least 2 characters" },
+                        maxLength: { value: 200, message: "Maximum 200 characters" },
+                      })}
+                      className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                     />
                   </div>
+                  {errors.venue && (
+                    <p
+                      id="event-venue-error"
+                      className="mt-1 text-xs text-red-600"
+                    >
+                      {errors.venue.message}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -307,13 +383,10 @@ function CreateEvent() {
                     <>
                       <MdCloudUpload className="text-4xl text-gray-300 mb-2" />
                       <p className="text-xs font-semibold text-gray-500 text-center">
-                        Click to upload or drag and drop
+                        Click to choose an image
                       </p>
                       <p className="text-[11px] text-gray-400 mt-1 text-center">
-                        SVG, PNG, JPG or GIF (Max. 5MB)
-                      </p>
-                      <p className="text-[10px] text-gray-300 mt-1 text-center">
-                        Recommended aspect ratio 16:9
+                        JPG, PNG, GIF, or WebP · up to 5 MB
                       </p>
                     </>
                   )}
@@ -322,99 +395,53 @@ function CreateEvent() {
                 <input
                   id="image"
                   type="file"
-                  accept="image/*"
+                  accept=".jpg,.jpeg,.png,.gif,.webp"
                   className="hidden"
-                  {...register("image")}
+                  {...imageRegistration}
+                  onChange={(event) => {
+                    imageRegistration.onChange(event);
+                    handleImageChange(event);
+                  }}
                 />
               </div>
 
-              {/* Categories */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">
-                  Categories
-                </h3>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {categories.map((cat) => (
-                    <span
-                      key={cat}
-                      className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold"
-                    >
-                      {cat}
-                      <button
-                        type="button"
-                        onClick={() => removeCategory(cat)}
-                        className="hover:text-blue-900"
-                      >
-                        <MdClose className="text-xs" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2">
-                  <input
-                    type="text"
-                    placeholder="Search or add categories..."
-                    value={catInput}
-                    onChange={(e) => setCatInput(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" &&
-                      (e.preventDefault(), addCategory(catInput))
-                    }
-                    className="flex-1 text-xs outline-none placeholder:text-gray-400"
-                    list="category-suggestions"
-                  />
-                  
-                  <datalist id="category-suggestions">
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c} />
-                    ))}
-                  </datalist>
-                  <button
-                    type="button"
-                    onClick={() => addCategory(catInput)}
-                    className="text-blue-600 text-lg font-bold leading-none"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Registration */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 className="text-sm font-bold text-gray-900 mb-4">
-                  Registration
-                </h3>
-
-                <label className="flex items-center gap-3 mb-4 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={requireRSVP}
-                    onChange={(e) => setRequireRSVP(e.target.checked)}
-                    className="w-4 h-4 rounded text-blue-600 accent-blue-600"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    Require RSVP
-                  </span>
+                <label
+                  htmlFor="event-capacity"
+                  className="mb-1.5 block text-sm font-bold text-gray-900"
+                >
+                  Attendee limit{" "}
+                  <span className="font-normal text-gray-400">(optional)</span>
                 </label>
-
-                {requireRSVP && (
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                      Attendee Limit
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="number"
-                        placeholder="e.g. 50"
-                        {...register("maxParticipants")}
-                        className="w-24 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-                      />
-                      <span className="text-xs text-gray-400">
-                        Leave blank for unlimited
-                      </span>
-                    </div>
-                  </div>
+                <input
+                  id="event-capacity"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  placeholder="No limit"
+                  aria-invalid={Boolean(errors.maxParticipants)}
+                  aria-describedby={
+                    errors.maxParticipants ? "event-capacity-error" : undefined
+                  }
+                  {...register("maxParticipants", {
+                    min: { value: 1, message: "At least 1 attendee" },
+                    max: { value: 10000, message: "Maximum 10,000 attendees" },
+                    setValueAs: (value) =>
+                      value === "" ? undefined : Number(value),
+                  })}
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                {errors.maxParticipants && (
+                  <p
+                    id="event-capacity-error"
+                    className="mt-1 text-xs text-red-600"
+                  >
+                    {errors.maxParticipants.message}
+                  </p>
                 )}
+                <p className="mt-2 text-xs text-gray-500">
+                  Leave blank for unlimited attendance.
+                </p>
               </div>
             </div>
           </div>

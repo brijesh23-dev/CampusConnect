@@ -80,23 +80,20 @@ const createEventSchema = Joi.object({
     .integer()
     .min(1)
     .max(10000)
-    .required()
+    .optional()
     .messages({
       "number.base": "Maximum participants must be a number",
       "number.integer": "Maximum participants must be a whole number",
       "number.min": "Maximum participants must be at least 1",
       "number.max": "Maximum participants cannot exceed 10000",
-      "any.required": "Maximum participants is required",
-    })
-    .custom((event, helpers) => {
-      if (event.startTime >= event.endTime) {
-        return helpers.message({
-          custom: "End time must be after start time",
-        });
-      }
-
-      return event;
     }),
+  status: Joi.string().valid("draft", "published").default("published"),
+}).custom((event, helpers) => {
+  if (event.startTime >= event.endTime) {
+    return helpers.message({ custom: "End time must be after start time" });
+  }
+
+  return event;
 });
 
 module.exports = createEventSchema;

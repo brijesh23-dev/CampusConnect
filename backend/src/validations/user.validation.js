@@ -12,6 +12,7 @@ const loginSchema = Joi.object({
     "string.max": "Password cannot exceed 30 characters",
     "any.required": "Password is required",
   }),
+  rememberMe: Joi.boolean().default(false),
 });
 
 const updateInterestsSchema = Joi.object({

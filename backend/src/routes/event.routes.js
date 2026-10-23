@@ -49,8 +49,8 @@ router.post(
   "/create",
   protect,
   authorizeRoles("club"),
-  validate(createEventSchema),
   imageUpload.single("image"),
+  validate(createEventSchema),
   uploadImageToCloudinary,
   catchAsync(eventController.createEvent),
 );

@@ -75,6 +75,15 @@ function AppRoutes() {
   return (
     <main id="main-content" role="main" className="min-h-screen">
       <Routes>
+        <Route
+          path="/login"
+          element={
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          }
+        />
+
         {/* ── Public routes (with Navbar + Footer) ── */}
         <Route element={<PublicLayout />}>
           <Route index element={<LandingPage />} />
@@ -84,14 +93,6 @@ function AppRoutes() {
           <Route path="clubs-directory/:id" element={<ClubDetails />} />
 
           {/* Auth pages — redirect if already logged in */}
-          <Route
-            path="login"
-            element={
-              <GuestRoute>
-                <Login />
-              </GuestRoute>
-            }
-          />
           <Route
             path="register"
             element={

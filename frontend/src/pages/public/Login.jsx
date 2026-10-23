@@ -1,13 +1,37 @@
-import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "../../utilities/validation";
-import { loginUser } from "../../redux/authSlice";
-import { MdOutlineEmail, MdErrorOutline } from "react-icons/md";
-import { RiLockPasswordLine } from "react-icons/ri";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  MdAdd,
+  MdArrowForward,
+  MdErrorOutline,
+  MdGroups,
+  MdOutlineEmail,
+  MdOutlineEventAvailable,
+  MdOutlineNotificationsNone,
+  MdPersonOutline,
+} from "react-icons/md";
+import { RiLockPasswordLine } from "react-icons/ri";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import { loginUser } from "../../redux/authSlice";
+import { loginSchema } from "../../utilities/validation";
+
+const features = [
+  {
+    icon: MdOutlineEventAvailable,
+    text: "Find campus events that match your interests",
+  },
+  {
+    icon: MdGroups,
+    text: "Discover student clubs and communities",
+  },
+  {
+    icon: MdOutlineNotificationsNone,
+    text: "Keep up with registrations and event updates",
+  },
+];
 
 function Login() {
   const {
@@ -17,6 +41,7 @@ function Login() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "", rememberMe: false },
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -48,200 +73,267 @@ function Login() {
   };
 
   return (
-    <div className="flex min-h-screen w-full">
-      {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-blue-500 to-violet-600" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800')] bg-cover bg-center opacity-20" />
-        <div className="relative z-10 flex flex-col justify-between p-10 w-full">
-          {/* Logo */}
-          <div>
-            <Link to="/">
-              <h1 className="text-3xl font-extrabold text-white tracking-tight">
-                CampusConnect
-              </h1>
-            </Link>
-            <p className="text-blue-100 mt-3 text-base leading-relaxed max-w-xs">
-              Connect with your campus. Discover events, join clubs, and manage
-              your academic social life in one place.
-            </p>
-          </div>
+    <div className="flex min-h-screen items-center justify-center bg-[#f4f5fa] px-4 py-5 dark:bg-[#10131c] sm:px-6 lg:px-8">
+      <div className="flex w-full max-w-6xl overflow-hidden rounded-[28px] bg-white shadow-[0_28px_80px_-32px_rgba(34,27,82,0.32)] dark:bg-[#191d29] lg:min-h-[680px]">
+        <aside className="relative hidden w-[43%] flex-col justify-between overflow-hidden bg-gradient-to-br from-[#30276d] via-[#403584] to-[#51419b] p-10 text-white lg:flex xl:p-12">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-28 -top-28 h-96 w-96 rounded-full border border-white/10"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-52 -left-36 h-[30rem] w-[30rem] rounded-full border border-white/10"
+          />
 
-          {/* Feature list */}
-          <div className="space-y-4 my-auto py-10">
-            {[
-              "Discover campus events tailored to your interests",
-              "Join clubs and build meaningful connections",
-              "Get real-time notifications and RSVP instantly",
-              "Track your event history and memberships",
-            ].map((feat) => (
-              <div key={feat} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <p className="text-blue-100 text-sm leading-relaxed">{feat}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Testimonial card */}
-          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 border border-white/30">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-yellow-900 font-bold text-sm">
-                ★
-              </div>
-              <div>
-                <p className="text-white font-semibold text-sm">
-                  "The heart of student life."
-                </p>
-                <p className="text-blue-100 text-xs">Join 10,000+ active students</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Panel */}
-      <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-12">
-        <div className="w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="lg:hidden mb-8 text-center">
-            <Link to="/" className="text-2xl font-extrabold text-blue-600 tracking-tight">
+          <Link
+            to="/"
+            className="relative inline-flex w-fit items-center gap-3 rounded-md text-white"
+            aria-label="CampusConnect home"
+          >
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15">
+              <MdAdd className="text-3xl" aria-hidden="true" />
+            </span>
+            <span className="text-xl font-semibold tracking-[-0.02em]">
               CampusConnect
-            </Link>
+            </span>
+          </Link>
+
+          <div className="relative max-w-md py-12">
+            <h1 className="text-4xl font-semibold leading-[1.12] tracking-[-0.03em] xl:text-[2.8rem]">
+              Make more of campus.
+            </h1>
+            <p className="mt-5 max-w-sm text-base leading-7 text-violet-100">
+              Find the events, clubs, and people that make your campus feel
+              like yours.
+            </p>
+
+            <ul className="mt-10 space-y-5">
+              {features.map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-center gap-3.5">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 text-violet-100">
+                    <Icon className="text-xl" aria-hidden="true" />
+                  </span>
+                  <span className="text-sm leading-6 text-violet-50">{text}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
-            <p className="text-gray-500 mt-1.5">
-              Sign in to access your{" "}
-              {activeTab === "club" ? "club admin" : "student"} dashboard.
+          <p className="relative text-xs tracking-wide text-violet-200">
+            Your campus community, all in one place.
+          </p>
+        </aside>
+
+        <section className="flex flex-1 items-center justify-center px-6 py-9 sm:px-10 sm:py-12 lg:px-12 xl:px-16">
+          <div className="w-full max-w-md">
+            <Link
+              to="/"
+              className="mb-9 inline-flex items-center gap-2.5 rounded-md text-[#393078] dark:text-violet-300 lg:hidden"
+              aria-label="CampusConnect home"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#eeeafd] dark:bg-violet-400/15">
+                <MdAdd className="text-2xl" aria-hidden="true" />
+              </span>
+              <span className="text-lg font-semibold tracking-[-0.02em]">
+                CampusConnect
+              </span>
+            </Link>
+
+            <header className="mb-8">
+              <h2 className="text-[1.8rem] font-semibold leading-tight tracking-[-0.03em] text-[#1f2030] dark:text-white sm:text-3xl">
+                Welcome back
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-[#707184] dark:text-slate-300">
+                Sign in to continue to CampusConnect.
+              </p>
+            </header>
+
+            <div
+              className="mb-7 grid grid-cols-2 rounded-xl bg-[#f1f1f6] p-1 dark:bg-[#252938]"
+              role="group"
+              aria-label="Choose account type"
+            >
+              {["student", "club"].map((tab) => {
+                const Icon = tab === "student" ? MdPersonOutline : MdGroups;
+                const isActive = activeTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveTab(tab)}
+                    aria-pressed={isActive}
+                    className={`flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-white text-[#30276d] shadow-sm dark:bg-[#373b4d] dark:text-violet-200"
+                        : "text-[#737386] hover:text-[#30276d] dark:text-slate-300 dark:hover:text-white"
+                    }`}
+                  >
+                    <Icon className="text-lg" aria-hidden="true" />
+                    {tab === "club" ? "Club Admin" : "Student"}
+                  </button>
+                );
+              })}
+            </div>
+
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              noValidate
+              className="space-y-5"
+            >
+              <div>
+                <label
+                  htmlFor="login-email"
+                  className="mb-2 block text-sm font-medium text-[#343446] dark:text-slate-100"
+                >
+                  College email
+                </label>
+                <div
+                  className={`flex min-h-12 items-center gap-3 rounded-xl bg-white px-3.5 transition-colors dark:bg-[#202432] ${
+                    errors.email
+                      ? "ring-1 ring-red-400"
+                      : "ring-1 ring-[#dedee8] focus-within:ring-1 focus-within:ring-[#7668cb] dark:ring-[#3c4152] dark:focus-within:ring-violet-400"
+                  }`}
+                >
+                  <MdOutlineEmail
+                    className="shrink-0 text-lg text-[#8a8b9b] dark:text-slate-400"
+                    aria-hidden="true"
+                  />
+                  <input
+                    type="email"
+                    id="login-email"
+                    autoComplete="email"
+                    placeholder="name@university.edu"
+                    aria-invalid={Boolean(errors.email)}
+                    aria-describedby={errors.email ? "login-email-error" : undefined}
+                    {...register("email")}
+                    className="min-w-0 flex-1 bg-transparent py-3 text-sm text-[#242536] outline-none placeholder:text-[#747482] dark:text-white dark:placeholder:text-slate-300"
+                  />
+                </div>
+                {errors.email && (
+                  <p
+                    id="login-email-error"
+                    className="mt-1.5 text-xs text-red-600 dark:text-red-400"
+                  >
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <label
+                    htmlFor="login-password"
+                    className="text-sm font-medium text-[#343446] dark:text-slate-100"
+                  >
+                    Password
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    className="rounded-sm text-xs font-medium text-[#51449b] underline-offset-4 hover:underline dark:text-violet-300"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div
+                  className={`flex min-h-12 items-center gap-3 rounded-xl bg-white px-3.5 transition-colors dark:bg-[#202432] ${
+                    errors.password
+                      ? "ring-1 ring-red-400"
+                      : "ring-1 ring-[#dedee8] focus-within:ring-1 focus-within:ring-[#7668cb] dark:ring-[#3c4152] dark:focus-within:ring-violet-400"
+                  }`}
+                >
+                  <RiLockPasswordLine
+                    className="shrink-0 text-lg text-[#8a8b9b] dark:text-slate-400"
+                    aria-hidden="true"
+                  />
+                  <input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    aria-invalid={Boolean(errors.password)}
+                    aria-describedby={
+                      errors.password ? "login-password-error" : undefined
+                    }
+                    {...register("password")}
+                    className="min-w-0 flex-1 bg-transparent py-3 text-sm text-[#242536] outline-none placeholder:text-[#747482] dark:text-white dark:placeholder:text-slate-300"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((previous) => !previous)}
+                    className="rounded-sm text-[#858596] transition-colors hover:text-[#393078] dark:text-slate-400 dark:hover:text-white"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? (
+                      <HiEyeOff className="text-lg" aria-hidden="true" />
+                    ) : (
+                      <HiEye className="text-lg" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p
+                    id="login-password-error"
+                    className="mt-1.5 text-xs text-red-600 dark:text-red-400"
+                  >
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <label className="flex w-fit cursor-pointer items-center gap-2.5 py-1 text-sm text-[#656579] dark:text-slate-300">
+                <input
+                  type="checkbox"
+                  {...register("rememberMe")}
+                  className="h-4 w-4 cursor-pointer rounded border-[#c9c9d5] accent-[#51449b] focus-visible:outline-offset-2 dark:border-slate-500"
+                />
+                Remember this device for 30 days
+              </label>
+
+              {loginError && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-2.5 rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300"
+                >
+                  <MdErrorOutline
+                    className="mt-0.5 shrink-0 text-lg"
+                    aria-hidden="true"
+                  />
+                  <p className="leading-5">{loginError}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                id="login-submit"
+                disabled={isSubmitting}
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#443782] px-4 text-sm font-semibold text-white shadow-[0_8px_18px_-10px_rgba(49,39,109,0.8)] transition-colors hover:bg-[#382d71] disabled:cursor-wait disabled:opacity-65"
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/90 border-t-transparent" />
+                    Signing in…
+                  </>
+                ) : (
+                  <>
+                    Sign in
+                    <MdArrowForward className="text-lg" aria-hidden="true" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <p className="mt-7 text-center text-sm text-[#777789] dark:text-slate-300">
+              New to CampusConnect?{" "}
+              <Link
+                to="/register"
+                className="rounded-sm font-semibold text-[#51449b] underline-offset-4 hover:underline dark:text-violet-300"
+              >
+                Create an account
+              </Link>
             </p>
           </div>
-
-          {/* Tab Toggle */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-            {["student", "club"].map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 capitalize ${
-                  activeTab === tab
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                {tab === "club" ? "Club Admin" : "Student"}
-              </button>
-            ))}
-          </div>
-
-          <div className="mb-6 rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-600">
-            Use your university email and password to continue.
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-            {/* Email */}
-            <div>
-              <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1.5">
-                College Email
-              </label>
-              <div
-                className={`flex items-center border rounded-xl px-3 py-3 bg-white transition-all ${
-                  errors.email
-                    ? "border-red-400 ring-1 ring-red-300"
-                    : "border-gray-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100"
-                }`}
-              >
-                <MdOutlineEmail className="text-gray-400 text-lg flex-shrink-0 mr-2" />
-                <input
-                  type="email"
-                  id="login-email"
-                  placeholder="name@university.edu"
-                  {...register("email")}
-                  className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 outline-none bg-transparent"
-                />
-              </div>
-              {errors.email && (
-                <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="login-password" className="text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <Link to="/forgot-password" className="text-xs text-blue-600 font-medium hover:underline">
-                  Forgot?
-                </Link>
-              </div>
-              <div
-                className={`flex items-center border rounded-xl px-3 py-3 bg-white transition-all ${
-                  errors.password
-                    ? "border-red-400 ring-1 ring-red-300"
-                    : "border-gray-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100"
-                }`}
-              >
-                <RiLockPasswordLine className="text-gray-400 text-lg flex-shrink-0 mr-2" />
-                <input
-                  id="login-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  {...register("password")}
-                  className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 outline-none bg-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="text-gray-400 hover:text-gray-600 transition ml-2"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <HiEyeOff className="text-lg" /> : <HiEye className="text-lg" />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-
-            {/* API Error Banner */}
-            {loginError && (
-              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-red-50 border border-red-200">
-                <MdErrorOutline className="text-red-500 text-lg flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-red-600 font-medium leading-relaxed">{loginError}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              id="login-submit"
-              disabled={isSubmitting}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white font-semibold text-sm hover:opacity-90 transition shadow-md disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Signing in…
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </button>
-          </form>
-
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Don&apos;t have an account?{" "}
-            <Link to="/register" className="text-blue-600 font-semibold hover:underline">
-              Sign up
-            </Link>
-          </p>
-        </div>
+        </section>
       </div>
     </div>
   );

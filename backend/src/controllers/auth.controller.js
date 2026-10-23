@@ -4,9 +4,12 @@ const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 const ApiError = require("../utils/ApiError.js");
 const isProd = process.env.NODE_ENV === "production";
+const DEFAULT_SESSION_DURATION = "7d";
+const REMEMBERED_SESSION_DURATION = "30d";
+const REMEMBERED_COOKIE_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
-const generateToken = (userId, role) => {
-  return jwt.sign({ id: userId, role }, config.JWT_SECRET, { expiresIn: "7d" });
+const generateToken = (userId, role, expiresIn = DEFAULT_SESSION_DURATION) => {
+  return jwt.sign({ id: userId, role }, config.JWT_SECRET, { expiresIn });
 };
 
 const cookieOptions = {
@@ -51,7 +54,7 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe = false } = req.body;
 
   const user = await UserModel.findOne({ email });
 
@@ -65,8 +68,14 @@ const login = async (req, res) => {
     throw new ApiError(401, "Incorrect password.");
   }
 
-  const token = generateToken(user._id, user.role);
-  res.cookie("token", token, cookieOptions);
+  const expiresIn = rememberMe
+    ? REMEMBERED_SESSION_DURATION
+    : DEFAULT_SESSION_DURATION;
+  const sessionCookieOptions = rememberMe
+    ? { ...cookieOptions, maxAge: REMEMBERED_COOKIE_MAX_AGE }
+    : cookieOptions;
+  const token = generateToken(user._id, user.role, expiresIn);
+  res.cookie("token", token, sessionCookieOptions);
   res.status(200).json({
     message: "Login successful",
     user: {

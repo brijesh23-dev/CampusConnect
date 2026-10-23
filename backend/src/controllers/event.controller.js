@@ -43,34 +43,35 @@ const createEvent = async (req, res) => {
   });
 
   await newEvent.save();
-  const students = await UserModel.find({ role: "student" }, "_id interests");
+  if (newEvent.status !== "draft") {
+    const students = await UserModel.find({ role: "student" }, "_id interests");
 
-  const notifications = students.map((student) => {
-    const isInterested = student.interests?.includes(category);
+    const notifications = students.map((student) => {
+      const isInterested = student.interests?.includes(category);
 
-    return {
-      user: student._id,
-      event: newEvent._id,
-      message: isInterested
-        ? `New ${category} event: ${title} matches your interests.`
-        : `New ${category} event: ${title}`,
-      type: isInterested ? "interest" : "general",
-    };
-  });
-
-  if (notifications.length > 0) {
-    const saved = await Notification.insertMany(notifications);
-
-    // Push each notification in real-time via Socket.IO
-    saved.forEach((notif) => {
-      socketService.sendToUser(notif.user, "new-notification", {
-        _id: notif._id,
-        message: notif.message,
-        event: { _id: newEvent._id, title: newEvent.title },
-        isRead: false,
-        createdAt: notif.createdAt,
-      });
+      return {
+        user: student._id,
+        event: newEvent._id,
+        message: isInterested
+          ? `New ${category} event: ${title} matches your interests.`
+          : `New ${category} event: ${title}`,
+        type: isInterested ? "interest" : "general",
+      };
     });
+
+    if (notifications.length > 0) {
+      const saved = await Notification.insertMany(notifications);
+
+      saved.forEach((notif) => {
+        socketService.sendToUser(notif.user, "new-notification", {
+          _id: notif._id,
+          message: notif.message,
+          event: { _id: newEvent._id, title: newEvent.title },
+          isRead: false,
+          createdAt: notif.createdAt,
+        });
+      });
+    }
   }
   res.status(201).json({
     message: "Event created successfully",

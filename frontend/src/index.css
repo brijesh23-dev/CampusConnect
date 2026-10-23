@@ -38,17 +38,29 @@ html,body{
 }
 
 :focus-visible {
-    outline: 3px solid rgba(99, 102, 241, 0.8);
-    outline-offset: 3px;
+    outline: 2px solid color-mix(in srgb, var(--ring) 80%, transparent);
+    outline-offset: 2px;
 }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-    outline: 3px solid rgba(99, 102, 241, 0.8);
-    outline-offset: 3px;
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: none;
+}
+
+select:focus-visible:not([class*="focus:"]) {
+    outline: 1px solid color-mix(in srgb, var(--ring) 80%, transparent);
+    outline-offset: 1px;
+}
+
+:where(div, label):has(
+    > input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):focus-visible:not([class*="focus:"])
+):not([class*="focus-within"]),
+:where(div, label):has(
+    > textarea:focus-visible:not([class*="focus:"])
+):not([class*="focus-within"]) {
+    outline: 1px solid color-mix(in srgb, var(--ring) 80%, transparent);
+    outline-offset: 1px;
 }
 
 @media (prefers-reduced-motion: reduce) {
