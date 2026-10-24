@@ -42,6 +42,7 @@ function Events() {
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const { events = [], loading } = useSelector((state) => state.events);
+  const { user } = useSelector((state) => state.auth);
   const initialQuery = searchParams.get("q") || "";
 
   const [search, setSearch] = useState(initialQuery);
@@ -195,8 +196,15 @@ function Events() {
                     <p className="flex items-center gap-2"><MdLocationOn aria-hidden="true" /> <span className="truncate">{event.venue || "Venue to be announced"}</span></p>
                   </div>
                   <div className="mt-auto flex gap-3">
-                    <Link to={`/events/${event._id}`} className="flex-1 rounded-xl bg-gray-100 py-2.5 text-center text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">Details</Link>
-                    <Link to={`/events/${event._id}#registration`} className="flex-1 rounded-xl bg-blue-700 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-800">Register</Link>
+                    <Link
+                      to={`/events/${event._id}`}
+                      className={`${user?.role === "club" ? "w-full" : "flex-1"} rounded-xl bg-gray-100 py-2.5 text-center text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700`}
+                    >
+                      Details
+                    </Link>
+                    {user?.role !== "club" && (
+                      <Link to={`/events/${event._id}#registration`} className="flex-1 rounded-xl bg-blue-700 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-800">Register</Link>
+                    )}
                   </div>
                 </div>
               </article>

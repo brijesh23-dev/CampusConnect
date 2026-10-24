@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { updateInterests } from "../../redux/authSlice";
 import InterestCard from "../../components/common/student/InterestCard";
 import { MdStar, MdCheck, MdInfo } from "react-icons/md";
@@ -135,6 +136,15 @@ function ManageInterests() {
             "Save Interests"
           )}
         </button>
+
+        {saved && (
+          <Link
+            to="/student/dashboard"
+            className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
+          >
+            Back to Dashboard
+          </Link>
+        )}
 
         {selected.length > 0 && (
           <button

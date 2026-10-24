@@ -96,19 +96,21 @@ const getAllEvents = async (req, res) => {
   }
   const events = await EventModel.find(filter)
     .populate("club", "name email")
-    .sort({ date: -1 });
+    .sort({ date: -1 })
+    .lean();
 
   const eventsWithCardImages = events.map((event) => {
-    const publicIdToUse = event.imagePublicId || "default_event_image";
-    event.cardImageUrl = Cloudinary.url(publicIdToUse, {
-      width: 400,
-      height: 225,
-      crop: "fill",
-      gravity: "auto",
-      fetch_format: "auto",
-      quality: "auto",
-    });
-    
+    //onst publicIdToUse = event.imagePublicId || "default_event_image";
+    if (events.imagePublicId) {
+      event.cardImageUrl = Cloudinary.url(event.imagePublicId, {
+        width: 400,
+        height: 225,
+        crop: "fill",
+        gravity: "auto",
+        fetch_format: "auto",
+        quality: "auto",
+      });
+    }
     return event;
   });
   res.status(200).json({
