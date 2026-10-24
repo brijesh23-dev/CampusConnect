@@ -107,6 +107,7 @@ const getAllEvents = async (req, res) => {
 const getsingleEvent = async (req, res) => {
   let { id } = req.params;
   let event = await EventModel.findById(id).populate("club", "name email");
+
   if (!event) {
     throw new ApiError(404, "Event not found");
   }

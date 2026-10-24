@@ -33,15 +33,15 @@ const uploadImageToCloudinary = (req, res, next) => {
   if (!req.file) return next();
 
   const uploadStream = Cloudinary.uploader.upload_stream(
-    { folder: "events", resource_type: "image" ,
-      transformation:[
-        {
-          width:1200,
-          hieght:1200
-        }
-      ]
+    {
+      folder: "events",
+      resource_type: "image",
+      // Combine your transformations here
+      transformation: [
+        { width: 1200, crop: "scale", fetch_format: "auto", quality: "auto" },
+      ],
     },
-    
+
     (error, result) => {
       if (error) return next(error);
       req.file.path = result.secure_url;
