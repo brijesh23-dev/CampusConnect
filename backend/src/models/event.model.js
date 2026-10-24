@@ -50,6 +50,11 @@ const eventSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    // this is image id on cloud to delete from cloud.
+    imagePublicId: {
+      type: String,
+      default: null,
+    },
 
     status: {
       type: String,

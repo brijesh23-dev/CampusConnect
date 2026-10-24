@@ -4,6 +4,7 @@ const UserModel = require("../models/user.model");
 const RegistrationModel = require("../models/Registration.model");
 const socketService = require("../socket/socketService");
 const ApiError = require("../utils/ApiError");
+const Cloudinary = require("cloudinary").v2;
 
 const createEvent = async (req, res) => {
   let {
@@ -37,6 +38,7 @@ const createEvent = async (req, res) => {
     venue,
     club: req.user._id,
     image: req.file ? req.file.path : null || req.body.image,
+    imagePublicId: req.file?.filename,
     // If caller explicitly sets status (e.g. "draft"), honour it; otherwise default ("published")
     ...(status && { status }),
     ...(maxParticipants && { maxParticipants: Number(maxParticipants) }),
@@ -156,16 +158,22 @@ const updateEvent = async (req, res) => {
 
   // Allow status changes via full edit form
   // if (status) updateData.status = status;
-  
+
   if (maxParticipants !== undefined)
     updateData.maxParticipants = maxParticipants
       ? Number(maxParticipants)
       : null;
 
   // If a new image was uploaded via multer → Cloudinary, use its URL
+
   if (req.file?.path) {
+    if (event.imagePublicId) {
+      await Cloudinary.uploader.destroy(event.imagePublicId);
+    }
     updateData.image = req.file.path;
+    updateData.imagePublicId = req.file.filename;
   }
+
   // Remove undefined fields to avoid overwriting with undefined
   Object.keys(updateData).forEach(
     (k) => updateData[k] === undefined && delete updateData[k],
@@ -204,19 +212,33 @@ const updateEventStatus = async (req, res) => {
   res.json({ message: "Status updated", event });
 };
 
-const deleteEvent = async (req, res) => {
+const deleteEvent = async (req, res, next) => {
   const event = await EventModel.findById(req.params.id);
 
   if (!event) {
     throw new ApiError(404, "Event not found");
   }
 
+  // Ensure only the owning club can delete the event
   if (event.club.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "Not allowed");
   }
 
-  await EventModel.findByIdAndDelete(req.params.id);
-  res.json({ message: "Event deleted successfully" });
+  // Delete the image from Cloudinary if a public ID exists
+  if (event.imagePublicId) {
+    const result = await Cloudinary.uploader.destroy(event.imagePublicId);
+
+    if (result.result !== "ok" && result.result !== "not found") {
+      throw new ApiError(500, "Failed to delete event image from Cloudinary");
+    }
+  }
+
+  // Delete the event from MongoDB
+  await EventModel.findByIdAndDelete(event._id);
+
+  return res.status(200).json({
+    message: "Event deleted successfully",
+  });
 };
 
 const registerForEvent = async (req, res) => {

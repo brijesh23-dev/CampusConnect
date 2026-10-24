@@ -57,7 +57,7 @@ function EditEvent() {
         date: singleEvent.date?.slice(0, 10),
         time: singleEvent.time,
         venue: singleEvent.venue,
-        maxParticipants: singleEvent.maxParticipants || "",
+        maxParticipants: singleEvent.maxParticipants || null,
         tags: singleEvent.tags?.join(", ") || "",
       });
       // Show existing Cloudinary image as default preview
@@ -66,6 +66,7 @@ function EditEvent() {
   }, [singleEvent, reset]);
 
   const onSubmit = async (data) => {
+    console.log(data);
     try {
       await dispatch(updateEvent({ id, data, imageFile })).unwrap();
       setSaveSuccess(true);

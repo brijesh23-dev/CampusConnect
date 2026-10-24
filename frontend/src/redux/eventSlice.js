@@ -66,6 +66,7 @@ export const updateEvent = createAsyncThunk(
       Object.entries(data).forEach(([key, val]) => {
         if (val !== undefined && val !== null) formData.append(key, val);
       });
+      
       if (imageFile) formData.append("image", imageFile);
 
       const res = await API.put(`/events/update/${id}`, formData);
