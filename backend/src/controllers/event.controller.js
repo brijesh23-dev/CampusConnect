@@ -97,10 +97,24 @@ const getAllEvents = async (req, res) => {
   const events = await EventModel.find(filter)
     .populate("club", "name email")
     .sort({ date: -1 });
+
+  const eventsWithCardImages = events.map((event) => {
+    const publicIdToUse = event.imagePublicId || "default_event_image";
+    event.cardImageUrl = Cloudinary.url(publicIdToUse, {
+      width: 400,
+      height: 225,
+      crop: "fill",
+      gravity: "auto",
+      fetch_format: "auto",
+      quality: "auto",
+    });
+    
+    return event;
+  });
   res.status(200).json({
     message: "All events fetched successfully",
     success: true,
-    events,
+    events: eventsWithCardImages,
   });
 };
 
@@ -118,10 +132,32 @@ const getsingleEvent = async (req, res) => {
 };
 
 const getMyevents = async (req, res) => {
-  const events = await EventModel.find({ club: req.user._id }).sort({
-    date: 1,
-  });
-  res.json({ events });
+  try {
+    // 1. Add .lean() to easily modify the returned objects
+    const events = await EventModel.find({ club: req.user._id })
+      .sort({ date: 1 })
+      .lean();
+
+    // 2. Loop through events and generate the small image URL
+    const eventsWithThumbnails = events.map((event) => {
+      if (event.imagePublicId) {
+        event.thumbnailUrl = Cloudinary.url(event.imagePublicId, {
+          width: 48,
+          height: 48,
+          crop: "fill",
+          gravity: "auto",
+          fetch_format: "auto",
+          quality: "auto",
+        });
+      }
+      return event;
+    });
+
+    // 3. Send the modified array to the frontend
+    res.json({ events: eventsWithThumbnails });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch events" });
+  }
 };
 
 const updateEvent = async (req, res) => {
