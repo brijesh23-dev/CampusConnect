@@ -76,8 +76,8 @@ function RecommendedEvents() {
         }`}
       >
         {/* Event image or gradient fallback */}
-        {event.image ? (
-          <img src={event.image} alt={event.title} className="h-36 w-full object-cover" />
+        {event.cardImageUrl ? (
+          <img src={event.cardImageUrl} alt={event.title} className="h-36 w-full object-cover" />
         ) : (
           <div className="flex h-36 w-full items-center justify-center bg-gradient-to-br from-blue-100 to-violet-100 dark:from-slate-800 dark:to-slate-700">
             <MdEventAvailable aria-hidden="true" className="text-4xl text-blue-500 dark:text-blue-300" />

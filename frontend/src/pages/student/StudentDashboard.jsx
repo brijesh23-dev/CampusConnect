@@ -45,9 +45,9 @@ function EventMiniCard({ event, featured }) {
         : "border-gray-200 dark:border-slate-700"
     }`}>
       {/* Image / gradient */}
-      {event.image ? (
+      {event.cardImageUrl ? (
         <img
-          src={event.image}
+          src={event.cardImageUrl}
           alt={event.title}
           className="h-32 w-full object-cover"
           onError={(e) => { e.target.style.display = "none"; }}
