@@ -25,6 +25,11 @@ const protect = catchAsync(async (req, res, next) => {
   if (!req.user) {
     throw new ApiError(401, "User not found");
   }
+
+  if ((decoded.sessionVersion ?? 0) !== (req.user.sessionVersion ?? 0)) {
+    throw new ApiError(401, "Your session has expired. Please log in again.");
+  }
+
   next();
 });
 

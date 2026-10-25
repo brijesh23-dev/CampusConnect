@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
+const User = require("../models/user.model");
 
-const socketAuth = (socket, next) => {
+const socketAuth = async (socket, next) => {
   try {
     const token =
       socket.handshake.auth?.token ||
@@ -20,6 +21,16 @@ const socketAuth = (socket, next) => {
       token,
       config.JWT_SECRET || process.env.JWT_SECRET,
     );
+
+    const user = await User.findById(decoded.id || decoded._id || decoded.userId)
+      .select("sessionVersion");
+
+    if (
+      !user ||
+      (decoded.sessionVersion ?? 0) !== (user.sessionVersion ?? 0)
+    ) {
+      return next(new Error("Invalid or expired token"));
+    }
 
     socket.data.userId = decoded.id || decoded._id || decoded.userId;
     next();

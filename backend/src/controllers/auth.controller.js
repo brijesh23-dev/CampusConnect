@@ -8,8 +8,17 @@ const DEFAULT_SESSION_DURATION = "7d";
 const REMEMBERED_SESSION_DURATION = "30d";
 const REMEMBERED_COOKIE_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
-const generateToken = (userId, role, expiresIn = DEFAULT_SESSION_DURATION) => {
-  return jwt.sign({ id: userId, role }, config.JWT_SECRET, { expiresIn });
+const generateToken = (
+  userId,
+  role,
+  sessionVersion,
+  expiresIn = DEFAULT_SESSION_DURATION,
+) => {
+  return jwt.sign(
+    { id: userId, role, sessionVersion },
+    config.JWT_SECRET,
+    { expiresIn },
+  );
 };
 
 const cookieOptions = {
@@ -36,7 +45,7 @@ const register = async (req, res) => {
     role,
   });
 
-  const token = generateToken(user._id, user.role);
+  const token = generateToken(user._id, user.role, user.sessionVersion);
   res.cookie("token", token, cookieOptions);
 
   res.status(201).json({
@@ -74,16 +83,31 @@ const login = async (req, res) => {
   const sessionCookieOptions = rememberMe
     ? { ...cookieOptions, maxAge: REMEMBERED_COOKIE_MAX_AGE }
     : cookieOptions;
-  const token = generateToken(user._id, user.role, expiresIn);
+  const activeSession = await UserModel.findByIdAndUpdate(
+    user._id,
+    { $inc: { sessionVersion: 1 } },
+    { returnDocument: "after" },
+  );
+
+  if (!activeSession) {
+    throw new ApiError(401, "Invalid credentials.");
+  }
+
+  const token = generateToken(
+    activeSession._id,
+    activeSession.role,
+    activeSession.sessionVersion,
+    expiresIn,
+  );
   res.cookie("token", token, sessionCookieOptions);
   res.status(200).json({
     message: "Login successful",
     user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      interests: user.interests,
+      id: activeSession._id,
+      name: activeSession.name,
+      email: activeSession.email,
+      role: activeSession.role,
+      interests: activeSession.interests,
     },
     token,
   });

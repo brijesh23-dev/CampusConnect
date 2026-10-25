@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema(
       default: "student",
     },
 
+    sessionVersion: {
+      type: Number,
+      default: 0,
+    },
+
     interests: [
       {
         type: String,

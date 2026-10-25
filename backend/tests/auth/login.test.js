@@ -2,6 +2,7 @@ const request = require("supertest");
 const jwt = require("jsonwebtoken");
 const app = require("../../src/app");
 const clearDatabase = require("../helpers/db");
+const UserModel = require("../../src/models/user.model");
 
 describe("POST api/auth/login", () => {
   beforeEach(async () => {
@@ -50,6 +51,45 @@ describe("POST api/auth/login", () => {
     expect(token.exp - token.iat).toBe(30 * 24 * 60 * 60);
     expect(response.headers["set-cookie"][0]).toContain("Max-Age=2592000");
   });
+
+  test.each(["student", "club", "admin"])(
+    "a new %s login invalidates the previous device session",
+    async (role) => {
+      const email = `test-${role}@gmail.com`;
+      await request(app).post("/api/auth/register").send({
+        name: `Test ${role}`,
+        email,
+        password: "password123",
+        role: role === "admin" ? "student" : role,
+      });
+      if (role === "admin") {
+        await UserModel.updateOne({ email }, { role: "admin" });
+      }
+
+      const firstLogin = await request(app)
+        .post("/api/auth/login")
+        .send({ email, password: "password123" });
+      const secondLogin = await request(app)
+        .post("/api/auth/login")
+        .send({ email, password: "password123" });
+
+      const firstSession = await request(app)
+        .get("/api/auth/getme")
+        .set("Authorization", `Bearer ${firstLogin.body.token}`);
+      const secondSession = await request(app)
+        .get("/api/auth/getme")
+        .set("Authorization", `Bearer ${secondLogin.body.token}`);
+
+      expect(firstLogin.statusCode).toBe(200);
+      expect(secondLogin.statusCode).toBe(200);
+      expect(firstSession.statusCode).toBe(401);
+      expect(firstSession.body.message).toBe(
+        "Your session has expired. Please log in again.",
+      );
+      expect(secondSession.statusCode).toBe(200);
+    },
+  );
+
   test("should return 401 when password is incorrect", async () => {
     //register user
     await request(app).post("/api/auth/register").send({
