@@ -11,6 +11,7 @@ const dashboardRoutes = require("./routes/Dashboard.routes");
 const adminRoutes = require("./routes/admin.routes");
 const clubRoutes = require("./routes/club.routes");
 const errorHandler = require("./middleware/error.middleware");
+const helmet = require("helmet");
 const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
@@ -25,6 +26,7 @@ app.use(
   }),
 );
 
+app.use(helmet());
 app.use(cookie_Parser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,6 +44,6 @@ app.get("/", (req, res) => {
 });
 
 //errorhandler
-app.use(errorHandler)
+app.use(errorHandler);
 
 module.exports = app;

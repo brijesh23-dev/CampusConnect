@@ -185,7 +185,7 @@ function Events() {
             {pagedEvents.map((event) => (
               <article key={event._id} className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-200 hover:shadow-lg dark:bg-slate-900">
                 <div className="relative flex h-48 items-center justify-center overflow-hidden bg-blue-50">
-                  {event.image ? <img src={event.image} alt="" className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" /> : <MdEvent className="text-5xl text-blue-500" aria-hidden="true" />}
+                  {event.cardImageUrl ? <img src={event.cardImageUrl} alt="" className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" /> : <MdEvent className="text-5xl text-blue-500" aria-hidden="true" />}
                   <span className="absolute left-3 top-3 rounded-full bg-blue-700 px-3 py-1 text-xs font-bold capitalize text-white">{event.category || "Campus event"}</span>
                 </div>
                 <div className="flex flex-1 flex-col p-5">

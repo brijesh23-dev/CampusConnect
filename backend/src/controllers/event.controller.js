@@ -85,7 +85,7 @@ const getAllEvents = async (req, res) => {
   // Return published events (+ legacy "approved" value) to the public
   let filter = { status: { $in: ["published", "approved"] } };
   let { search, category } = req.query;
-  if (category) {
+  if (category && category !== "all") {
     filter.category = category;
   }
   if (search) {
@@ -101,7 +101,7 @@ const getAllEvents = async (req, res) => {
 
   const eventsWithCardImages = events.map((event) => {
     //onst publicIdToUse = event.imagePublicId || "default_event_image";
-    if (events.imagePublicId) {
+    if (event.imagePublicId) {
       event.cardImageUrl = Cloudinary.url(event.imagePublicId, {
         width: 400,
         height: 225,
@@ -116,16 +116,29 @@ const getAllEvents = async (req, res) => {
   res.status(200).json({
     message: "All events fetched successfully",
     success: true,
-    events: eventsWithCardImages,
+    events:eventsWithCardImages,
   });
 };
 
 const getsingleEvent = async (req, res) => {
   let { id } = req.params;
-  let event = await EventModel.findById(id).populate("club", "name email");
+  let event = await EventModel.findById(id)
+    .populate("club", "name email")
+    .lean();
 
   if (!event) {
     throw new ApiError(404, "Event not found");
+  }
+
+  if (event.imagePublicId) {
+    event.formImageUrl = Cloudinary.url(event.imagePublicId, {
+      width: 1200,
+      height: 675,
+      crop: "fill",
+      gravity: "auto",
+      fetch_format: "auto",
+      quality: "auto",
+    });
   }
   res.status(200).json({
     message: "Event fetched successfully",

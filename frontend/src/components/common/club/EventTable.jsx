@@ -62,8 +62,8 @@ function EventTable({ events = [], onDelete, onStatusChange }) {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                          {event?.image ? (
-                            <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+                          {event?.thumbnailUrl ? (
+                            <img src={event.thumbnailUrl} alt={event.title} className="w-full h-full object-cover" />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-100 to-violet-100 text-blue-500 dark:from-slate-800 dark:to-slate-700 dark:text-blue-300">
                               <MdEventAvailable aria-hidden="true" className="text-lg" />

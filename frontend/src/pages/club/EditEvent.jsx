@@ -61,7 +61,7 @@ function EditEvent() {
         tags: singleEvent.tags?.join(", ") || "",
       });
       // Show existing Cloudinary image as default preview
-      if (singleEvent.image) setImagePreview(singleEvent.image);
+      if (singleEvent.formImageUrl) setImagePreview(singleEvent.formImageUrl);
     }
   }, [singleEvent, reset]);
 
@@ -85,7 +85,7 @@ function EditEvent() {
 
   const handleRemoveImage = () => {
     setImageFile(null);
-    setImagePreview(singleEvent?.image || null);
+    setImagePreview(singleEvent?.formImageUrl || null);
   };
 
   if (!singleEvent) {
@@ -343,7 +343,7 @@ function EditEvent() {
                 <MdClose className="text-sm" /> Remove new image
               </button>
             )}
-            {!imageFile && singleEvent?.image && (
+            {!imageFile && singleEvent?.formImageUrl && (
               <p className="mt-2 text-xs text-gray-400">
                 Current poster shown above. Upload a new one to replace it.
               </p>
