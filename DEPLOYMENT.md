@@ -52,13 +52,15 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ### Frontend
 Create `frontend/.env`:
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5000
 ```
 
 For production hosting, set the frontend build to the deployed backend URL, for example:
 ```env
-VITE_API_URL=https://api.your-domain.com/api
+VITE_API_URL=https://api.your-domain.com
 ```
+
+The frontend appends `/api` to this origin when creating its Axios client.
 
 ---
 
@@ -101,7 +103,7 @@ node -e "
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 require('dotenv').config();
-mongoose.connect(process.env.MONGO_URI).then(async () => {
+mongoose.connect(process.env.DB_URI).then(async () => {
   const User = require('./src/models/user.model');
   await User.create({ name:'Admin', email:'admin@campus.edu', password: bcrypt.hashSync('admin123', 10), role:'admin' });
   console.log('Admin created'); process.exit();
